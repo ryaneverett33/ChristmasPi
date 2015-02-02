@@ -28,3 +28,10 @@ Changes the integer 'fn' to whatever animation needs to play next. If the functi
 void *Animation()
 ```
 Executes the appropriate animation function according to the integer 'fn'. It loops upon start and doesn't end until the program closes. 
+### To-do
+| Name                         | Description                                                                 |
+| ---------------------------- | ---------------------------------------------------------------------------:|
+| Connect via Smartphone| Controls individual branches, triggers animations.|
+| Server-Fix        | Fix binding error, create handler() |
+| JSON Serializing & De-serializing | On both server and client (Windows Runtime) |
+| Login Checking | Load password from text file (Plain text), check submitted password |
