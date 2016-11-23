@@ -1,0 +1,6 @@
+G:\ChristmasPi\test\GpioTest\GpioTest\bin\Debug\GpioTest.exe.config
+G:\ChristmasPi\test\GpioTest\GpioTest\bin\Debug\GpioTest.exe
+G:\ChristmasPi\test\GpioTest\GpioTest\bin\Debug\GpioTest.pdb
+G:\ChristmasPi\test\GpioTest\GpioTest\obj\Debug\GpioTest.exe
+G:\ChristmasPi\test\GpioTest\GpioTest\obj\Debug\GpioTest.pdb
+G:\ChristmasPi\test\GpioTest\GpioTest\obj\Debug\GpioTest.csprojResolveAssemblyReference.cache
