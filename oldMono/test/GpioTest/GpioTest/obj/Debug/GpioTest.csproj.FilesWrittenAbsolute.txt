@@ -1,6 +1,0 @@
-/home/pi/ChristmasPi/test/GpioTest/GpioTest/obj/Debug/.NETFramework,Version=v4.5.2.AssemblyAttribute.cs
-/home/pi/ChristmasPi/test/GpioTest/GpioTest/obj/Debug/GpioTest.exe
-/home/pi/ChristmasPi/test/GpioTest/GpioTest/obj/Debug/.NETFramework,Version=v4.0.AssemblyAttribute.cs
-/home/pi/ChristmasPi/test/GpioTest/GpioTest/bin/Debug/GpioTest.exe.mdb
-/home/pi/ChristmasPi/test/GpioTest/GpioTest/bin/Debug/GpioTest.exe
-/home/pi/ChristmasPi/test/GpioTest/GpioTest/obj/Debug/GpioTest.exe.mdb
