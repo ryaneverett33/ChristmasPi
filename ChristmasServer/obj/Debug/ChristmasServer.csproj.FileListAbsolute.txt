@@ -1,0 +1,2 @@
+C:\Users\ryan\Repositories\ChristmasPi\ChristmasServer\ChristmasServer\bin\Debug\ChristmasServer.exe.config
+C:\Users\ryan\Repositories\ChristmasPi\ChristmasServer\bin\Debug\ChristmasServer.exe.config

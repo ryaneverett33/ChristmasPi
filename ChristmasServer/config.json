@@ -1,0 +1,32 @@
+/*
+Pin configuration file
+*/
+{
+		"pin_count": 5,
+		"server_port" : 1215,
+		"pins": [{
+			"gpio_pin": 7,
+			"branch": 0,
+			"status": 0
+		}, {
+			"gpio_pin": 11,
+			"branch": 1,
+			"status": 0
+		}, {
+			"gpio_pin": 13,
+			"branch": 2,
+			"status": 0
+		}, {
+			"gpio_pin": 15,
+			"branch": 3,
+			"status": 0
+		}, {
+			"gpio_pin": 12,
+			"branch": 4,
+			"status": 0
+		}, {
+			"gpio_pin": 16,
+			"branch": 5,
+			"status": 0
+		}]
+	}
