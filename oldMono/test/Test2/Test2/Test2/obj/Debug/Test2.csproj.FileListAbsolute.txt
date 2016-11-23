@@ -1,0 +1,5 @@
+G:\ChristmasPi\test\Test2\Test2\Test2\bin\Debug\Test2.exe
+G:\ChristmasPi\test\Test2\Test2\Test2\bin\Debug\Test2.pdb
+G:\ChristmasPi\test\Test2\Test2\Test2\obj\Debug\Test2.csprojResolveAssemblyReference.cache
+G:\ChristmasPi\test\Test2\Test2\Test2\obj\Debug\Test2.exe
+G:\ChristmasPi\test\Test2\Test2\Test2\obj\Debug\Test2.pdb
