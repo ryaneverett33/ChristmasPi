@@ -1,0 +1,81 @@
+Methods Summary
+POST Methods
+	"playAnimation" : {
+		"parameters" : {
+			"animationName" : string,
+		}
+		"returns" : {
+			"success" : bool,
+			"failureReason" : string
+		}
+	},
+	"stopAnimation" : {
+		"parameters" : {
+			"animationName" : string,
+		}
+		"returns" : {
+			"success" : bool,
+			"failureReason" : string
+		}
+	},
+	"pauseAnimation" : {
+		"parameters" : {
+			"animationName" : string,
+		}
+		"returns" : {
+			"success" : bool,
+			"failureReason" : string
+		}
+	},
+	"resumeAnimation" : {
+		"parameters" : {
+			"animationName" : string,
+		}
+		"returns" : {
+			"success" : bool,
+			"failureReason" : string
+		}
+	},
+	"updateLights" : {
+		"parameters" : {
+			"newPins" : [
+				"branch" : int,
+				"listAddress" : int,
+				"status" : int
+			]
+		}
+		"returns" : {
+			"success" : bool,
+			"failureReason" : string
+		}
+	}
+GET Methods
+	"listAnimations" : {
+		"returns" : {
+			"animations" : [
+				"name" : string,
+				"length" : int,
+			],
+		}
+	},
+	"currentPlaying" : {
+		"returns" : {
+			"name" : string,
+			"length" : int,
+		}
+	}
+	"isPlaying" : {
+		"returns" : {
+			"isPlaying" : bool,
+		}
+	}
+	"listTreeInfo" : {
+		"returns" : {
+			"branch_count" : int,
+			"current_branches" : [
+				"listAddress" : int,
+				"branch" : int,
+				"status" : int
+			]
+		}
+	}

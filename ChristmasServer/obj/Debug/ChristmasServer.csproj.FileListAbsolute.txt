@@ -1,2 +1,9 @@
 C:\Users\ryan\Repositories\ChristmasPi\ChristmasServer\ChristmasServer\bin\Debug\ChristmasServer.exe.config
 C:\Users\ryan\Repositories\ChristmasPi\ChristmasServer\bin\Debug\ChristmasServer.exe.config
+C:\Users\ryan\Repositories\ChristmasPi\ChristmasServer\obj\Debug\ChristmasServer.csprojResolveAssemblyReference.cache
+C:\Users\ryan\Repositories\ChristmasPi\ChristmasServer\bin\Debug\ChristmasServer.exe
+C:\Users\ryan\Repositories\ChristmasPi\ChristmasServer\bin\Debug\ChristmasServer.pdb
+C:\Users\ryan\Repositories\ChristmasPi\ChristmasServer\bin\Debug\Newtonsoft.Json.dll
+C:\Users\ryan\Repositories\ChristmasPi\ChristmasServer\bin\Debug\Newtonsoft.Json.xml
+C:\Users\ryan\Repositories\ChristmasPi\ChristmasServer\obj\Debug\ChristmasServer.exe
+C:\Users\ryan\Repositories\ChristmasPi\ChristmasServer\obj\Debug\ChristmasServer.pdb

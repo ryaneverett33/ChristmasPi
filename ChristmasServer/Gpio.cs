@@ -78,6 +78,7 @@ namespace ChristmasServer {
             for (int i = 0; i < pins.Length; i++) {
                 turnOff(pins[i].listAddress);
             }
+            log.logOK("Turned on all pins");
         }
         /// <summary>
         /// Turns off all the pins in gpio::pins
@@ -86,6 +87,28 @@ namespace ChristmasServer {
         public void AllOff() {
             for (int i = 0; i < pins.Length; i++) {
                 turnOn(pins[i].listAddress);
+            }
+            log.logOK("Turned off all pins");
+        }
+        /// <summary>
+        /// Flips the status of a pin. If it's currently off, togglePin will turn it on.
+        /// </summary>
+        /// <param name="listAddress" cref="pins">The address of the pin in gpio::pins</param>
+        public void togglePin (int listAddress) {
+            try {
+                //same idea as gpio::turnOn
+                gpio_pin refPin = pins[listAddress];
+                if (refPin.status == ON) {
+                    GPIO.digitalWrite(refPin.gpioPin, OFF);
+                    pins[listAddress].status = OFF;
+                }
+                else {
+                    GPIO.digitalWrite(refPin.gpioPin, ON);
+                    pins[listAddress].status = ON;
+                }
+            }
+            catch (Exception e) {
+                log.logError("Failed to togglePin at {0}", listAddress);
             }
         }
     }
