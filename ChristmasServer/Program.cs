@@ -7,12 +7,14 @@ using System.IO;
 using Newtonsoft.Json;
 using System.Net.Sockets;
 using System.Net;
+using System.Web;       //need for HttpServerUtility
 
 namespace ChristmasServer {
     class Program {
         ConfigFile config;
         TcpListener listener;
         Thread serverThread;
+        Logger log;
         static void Main(string[] args) {
             Program p = new Program();
             string configFileLoc;
@@ -20,7 +22,7 @@ namespace ChristmasServer {
             bool isProgramAlive = true;
             parseArgs(args, out configFileLoc, out canContinue);
             if (canContinue) {
-
+                p.log = new Logger();   //TODO Log all the data
                 try {
                     string FileText = File.ReadAllText(configFileLoc);
                     p.config = JsonConvert.DeserializeObject<ConfigFile>(FileText);
@@ -123,16 +125,13 @@ namespace ChristmasServer {
                     string message = "";
                     NetworkStream recievedStream = recieved.GetStream();
                     byte[] buffer = new byte[10000];
-                    Console.WriteLine("Recieved Buffer size: " + recieved.ReceiveBufferSize);
                     int readResult = recievedStream.Read(buffer, 0, 10000);
                     if (readResult > 0) {
-                        message = Encoding.UTF8.GetString(buffer,0, readResult-4);
-                        string[] lines = message.Split('\n');
-                        foreach (string line in lines) {
-                            Console.WriteLine(line);
-                        }
-                        byte[] toSend = Encoding.UTF8.GetBytes("Recieved");
-                        recievedStream.Write(toSend, 0, toSend.Length);
+                        message = Encoding.UTF8.GetString(buffer,0, readResult);
+                        message = ReceivedMessage.decodeURL(message);        //Get rid of %22 and %20
+                        handle(ReceivedMessage.parseHTTP(message, p.log), recievedStream);
+                        //byte[] toSend = Encoding.UTF8.GetBytes("Recieved");
+                        //recievedStream.Write(toSend, 0, toSend.Length);
                     }
                     else {
                         //failed to read from stream
@@ -147,6 +146,21 @@ namespace ChristmasServer {
             catch (ThreadAbortException) {
 
             }
+        }
+        static void handle(ReceivedMessage message, NetworkStream netStream) {
+            switch (message.type) {
+                case ReceivedMessage.MessageType.GetMessage:
+                    Console.WriteLine("MessageType: {0}, isValidURL: {1}, HttpVer: {2}", message.type, message.isValidURL, message.HTTPVersion);
+                    break;
+                case ReceivedMessage.MessageType.PostMessage:
+                    Console.WriteLine("MessageType: {0}, isValidURL: {1}, isValidArgs: {2}, HttpVer: {3}", message.type, message.isValidURL, message.isValidPostArgs, message.HTTPVersion);
+                    break;
+                case ReceivedMessage.MessageType.Unknown:
+                    Console.WriteLine("MessageType: {0}, isValidURL: {1}, HttpVer: {2}", message.type, message.isValidURL, message.HTTPVersion);
+                    break;
+            }
+            byte[] outText = Encoding.UTF8.GetBytes(message.rawText);
+            netStream.Write(outText,0,outText.Length);
         }
     }
 }
