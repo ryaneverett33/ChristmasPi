@@ -50,10 +50,22 @@
   <ItemGroup>
     <Compile Include="ConfigFile.cs" />
     <Compile Include="Gpio.cs" />
+    <Compile Include="HttpArgs.cs" />
     <Compile Include="Logger.cs" />
+    <Compile Include="Methods\currentlyPlaying.cs" />
+    <Compile Include="Methods\IMethod.cs" />
+    <Compile Include="Methods\isPlaying.cs" />
+    <Compile Include="Methods\listAnimations.cs" />
+    <Compile Include="Methods\listTreeInfo.cs" />
+    <Compile Include="Methods\pauseAnimation.cs" />
+    <Compile Include="Methods\playAnimation.cs" />
+    <Compile Include="Methods\resumeAnimation.cs" />
+    <Compile Include="Methods\stopAnimation.cs" />
+    <Compile Include="Methods\updateLights.cs" />
     <Compile Include="pin.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReceivedMessage.cs" />
     <Compile Include="WrapperClass.cs" />
   </ItemGroup>
   <ItemGroup>
