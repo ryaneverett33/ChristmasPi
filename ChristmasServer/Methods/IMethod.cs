@@ -4,18 +4,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using ChristmasServer;
 
 namespace ChristmasServer.Methods {
     interface IMethod {
-        /// <notes>
+        /// <remarks>
         /// Must be run before runMethod can be ran
-        /// </notes>
+        /// </remarks>
         /// <param name="properties">Unparsed params from the RPC call</param>
-        /// <returns></returns>
+        /// <returns>Whether or not the Method can run</returns>
         bool isValidArguments(JProperty properties);
-        /// <notes>
+        /// <remarks>
         /// Will not run without validating arguments first
-        /// </notes>
+        /// </remarks>
         void runMethod();
+        /// <returns>What type of Method it is (POST || GET)</returns>
+        ReceivedMessage.MessageType getType();
     }
 }

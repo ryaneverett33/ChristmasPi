@@ -5,9 +5,22 @@ using System.Text;
 using System.Threading.Tasks;
 
 using WiringPi;
-using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace ChristmasServer.Methods {
-    class playAnimation {
+    class playAnimation : IMethod {
+        public bool isValidArguments(JProperty prop)
+        {
+            System.Diagnostics.Debug.WriteLine("{0} is not implemented", this.ToString());
+            return false;
+        }
+        public void runMethod()
+        {
+            System.Diagnostics.Debug.WriteLine("{0} cannot run", this.ToString());
+        }
+        public ReceivedMessage.MessageType getType()
+        {
+            return ReceivedMessage.MessageType.PostMessage;
+        }
     }
 }

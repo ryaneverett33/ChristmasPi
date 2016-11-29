@@ -57,6 +57,7 @@
     <Compile Include="Methods\isPlaying.cs" />
     <Compile Include="Methods\listAnimations.cs" />
     <Compile Include="Methods\listTreeInfo.cs" />
+    <Compile Include="Methods\MethodManager.cs" />
     <Compile Include="Methods\pauseAnimation.cs" />
     <Compile Include="Methods\playAnimation.cs" />
     <Compile Include="Methods\resumeAnimation.cs" />

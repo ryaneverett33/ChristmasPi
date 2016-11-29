@@ -7,7 +7,7 @@ using System.IO;
 using Newtonsoft.Json;
 using System.Net.Sockets;
 using System.Net;
-using System.Web;       //need for HttpServerUtility
+using ChristmasServer.Methods;
 
 namespace ChristmasServer {
     class Program {
@@ -15,6 +15,7 @@ namespace ChristmasServer {
         TcpListener listener;
         Thread serverThread;
         Logger log;
+        MethodManager methMan;
         static void Main(string[] args) {
             Program p = new Program();
             string configFileLoc;
@@ -60,6 +61,7 @@ namespace ChristmasServer {
                     isProgramAlive = false;
                     return;
                 }
+                p.methMan = new MethodManager();
                 //Listening to kill
                 Console.WriteLine("Listening for kill");
                 while(isProgramAlive) {
@@ -86,6 +88,7 @@ namespace ChristmasServer {
                     canContinue = false;
                     configFileLoc = null;
                     canGo = false;
+                    printHelp();
                     break;
                 }
                 else if (File.Exists(arg)) {
@@ -108,6 +111,7 @@ namespace ChristmasServer {
             else if (!fileSet) {
                 canContinue = false;
                 configFileLoc = null;
+                printHelp();
             }
             else {
                 configFileLoc = null;
@@ -129,7 +133,7 @@ namespace ChristmasServer {
                     if (readResult > 0) {
                         message = Encoding.UTF8.GetString(buffer,0, readResult);
                         message = ReceivedMessage.decodeURL(message);        //Get rid of %22 and %20
-                        handle(ReceivedMessage.parseHTTP(message, p.log), recievedStream);
+                        handle(ReceivedMessage.parseHTTP(message, p.log), recievedStream, p);
                         //byte[] toSend = Encoding.UTF8.GetBytes("Recieved");
                         //recievedStream.Write(toSend, 0, toSend.Length);
                     }
@@ -147,10 +151,11 @@ namespace ChristmasServer {
 
             }
         }
-        static void handle(ReceivedMessage message, NetworkStream netStream) {
+        static void handle(ReceivedMessage message, NetworkStream netStream, Program p) {
             switch (message.type) {
                 case ReceivedMessage.MessageType.GetMessage:
                     Console.WriteLine("MessageType: {0}, isValidURL: {1}, HttpVer: {2}", message.type, message.isValidURL, message.HTTPVersion);
+                    Console.WriteLine("isValidMethod: " + p.methMan.isValidMethod(message.httpArgs.method, ReceivedMessage.MessageType.GetMessage));
                     break;
                 case ReceivedMessage.MessageType.PostMessage:
                     Console.WriteLine("MessageType: {0}, isValidURL: {1}, isValidArgs: {2}, HttpVer: {3}", message.type, message.isValidURL, message.isValidPostArgs, message.HTTPVersion);
