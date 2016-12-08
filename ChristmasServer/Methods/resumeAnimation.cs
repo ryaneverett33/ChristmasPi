@@ -7,6 +7,7 @@ using Newtonsoft.Json.Linq;
 
 namespace ChristmasServer.Methods {
     class resumeAnimation : IMethod {
+        bool isValid = false;
         public bool isValidArguments(JProperty prop)
         {
             System.Diagnostics.Debug.WriteLine("{0} is not implemented", this.ToString());
@@ -14,6 +15,9 @@ namespace ChristmasServer.Methods {
         }
         public void runMethod()
         {
+            if (!isValid) {
+                Console.WriteLine("Called runMethod with invalid arguments");
+            }
             System.Diagnostics.Debug.WriteLine("{0} cannot run", this.ToString());
         }
         public ReceivedMessage.MessageType getType()

@@ -73,6 +73,7 @@ namespace ChristmasServer {
             }
             //check if args are valid or not
             if (encounteredError) {
+                Console.WriteLine("HttpArgs:: Encountered Error");
                 isValidURL = false;
                 args = null;
             }

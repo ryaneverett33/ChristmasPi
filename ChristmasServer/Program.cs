@@ -155,7 +155,15 @@ namespace ChristmasServer {
             switch (message.type) {
                 case ReceivedMessage.MessageType.GetMessage:
                     Console.WriteLine("MessageType: {0}, isValidURL: {1}, HttpVer: {2}", message.type, message.isValidURL, message.HTTPVersion);
-                    Console.WriteLine("isValidMethod: " + p.methMan.isValidMethod(message.httpArgs.method, ReceivedMessage.MessageType.GetMessage));
+                    //Console.WriteLine("isValidMethod: " + p.methMan.isValidMethod(message.httpArgs.method, ReceivedMessage.MessageType.GetMessage));
+                    if (message.isValidURL) {
+                        try {
+                            p.methMan.callMethod(message.httpArgs.method, message.httpArgs.parameters, message.type);
+                        }
+                        catch (Exception e) {
+                            Console.WriteLine("Failed to execute {0}. Exception: {1}", message.httpArgs.method, e.Message);
+                        }
+                    }
                     break;
                 case ReceivedMessage.MessageType.PostMessage:
                     Console.WriteLine("MessageType: {0}, isValidURL: {1}, isValidArgs: {2}, HttpVer: {3}", message.type, message.isValidURL, message.isValidPostArgs, message.HTTPVersion);
