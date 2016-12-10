@@ -10,27 +10,21 @@ POST Methods
 		}
 	},
 	"stopAnimation" : {
-		"parameters" : {
-			"animationName" : string,
-		}
+		"parameters" : {}
 		"returns" : {
 			"success" : bool,
 			"failureReason" : string
 		}
 	},
 	"pauseAnimation" : {
-		"parameters" : {
-			"animationName" : string,
-		}
+		"parameters" : {}
 		"returns" : {
 			"success" : bool,
 			"failureReason" : string
 		}
 	},
 	"resumeAnimation" : {
-		"parameters" : {
-			"animationName" : string,
-		}
+		"parameters" : {}
 		"returns" : {
 			"success" : bool,
 			"failureReason" : string
