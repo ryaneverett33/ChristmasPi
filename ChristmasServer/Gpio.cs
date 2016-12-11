@@ -9,7 +9,7 @@ using System.Diagnostics;
 using WiringPi;
 
 namespace ChristmasServer {
-    class Gpio {
+    public class Gpio {
         const int ON = 0;
         const int OFF = 1;
         Logger log;

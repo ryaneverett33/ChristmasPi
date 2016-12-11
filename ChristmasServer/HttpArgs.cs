@@ -101,6 +101,12 @@ namespace ChristmasServer {
         public static void isValidPostArgs(string line, out bool isValidArgs, out HttpArgs args) {
             bool encounteredError = false;
             HttpArgs newArgs = new HttpArgs();
+            if (line.Contains('\n')) {
+                Console.WriteLine("isValidPostArgs::contained multiple lines, invalid");
+                isValidArgs = false;
+                args = null;
+                return;
+            }
             try {
                 var jObject = JObject.Parse(line);
                 foreach (JProperty prop in jObject.Properties()) {

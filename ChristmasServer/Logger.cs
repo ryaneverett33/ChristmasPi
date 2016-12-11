@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.IO;
 
 namespace ChristmasServer {
-    class Logger {
+    public class Logger {
         FileStream log;
         bool created;
         string fileName;

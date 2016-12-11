@@ -12,7 +12,8 @@ using ChristmasServer.Methods;
 namespace ChristmasServer {
     class Program {
         ConfigFile config;
-        TcpListener listener;
+        //TcpListener listener;
+        Socket sock;
         Thread serverThread;
         Logger log;
         MethodManager methMan;
@@ -47,8 +48,11 @@ namespace ChristmasServer {
                 }
                 Console.WriteLine("Attempting to open a new Server on port: {0}", p.config.server_port);
                 try {
-                    p.listener = new TcpListener(IPAddress.Any,p.config.server_port);
-                    p.listener.Start();
+                    /*p.listener = new TcpListener(IPAddress.Any,p.config.server_port);
+                    p.listener.Start();*/
+                    p.sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
+                    p.sock.Bind(new IPEndPoint(IPAddress.Any, p.config.server_port));
+                    p.sock.Listen(5);
                     p.serverThread = new Thread(new ThreadStart(() => serverListen(p)));
                     p.serverThread.Start();
                 }
@@ -124,16 +128,17 @@ namespace ChristmasServer {
         static void serverListen(Program p) {
             try {
                 while (true) {
-                    TcpClient recieved = p.listener.AcceptTcpClient();
+                    //TcpClient recieved = p.listener.AcceptTcpClient();
+                    Socket recieved = p.sock.Accept();
                     //handle recieved info
                     string message = "";
-                    NetworkStream recievedStream = recieved.GetStream();
                     byte[] buffer = new byte[10000];
-                    int readResult = recievedStream.Read(buffer, 0, 10000);
+                    int readResult = recieved.Receive(buffer);
                     if (readResult > 0) {
-                        message = Encoding.UTF8.GetString(buffer,0, readResult);
+                        message = Encoding.ASCII.GetString(buffer,0, readResult);
                         message = ReceivedMessage.decodeURL(message);        //Get rid of %22 and %20
-                        handle(ReceivedMessage.parseHTTP(message, p.log), recievedStream, p);
+
+                        handle(ReceivedMessage.parseHTTP(message, p.log, recieved), recieved, p);
                         //byte[] toSend = Encoding.UTF8.GetBytes("Recieved");
                         //recievedStream.Write(toSend, 0, toSend.Length);
                     }
@@ -151,11 +156,12 @@ namespace ChristmasServer {
 
             }
         }
-        static void handle(ReceivedMessage message, NetworkStream netStream, Program p) {
+        static void handle(ReceivedMessage message, Socket newSock, Program p) {
             switch (message.type) {
                 case ReceivedMessage.MessageType.GetMessage:
                     Console.WriteLine("MessageType: {0}, isValidURL: {1}, HttpVer: {2}", message.type, message.isValidURL, message.HTTPVersion);
                     //Console.WriteLine("isValidMethod: " + p.methMan.isValidMethod(message.httpArgs.method, ReceivedMessage.MessageType.GetMessage));
+                    p.methMan.callMethod(message.httpArgs.method, message.httpArgs.parameters, message.type);
                     if (message.isValidURL) {
                         try {
                             p.methMan.callMethod(message.httpArgs.method, message.httpArgs.parameters, message.type);
@@ -167,13 +173,15 @@ namespace ChristmasServer {
                     break;
                 case ReceivedMessage.MessageType.PostMessage:
                     Console.WriteLine("MessageType: {0}, isValidURL: {1}, isValidArgs: {2}, HttpVer: {3}", message.type, message.isValidURL, message.isValidPostArgs, message.HTTPVersion);
+                    p.methMan.callMethod(message.httpArgs.method, message.httpArgs.parameters, message.type);
                     break;
                 case ReceivedMessage.MessageType.Unknown:
                     Console.WriteLine("MessageType: {0}, isValidURL: {1}, HttpVer: {2}", message.type, message.isValidURL, message.HTTPVersion);
                     break;
             }
             byte[] outText = Encoding.UTF8.GetBytes(message.rawText);
-            netStream.Write(outText,0,outText.Length);
+            //newSock.Write(outText,0,outText.Length);
+            newSock.Send(outText);
         }
     }
 }

@@ -33,7 +33,11 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>ChristmasServer.Tests.MethodResultTesting</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -48,16 +52,27 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Animations\BaseAnimation.cs" />
+    <Compile Include="Animations\Binary.cs" />
+    <Compile Include="Animations\Flash.cs" />
+    <Compile Include="Animations\IAnimation.cs" />
+    <Compile Include="Animations\Kels.cs" />
+    <Compile Include="Animations\Mirage.cs" />
+    <Compile Include="Animations\Staircase.cs" />
+    <Compile Include="Animations\ToggleEachBranch.cs" />
+    <Compile Include="Animations\Twinkle.cs" />
     <Compile Include="ConfigFile.cs" />
     <Compile Include="Gpio.cs" />
     <Compile Include="HttpArgs.cs" />
     <Compile Include="Logger.cs" />
+    <Compile Include="Animations\AnimationManager.cs" />
     <Compile Include="Methods\currentlyPlaying.cs" />
     <Compile Include="Methods\IMethod.cs" />
     <Compile Include="Methods\isPlaying.cs" />
     <Compile Include="Methods\listAnimations.cs" />
     <Compile Include="Methods\listTreeInfo.cs" />
     <Compile Include="Methods\MethodManager.cs" />
+    <Compile Include="Methods\MethodResult.cs" />
     <Compile Include="Methods\pauseAnimation.cs" />
     <Compile Include="Methods\playAnimation.cs" />
     <Compile Include="Methods\resumeAnimation.cs" />
@@ -67,11 +82,15 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReceivedMessage.cs" />
+    <Compile Include="Tests\MethodResultTesting.cs" />
     <Compile Include="WrapperClass.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -19,11 +19,11 @@ namespace ChristmasServer.Methods
             /// <remarks>
             /// All methods have to be manually put into the manager
             /// </remarks>
-            methDict = new Dictionary<string, IMethod>(10);
+            methDict = new Dictionary<string, IMethod>(10, StringComparer.OrdinalIgnoreCase);
             methDict.Add("playAnimation", new playAnimation());
             methDict.Add("stopAnimation", new stopAnimation());
-            methDict.Add("pauseAnimation", new pauseAnimation());
-            methDict.Add("resumeAnimation", new resumeAnimation());
+            //methDict.Add("pauseAnimation", new pauseAnimation());
+            //methDict.Add("resumeAnimation", new resumeAnimation());
             methDict.Add("updateLights", new updateLights());
             methDict.Add("currentPlaying", new currentlyPlaying());
             methDict.Add("isPlaying", new isPlaying());

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Net.Sockets;
 
 namespace ChristmasServer {
     /// <summary>
@@ -24,12 +25,12 @@ namespace ChristmasServer {
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="body">The raw text received by the server</param>
+        /// <param name="recievedMessage">The raw text received by the server</param>
         /// <returns></returns>
-        public static ReceivedMessage parseHTTP(string body, Logger log) {
+        public static ReceivedMessage parseHTTP(string recievedMessage, Logger log, Socket sock) {
             ReceivedMessage message  = new ReceivedMessage();
-            message.rawText = body;
-            string[] lines = body.Split('\n');
+            message.rawText = recievedMessage;
+            string[] lines = recievedMessage.Split('\n');
             string[] firstLineSplit = new string[3];                //First line defines HTTP type and URL
 
             if (lines.Length == 0) {
@@ -77,6 +78,7 @@ namespace ChristmasServer {
                         HttpArgs.isValidGetArgs(firstLineSplit[1], out message.isValidURL, out message.httpArgs);
                     }
                     else {
+                        Console.WriteLine("Get Message does not contain /jsonrpc?request");
                         message.isValidURL = false;
                     }
                     break;
@@ -84,8 +86,36 @@ namespace ChristmasServer {
                     if (firstLineSplit[1] == "/jsonrpc") {
                         //jsonrpc should be in the root directory, therefore the Host should only be /jsonrpc
                         message.isValidURL = true;
-                        //get arguments (should be very last line of the HTTP message)
-                        HttpArgs.isValidPostArgs(lines.Last(), out message.isValidPostArgs, out message.httpArgs);
+                        //get the rest of the body
+                        string httpBody = string.Empty;
+                        byte[] bodyBuffer = new byte[10000];
+                        string StrLength = string.Empty;
+                        int contentLength = 0;
+                        foreach (string line in lines) {
+                            if (line.Contains("content-length")) {
+                                string[] splitLine = line.Split(':');
+                                StrLength = splitLine[1];
+                                break;
+                            }
+                        }
+                        if (StrLength != null) {
+                            try {
+                                contentLength = int.Parse(StrLength);
+                            }
+                            catch {
+                                Console.WriteLine("Failed to parse content-length");
+                            }
+                        }
+                        else {
+                            Console.WriteLine("content-length header not found");
+                        }
+                        int bodyReadResult = sock.Receive(bodyBuffer);
+                        if (bodyReadResult != contentLength) {
+                            Console.WriteLine("Failed to read all of HTTP body, probably sent as a multipart");
+                        }
+                        httpBody = Encoding.ASCII.GetString(bodyBuffer, 0, bodyReadResult);
+
+                        HttpArgs.isValidPostArgs(httpBody, out message.isValidPostArgs, out message.httpArgs);
                     }
                     else {
                         message.isValidURL = false;

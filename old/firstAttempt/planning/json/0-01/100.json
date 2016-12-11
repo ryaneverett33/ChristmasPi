@@ -1,0 +1,22 @@
+//TREEPI-Login-Return
+{
+	"head": {
+		"version": 0.01,
+		"request": 100,
+		"type": "return"
+	},
+	"data": {
+		"login": {
+			"password": string,
+			"machineid": int
+		},
+		"animation": { },
+		"branches": { },
+		"star": -1
+	},
+	"client": {
+		"machineid": int,
+		"ip": string,
+		"name": string
+	}
+}

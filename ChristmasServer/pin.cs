@@ -8,7 +8,7 @@ namespace ChristmasServer {
     /// <summary>
     /// Describes a gpio pin on the board
     /// </summary>
-    class gpio_pin {
+    public class gpio_pin {
         public static readonly int statusOn = 1;
         public static readonly int statusOff = 0;
         public gpio_pin(int status,  int gpioPin, int branch, int listAddress) {

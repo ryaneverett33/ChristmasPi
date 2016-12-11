@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace ChristmasServer {
-    class ConfigFile {
+    public class ConfigFile {
         public int pin_count { get; set; }
         public int server_port { get; set; }
         public List<Pin> pins { get; set; }

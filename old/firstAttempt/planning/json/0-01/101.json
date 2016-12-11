@@ -1,0 +1,22 @@
+//TREEPI-DOC-Login-Request
+{
+	"head": {
+		"version": 0.01,
+		"request": 101,
+		"type": "push"
+	},
+	"data": {
+		"login": {
+			"password": string,
+			"machineid": int
+		},
+		"animation": {},
+		"branches": {},
+		"star": int
+	},
+	"client": {
+		"machineid": int,
+		"ip": string,
+		"name": string
+	}
+}

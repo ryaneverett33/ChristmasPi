@@ -10,15 +10,15 @@ namespace ChristmasServer.Methods {
         bool isValid = false;
         public bool isValidArguments(JProperty prop)
         {
-            System.Diagnostics.Debug.WriteLine("{0} is not implemented", this.ToString());
-            return false;
+            //requires no parameters
+            return true;
         }
         public void runMethod()
         {
             if (!isValid) {
                 Console.WriteLine("Called runMethod with invalid arguments");
             }
-            System.Diagnostics.Debug.WriteLine("{0} cannot run", this.ToString());
+            
         }
         public ReceivedMessage.MessageType getType()
         {
