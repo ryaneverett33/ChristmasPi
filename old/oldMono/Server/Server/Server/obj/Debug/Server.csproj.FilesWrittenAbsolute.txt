@@ -1,6 +1,0 @@
-/home/pi/ChristmasPi/Server/Server/Server/obj/Debug/.NETFramework,Version=v4.0.AssemblyAttribute.cs
-/home/pi/ChristmasPi/Server/Server/Server/bin/Debug/Server.exe.mdb
-/home/pi/ChristmasPi/Server/Server/Server/bin/Debug/Server.exe
-/home/pi/ChristmasPi/Server/Server/Server/obj/Debug/Server.exe
-/home/pi/ChristmasPi/Server/Server/Server/obj/Debug/Server.exe.mdb
-/home/pi/ChristmasPi/Server/Server/Server/bin/Debug/Newtonsoft.Json.dll
