@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 
 namespace ChristmasPi
 {
@@ -17,6 +18,7 @@ namespace ChristmasPi
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            ConfigureTree();
         }
 
         public IConfiguration Configuration { get; }
@@ -59,6 +61,11 @@ namespace ChristmasPi
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+        }
+
+        // This method loads the tree and animation configurations
+        public void ConfigureTree() {
+
         }
     }
 }

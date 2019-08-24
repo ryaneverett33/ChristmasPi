@@ -1,0 +1,21 @@
+{
+  "tree": {
+    "name": "",
+    
+    "color": {
+      "flipRG": false,
+      "flipGB": false,
+      "flipRB": false,
+      "default": "#fff"
+    }
+  },
+  "setup": {
+    "firstrun": false
+  },
+  "hardware": {
+    "lightcount": 0,
+    "fps": 30,
+    "datapin": 18,
+    "type": "RPI_WS281x"
+  }
+}
