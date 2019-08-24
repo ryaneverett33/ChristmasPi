@@ -4,6 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace ChristmasPi.Data.Exceptions {
+    /// <summary>
+    /// Color is an invalid format
+    /// </summary>
     public class InvalidColorFormatException : Exception {
         public InvalidColorFormatException() {
         }

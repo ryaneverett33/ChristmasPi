@@ -9,9 +9,23 @@
 
 
   <ItemGroup>
+    <PackageReference Include="log4net" Version="2.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <Folder Include="Data\Interfaces\" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <Reference Include="ws281x">
+      <HintPath>..\..\..\Documents\rpi_save\ws281x.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

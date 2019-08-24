@@ -4,6 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace ChristmasPi.Data.Exceptions {
+    /// <summary>
+    /// Tried to create a renderer that's not supported
+    /// </summary>
     public class InvalidRendererException : Exception {
         public InvalidRendererException() {
         }
