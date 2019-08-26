@@ -70,7 +70,7 @@ namespace ChristmasPi
         public void ConfigureTree() {
             // Load tree configuration
             if (!File.Exists("configuration.json")) {
-                Console.WriteLine("LOGTHIS Tree Configuration file not found, using defaul configuration values");
+                Console.WriteLine("LOGTHIS Tree Configuration file not found, using default configuration values");
                 ConfigurationManager.Instance.TreeConfiguration = TreeConfiguration.DefaultSettings();
             }
             else {

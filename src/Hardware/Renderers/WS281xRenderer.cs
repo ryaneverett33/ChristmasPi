@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Drawing;
 using ChristmasPi.Hardware.Interfaces;
 using ChristmasPi.Data;
+using ChristmasPi.Data.Extensions;
 using rpi_ws281x;
 
 namespace ChristmasPi.Hardware.Renderers {
@@ -56,7 +57,14 @@ namespace ChristmasPi.Hardware.Renderers {
             if (index < 0 || index >= ledColors.Capacity)
                 throw new ArgumentOutOfRangeException("index");
             lock (locker) {
-                ledColors[index] = color;
+                if (ConfigurationManager.Instance.TreeConfiguration.tree.color.flipGB)
+                    ledColors[index] = color.FlipGB();
+                else if (ConfigurationManager.Instance.TreeConfiguration.tree.color.flipRB)
+                    ledColors[index] = color.FlipRB();
+                else if (ConfigurationManager.Instance.TreeConfiguration.tree.color.flipRG)
+                    ledColors[index] = color.FlipRG();
+                else
+                    ledColors[index] = color;
                 colorsChanged = true;
             }
         }
