@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using ChristmasPi.Data;
 using ChristmasPi.Data.Models;
+using ChristmasPi.Operations;
 using System.IO;
 
 namespace ChristmasPi
@@ -22,6 +23,7 @@ namespace ChristmasPi
         {
             Configuration = configuration;
             ConfigureTree();
+            StartTree();
         }
 
         public IConfiguration Configuration { get; }
@@ -66,7 +68,9 @@ namespace ChristmasPi
             });
         }
 
-        // This method loads the tree and animation configurations
+        /// <summary>
+        /// Loads the tree and animation configurations
+        /// </summary>
         public void ConfigureTree() {
             // Load tree configuration
             if (!File.Exists("configuration.json")) {
@@ -78,6 +82,12 @@ namespace ChristmasPi
                 ConfigurationManager.Instance.TreeConfiguration = JsonConvert.DeserializeObject<TreeConfiguration>(json);
             }
             ConfigurationManager.Instance.Configuration = Configuration;
+        }
+        /// <summary>
+        /// Starts tree services
+        /// </summary>
+        public void StartTree() {
+            OperationManager.Instance.Init();
         }
     }
 }
