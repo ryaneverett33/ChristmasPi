@@ -13,12 +13,11 @@ namespace ChristmasPi.Hardware.Renderers {
     /// <summary>
     /// A WS281x renderer based on the raspberry pi
     /// </summary>
-    public class WS281xRenderer : IRenderer {
+    public class WS281xRenderer : BaseRenderer, IRenderer {
         private WS281x rpi;                             // WS281x object used for hardware access
         private RenderThread renderThread;              // thread used for rendering
-        private List<Color> ledColors;                  // a list of all the current color values to render, same size as the amount of LEDs
         private object locker;
-        private bool colorsChanged = false;             // Whether or not any new colors have been set
+        public new bool AutoRender => true;
 
         /// <summary>
         /// Creates and starts a new WS281x renderer
@@ -36,9 +35,9 @@ namespace ChristmasPi.Hardware.Renderers {
             }
             locker = new object();
             renderThread = new RenderThread(this);
-            renderThread.Start();
+            base.LightCount = ledCount;
         }
-        public void Render(IRenderer obj) {
+        public override void Render(IRenderer obj) {
             WS281xRenderer renderer = (WS281xRenderer)obj;
             lock (renderer.locker) {
                 // only render if the colors table has been updated
@@ -52,22 +51,11 @@ namespace ChristmasPi.Hardware.Renderers {
                 }
             }
         }
-
-        public void SetLEDColor(int index, Color color) {
-            if (index < 0 || index >= ledColors.Capacity)
-                throw new ArgumentOutOfRangeException("index");
-            lock (locker) {
-                if (ConfigurationManager.Instance.TreeConfiguration.tree.color.flipGB)
-                    ledColors[index] = color.FlipGB();
-                else if (ConfigurationManager.Instance.TreeConfiguration.tree.color.flipRB)
-                    ledColors[index] = color.FlipRB();
-                else if (ConfigurationManager.Instance.TreeConfiguration.tree.color.flipRG)
-                    ledColors[index] = color.FlipRG();
-                else
-                    ledColors[index] = color;
-                colorsChanged = true;
-            }
+        public override void Start() {
+            renderThread.Start();
         }
-
+        public override void Stop() {
+            renderThread.Stop();
+        }
     }
 }

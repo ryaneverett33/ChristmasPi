@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 namespace ChristmasPi.Data.Models {
     public enum HardwareType {
         RPI_WS281x,
+        TEST_RENDER,
         UNKNOWN
     }
     // from https://stackoverflow.com/a/52526628

@@ -15,8 +15,9 @@ namespace ChristmasPi.Hardware.Factories {
             get { return _locker; }
         }
         private static WS281xRenderer wS281XRenderer;
+        private static TestRenderer testRenderer;
 
-        public IRenderer GetRenderer() {
+        public static IRenderer GetRenderer() {
             lock (locker) {
                 var hardware = ConfigurationManager.Instance.TreeConfiguration.hardware;
                 switch (hardware.type) {
@@ -24,6 +25,11 @@ namespace ChristmasPi.Hardware.Factories {
                             if (wS281XRenderer == null)
                                 wS281XRenderer = new WS281xRenderer(hardware.lightcount, hardware.datapin);
                             return wS281XRenderer;
+                        }
+                    case HardwareType.TEST_RENDER: {
+                            if (testRenderer == null)
+                                testRenderer = new TestRenderer();
+                            return testRenderer;
                         }
                     case HardwareType.UNKNOWN:
                         throw new InvalidRendererException();
