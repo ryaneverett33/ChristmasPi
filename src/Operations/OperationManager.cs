@@ -22,13 +22,9 @@ namespace ChristmasPi.Operations {
             operatingModes = new Dictionary<string, IOperationMode>();
             string[] classes = getClasses();
             foreach (string classname in classes) {
-                object obj = Activator.CreateInstance(Type.GetType(classname));
-                if (obj == null) {
-
-                } else {
-                    IOperationMode operationMode = (IOperationMode)obj;
-                    operatingModes.Add(operationMode.Name, operationMode);
-                }
+                /// TODO Handle if exception occurs when creating instance or casting
+                IOperationMode operationMode = (IOperationMode)Activator.CreateInstance(Type.GetType(classname));
+                operatingModes.Add(operationMode.Name, operationMode);
             }
             // Set Current Operating mode
             setCurrentMode(Constants.DEFAULT_OPERATING_MODE);
@@ -37,16 +33,18 @@ namespace ChristmasPi.Operations {
             ICollection<string> keys = operatingModes.Keys;
             return keys.ToArray<string>();
         }
+
         /// <summary>
         /// Gets a list of all classes in the executing assembly that implement the IOperationMode interface
         /// </summary>
-        /// <returns>List of classes [simple name, full name]</returns>
+        /// <returns>List of classes</returns>
         private string[] getClasses() {
             /// TODO use reflection to get classes instead of a hardcoded list
             return new string[] {
                 typeof(SolidColorMode).FullName
             };
         }
+
         /// <summary>
         /// Switches the current operating mode to the newly requested one
         /// </summary>
@@ -54,6 +52,7 @@ namespace ChristmasPi.Operations {
         public void SwitchModes(string newMode) {
             setCurrentMode(newMode);
         }
+
         /// <summary>
         /// Deactivates the current operating mode and activates the new mode
         /// </summary>
