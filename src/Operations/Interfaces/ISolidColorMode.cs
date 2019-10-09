@@ -5,6 +5,7 @@ namespace ChristmasPi.Operations.Interfaces {
         /// The current color being displayed
         /// </summary>
         Color CurrentColor { get; }
+        
         /// <summary>
         /// Sets a new color to be displayed
         /// </summary>

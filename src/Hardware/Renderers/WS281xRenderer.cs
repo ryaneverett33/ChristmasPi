@@ -26,7 +26,11 @@ namespace ChristmasPi.Hardware.Renderers {
         /// <param name="pin">GPIO pin to connect to</param>
         public WS281xRenderer(int ledCount, int pin) {
             var settings = Settings.CreateDefaultSettings();
-            settings.Channels[0] = new Channel(ledCount, pin);
+            settings.Channels_1 = new Channel(ledCount, 
+                                            pin, 
+                                            ConfigurationManager.Instance.TreeConfiguration.hardware.brightness, 
+                                            ConfigurationManager.Instance.TreeConfiguration.hardware.invert, 
+                                            getStripTypeFromColorOrder(ConfigurationManager.Instance.TreeConfiguration.tree.color.colororder));
             rpi = new WS281x(settings);
             ledColors = new List<Color>(ledCount);
             var defaultColor = ConfigurationManager.Instance.TreeConfiguration.tree.color.DefaultColor;
@@ -56,6 +60,30 @@ namespace ChristmasPi.Hardware.Renderers {
         }
         public override void Stop() {
             renderThread.Stop();
+        }
+
+        /// <summary>
+        /// Converts color order from a string to it's ws281x byte order representation
+        /// </summary>
+        /// <param name="order">The color order parameter</param>
+        /// <returns>A WS2811x StripType</returns>
+        private StripType getStripTypeFromColorOrder(string order) {
+            switch (order.ToUpper().Trim()) {
+                case "RGB":
+                    return StripType.WS2811_STRIP_RGB;
+                case "RBG":
+                    return StripType.WS2811_STRIP_RBG;
+                case "GRB":
+                    return StripType.WS2811_STRIP_GRB;
+                case "GBR":
+                    return StripType.WS2811_STRIP_GBR;
+                case "BRG":
+                    return StripType.WS2811_STRIP_BRG;
+                case "BGR":
+                    return StripType.WS2811_STRIP_BGR;
+                default:
+                    return StripType.WS2811_STRIP_RGB;
+            }
         }
     }
 }

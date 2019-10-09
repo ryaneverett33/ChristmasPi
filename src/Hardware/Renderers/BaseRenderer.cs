@@ -21,15 +21,8 @@ namespace ChristmasPi.Hardware.Renderers {
         public void SetLEDColor(int index, Color color) {
             if (index < 0 || index >= ledColors.Count)
                 throw new ArgumentOutOfRangeException("index");
-                if (ConfigurationManager.Instance.TreeConfiguration.tree.color.flipGB)
-                    ledColors[index] = color.FlipGB();
-                else if (ConfigurationManager.Instance.TreeConfiguration.tree.color.flipRB)
-                    ledColors[index] = color.FlipRB();
-                else if (ConfigurationManager.Instance.TreeConfiguration.tree.color.flipRG)
-                    ledColors[index] = color.FlipRG();
-                else
-                    ledColors[index] = color;
-                colorsChanged = true;
+            ledColors[index] = color;
+            colorsChanged = true;
         }
         /// <summary>
         /// Sets all the LEDs to the same color

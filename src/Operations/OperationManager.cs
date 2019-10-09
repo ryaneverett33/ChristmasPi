@@ -16,6 +16,7 @@ namespace ChristmasPi.Operations {
         private Dictionary<string, IOperationMode> operatingModes;
         private string _currentOperatingMode = null;
         public string CurrentOperatingMode => _currentOperatingMode;
+        public object CurrentOperatingInfo => operatingModes[_currentOperatingMode].Info();
 
         public void Init() {
             operatingModes = new Dictionary<string, IOperationMode>();
@@ -51,7 +52,7 @@ namespace ChristmasPi.Operations {
         /// </summary>
         /// <param name="newMode">The mode being switched to</param>
         public void SwitchModes(string newMode) {
-
+            setCurrentMode(newMode);
         }
         /// <summary>
         /// Deactivates the current operating mode and activates the new mode
@@ -65,7 +66,7 @@ namespace ChristmasPi.Operations {
                 var currentMode = operatingModes[_currentOperatingMode];
                 task = Task.Run(() => currentMode.Deactivate());
                 if (!task.Wait(Constants.ACTIVATION_TIMEOUT)) {
-                    Console.WriteLine("LOGHIS Operating Mode deactivation timed out.");
+                    Console.WriteLine("LOGTHIS Operating Mode deactivation timed out.");
                     Console.WriteLine($"Current mode: {_currentOperatingMode}");
                 }
             }

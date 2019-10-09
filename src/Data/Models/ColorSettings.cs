@@ -2,25 +2,37 @@
 
 namespace ChristmasPi.Data.Models {
     public class ColorSettings {
-        public bool flipRG { get; set; }
-        public bool flipGB { get; set; }
-        public bool flipRB { get; set; }
+
+        /// <summary>
+        /// The byte order for a color object
+        /// </summary>
+        public string colororder { get; set; }
+
+        /// <summary>
+        /// The default color if no other color is used
+        /// </summary>
         public string @default { get; set; }
-        private Color _defaultColor = Color.Empty;
+        private Color _defaultColor = Color.White;
+
+        /// <summary>
+        /// Gets the object representation of the default color
+        /// </summary>
+        /// <see cref="ColorSettings.@default"/>
         public Color DefaultColor {
             get {
-                if (_defaultColor == Color.Empty)
+                if (_defaultColor == Color.White)
                     _defaultColor = Util.ColorConverter.Convert(@default);
                 return _defaultColor;
             }
             set { _defaultColor = value; }
         }
 
+        /// <summary>
+        /// Returns the default color settings
+        /// </summary>
         public static ColorSettings DefaultSettings() {
             ColorSettings settings = new ColorSettings();
-            settings.flipRG = false;
-            settings.flipGB = false;
-            settings.flipRB = false;
+            settings.colororder = "RGB";
             settings.@default = "#fff";
             return settings;
         }

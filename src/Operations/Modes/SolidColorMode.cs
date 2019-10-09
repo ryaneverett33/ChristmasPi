@@ -29,6 +29,11 @@ namespace ChristmasPi.Operations.Modes {
             renderer.Stop();
             Console.WriteLine("Deactivate Solid Color Mode");
         }
+        public object Info() {
+            return new {
+                currentcolor = CurrentColor
+            };
+        }
         #endregion
         #region Methods
         /// <summary>

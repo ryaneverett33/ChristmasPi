@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ChristmasPi.Util;
+using ChristmasPi.Operations;
+using ChristmasPi.Data;
 
 namespace ChristmasPi.Controllers {
     [Route("api/[controller]")]
@@ -13,12 +15,17 @@ namespace ChristmasPi.Controllers {
         [HttpGet("mode")]
         public IActionResult GetTreeMode() {
             // /api/tree/mode
-            return new NotImplementedResult();
+            return new JsonResult(OperationManager.Instance.CurrentOperatingInfo);
         }
         [HttpGet()]
         public IActionResult GetTreeInfo() {
             // /api/tree
-            return new NotImplementedResult();
+            var configuration = new {
+                lightcount = ConfigurationManager.Instance.TreeConfiguration.hardware.lightcount,
+                mode = OperationManager.Instance.CurrentOperatingMode,
+                name = ConfigurationManager.Instance.TreeConfiguration.tree.name
+            };
+            return new JsonResult(configuration);
         }
     }
 }
