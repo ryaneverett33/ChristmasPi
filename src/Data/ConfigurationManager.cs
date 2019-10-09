@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.IO;
 using Microsoft.Extensions.Configuration;
 using ChristmasPi.Data.Models;
+using Newtonsoft.Json;
 
 namespace ChristmasPi.Data {
     public class ConfigurationManager {
@@ -13,5 +13,20 @@ namespace ChristmasPi.Data {
         #endregion
         public IConfiguration Configuration;
         public TreeConfiguration TreeConfiguration;
+
+        public void Save() {
+            try {
+                string json = JsonConvert.SerializeObject(TreeConfiguration, Formatting.Indented);
+                if (File.Exists("configuration.json")) {
+                    File.Move("configuration.json", "configuration.old.json");
+                    File.WriteAllText("configuration.json", json);
+                }
+            }
+            catch (Exception e) {
+                Console.WriteLine("LOGTHIS Failed to Save tree configuration, an exception occurred");
+                Console.WriteLine(e.Message);
+                Console.WriteLine(e.StackTrace);
+            }
+        }
     }
 }

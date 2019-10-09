@@ -12,6 +12,7 @@ namespace ChristmasPi.Hardware.Renderers {
 
         public int LightCount { get; protected set; }
         public bool AutoRender => false;
+        public bool is2D => false;
         public abstract void Render(IRenderer obj);
         /// <summary>
         /// Sets the LED color at the position and applies color flips if needed

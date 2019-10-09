@@ -11,6 +11,11 @@
         bool AutoRender { get; }
 
         /// <summary>
+        /// Whether or not the renderer supports 2d (i.e. matrix and cube renderers)
+        /// </summary>
+        bool is2D { get; }
+
+        /// <summary>
         /// Renders a new frame
         /// </summary>
         /// <param name="obj">The Renderer object</param>
