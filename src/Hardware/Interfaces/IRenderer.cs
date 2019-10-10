@@ -1,5 +1,7 @@
-﻿namespace ChristmasPi.Hardware.Interfaces {
-    public interface IRenderer {
+﻿using System;
+
+namespace ChristmasPi.Hardware.Interfaces {
+    public interface IRenderer : IDisposable {
         /// <summary>
         /// The number of "Lights" attached to the renderer
         /// </summary>

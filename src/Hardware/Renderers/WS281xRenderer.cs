@@ -14,10 +14,12 @@ namespace ChristmasPi.Hardware.Renderers {
     /// A WS281x renderer based on the raspberry pi
     /// </summary>
     public class WS281xRenderer : BaseRenderer, IRenderer {
+        public new bool AutoRender => true;
         private WS281x rpi;                             // WS281x object used for hardware access
         private RenderThread renderThread;              // thread used for rendering
         private object locker;
-        public new bool AutoRender => true;
+        private bool disposed = false;
+
 
         /// <summary>
         /// Creates and starts a new WS281x renderer
@@ -26,13 +28,14 @@ namespace ChristmasPi.Hardware.Renderers {
         /// <param name="pin">GPIO pin to connect to</param>
         public WS281xRenderer(int ledCount, int pin) {
             var settings = Settings.CreateDefaultSettings();
-            settings.Channels_1 = new Channel(ledCount, 
+            settings.Channel_1 = new Channel(ledCount, 
                                             pin, 
-                                            ConfigurationManager.Instance.TreeConfiguration.hardware.brightness, 
+                                            (byte)ConfigurationManager.Instance.TreeConfiguration.hardware.brightness, 
                                             ConfigurationManager.Instance.TreeConfiguration.hardware.invert, 
                                             getStripTypeFromColorOrder(ConfigurationManager.Instance.TreeConfiguration.tree.color.colororder));
             rpi = new WS281x(settings);
-            ledColors = new List<Color>(ledCount);
+            base.ledColors = new List<Color>(ledCount);
+            base.InitList();
             var defaultColor = ConfigurationManager.Instance.TreeConfiguration.tree.color.DefaultColor;
             for (int i = 0; i < ledCount; i++) {
                 ledColors[i] = defaultColor;
@@ -60,6 +63,15 @@ namespace ChristmasPi.Hardware.Renderers {
         }
         public override void Stop() {
             renderThread.Stop();
+        }
+
+        public override void Dispose() {
+            if (disposed)
+                return;
+            renderThread.Stop();
+            rpi.Dispose();
+            base.Dispose();
+            disposed = true;
         }
 
         /// <summary>

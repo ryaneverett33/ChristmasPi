@@ -18,6 +18,8 @@ namespace ChristmasPi.Controllers
         [HttpPost("update")]
         public IActionResult Update(string color) {
             // /api/solid/update
+            if (color == null)
+                return new StatusCodeResult(StatusCodes.Status400BadRequest);
             try {
                 IRenderer renderer = RenderFactory.GetRenderer();
                 Color colorConverted = ChristmasPi.Util.ColorConverter.Convert(color);

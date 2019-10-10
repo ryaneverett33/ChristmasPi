@@ -34,7 +34,20 @@ namespace ChristmasPi.Hardware.Renderers {
                 SetLEDColor(i, color);
             }
         }
+
+        /// <summary>
+        /// Initializes the color list
+        /// </summary>
+        public void InitList() {
+            for (int i = 0; i < ledColors.Count; i++) {
+                ledColors.Add(Color.Empty);
+            }
+        }
         public abstract void Start();
         public abstract void Stop();
+
+        public virtual void Dispose() {
+            ledColors.Clear();
+        }
     }
 }
