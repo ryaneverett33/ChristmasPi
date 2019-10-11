@@ -1,13 +1,13 @@
 using System;
 using System.Drawing;
 using System.Collections.Generic;
-using ChristmasPi.Animations.Interfaces;
+using ChristmasPi.Animation.Interfaces;
 using ChristmasPi.Data.Models;
 using ChristmasPi.Util;
 using ChristmasPi.Data;
 using System.Linq;
 
-namespace ChristmasPi.Animations.Animations {
+namespace ChristmasPi.Animation.Animations {
     public class flash : IAnimation {
         private int lightcount;
         private int fps;
@@ -17,6 +17,8 @@ namespace ChristmasPi.Animations.Animations {
         public float TotalTime => 1f;
         public int LightCount => lightcount;
         public int FPS => fps;
+        public bool isBranchAnimation => false;
+        public bool isLegacyAnimation => false;
 
         
         private List<AnimationFrame> frames;

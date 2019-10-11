@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using ChristmasPi.Hardware.Interfaces;
 using ChristmasPi.Data;
+using ChristmasPi.Data.Models;
 using ChristmasPi.Data.Extensions;
 
 namespace ChristmasPi.Hardware.Renderers {
@@ -13,6 +14,9 @@ namespace ChristmasPi.Hardware.Renderers {
         public int LightCount { get; protected set; }
         public bool AutoRender => false;
         public bool is2D => false;
+        protected bool stopped = true;
+        public abstract event BeforeRenderHandler BeforeRenderEvent;
+        public abstract event AfterRenderHandler AfterRenderEvent;
         public abstract void Render(IRenderer obj);
         /// <summary>
         /// Sets the LED color at the position and applies color flips if needed

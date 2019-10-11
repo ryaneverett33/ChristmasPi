@@ -5,17 +5,19 @@ using ChristmasPi.Hardware.Interfaces;
 using ChristmasPi.Data;
 
 namespace ChristmasPi.Hardware.Renderers {
-    public class RenderThread {
+    public class RenderThread : IDisposable {
         private IRenderer renderer;         // The caller object 
         private Thread thread;              // worker thread
         private int waitTime;               // How long to wait (in ms) before rendering a new "frame"
         private int syncTime;               // Time left over from flooring the fps time
         private int fps;                    // How many "frames" are rendered per second
         private object locker;
+        private bool disposed;
         public bool Rendering { get; private set; } = false;
-        public RenderThread(IRenderer renderer) {
+
+        public RenderThread(IRenderer renderer, int fps) {
             this.renderer = renderer;
-            fps = ConfigurationManager.Instance.TreeConfiguration.hardware.fps;
+            this.fps = fps;
             waitTime = calculateWaitTime();
             syncTime = Math.Clamp(1000 - (fps * waitTime), 0, 10);
             locker = new object();
@@ -64,6 +66,15 @@ namespace ChristmasPi.Hardware.Renderers {
             }
             float value = (1f / (float)fps) * 1000f;
             return (int)Math.Floor(value);
+        }
+
+        public void Dispose() {
+            if (!disposed) {
+                Stop();
+                if (!thread.Join(500))
+                    thread.Abort();
+                renderer.Dispose();
+            }
         }
     }
 }

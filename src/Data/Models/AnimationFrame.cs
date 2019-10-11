@@ -17,10 +17,4 @@ namespace ChristmasPi.Data.Models {
             Colors2D = values;
         }
     }
-    public enum FrameAction {
-        Update,             // Update the current frame with new values
-        Update2D,           // Update the current 2D frame with new values
-        Sleep,              // Let the renderer sleep
-        Blank               // do nothing, wait for time sync
-    }
 }

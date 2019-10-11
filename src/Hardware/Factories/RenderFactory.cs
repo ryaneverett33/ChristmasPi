@@ -24,7 +24,7 @@ namespace ChristmasPi.Hardware.Factories {
                 switch (hardware.type) {
                     case HardwareType.RPI_WS281x: {
                             if (WS281xRenderer == null)
-                                WS281xRenderer = new WS281xRenderer(hardware.lightcount, hardware.datapin);
+                                WS281xRenderer = new WS281xRenderer(hardware.lightcount, hardware.datapin, ConfigurationManager.Instance.TreeConfiguration.hardware.fps);
                             return WS281xRenderer;
                         }
                     case HardwareType.TEST_RENDER: {
@@ -39,10 +39,12 @@ namespace ChristmasPi.Hardware.Factories {
             return null;
         }
         public void Dispose() {
-            if (WS281xRenderer != null)
-                WS281xRenderer.Dispose();
-            if (testRenderer != null)
-                testRenderer.Dispose();
+            if (!disposed) {
+                if (WS281xRenderer != null)
+                    WS281xRenderer.Dispose();
+                if (testRenderer != null)
+                    testRenderer.Dispose();
+            }
         }
     }
 }

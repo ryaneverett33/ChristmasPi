@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Drawing;
 using ChristmasPi.Hardware.Interfaces;
 using ChristmasPi.Data;
+using ChristmasPi.Data.Models;
 using ChristmasPi.Data.Extensions;
 using rpi_ws281x;
 
@@ -20,13 +21,16 @@ namespace ChristmasPi.Hardware.Renderers {
         private object locker;
         private bool disposed = false;
 
+        public override event BeforeRenderHandler BeforeRenderEvent;
+        public override event AfterRenderHandler AfterRenderEvent;
+
 
         /// <summary>
         /// Creates and starts a new WS281x renderer
         /// </summary>
         /// <param name="ledCount">Number of LEDs to render</param>
         /// <param name="pin">GPIO pin to connect to</param>
-        public WS281xRenderer(int ledCount, int pin) {
+        public WS281xRenderer(int ledCount, int pin, int fps) {
             var settings = Settings.CreateDefaultSettings();
             settings.Channel_1 = new Channel(ledCount, 
                                             pin, 
@@ -41,10 +45,11 @@ namespace ChristmasPi.Hardware.Renderers {
                 ledColors[i] = defaultColor;
             }
             locker = new object();
-            renderThread = new RenderThread(this);
+            renderThread = new RenderThread(this, fps);
             base.LightCount = ledCount;
         }
         public override void Render(IRenderer obj) {
+            BeforeRenderEvent.Invoke(this, new RenderArgs());
             WS281xRenderer renderer = (WS281xRenderer)obj;
             lock (renderer.locker) {
                 // only render if the colors table has been updated
@@ -57,21 +62,27 @@ namespace ChristmasPi.Hardware.Renderers {
                     renderer.colorsChanged = false;
                 }
             }
+            AfterRenderEvent.Invoke(this, new RenderArgs());
         }
         public override void Start() {
             renderThread.Start();
+            stopped = false;
         }
         public override void Stop() {
-            renderThread.Stop();
+            if (!stopped) {
+                renderThread.Stop();
+                stopped = true;
+            }
         }
 
         public override void Dispose() {
-            if (disposed)
-                return;
-            renderThread.Stop();
-            rpi.Dispose();
-            base.Dispose();
-            disposed = true;
+            if (disposed) {
+                renderThread.Stop();
+                renderThread.Dispose();
+                rpi.Dispose();
+                base.Dispose();
+                disposed = true;
+            }
         }
 
         /// <summary>

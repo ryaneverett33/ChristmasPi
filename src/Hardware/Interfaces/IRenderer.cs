@@ -1,4 +1,5 @@
 ﻿using System;
+using ChristmasPi.Data.Models;
 
 namespace ChristmasPi.Hardware.Interfaces {
     public interface IRenderer : IDisposable {
@@ -45,5 +46,15 @@ namespace ChristmasPi.Hardware.Interfaces {
         /// Stops any rendering activities that may be occuring
         /// </summary>
         void Stop();
+
+        /// <summary>
+        /// Event called before render occurs
+        /// </summary>
+        event BeforeRenderHandler BeforeRenderEvent;
+
+        /// <summary>
+        /// Event called after render occurs
+        /// </summary>
+        event AfterRenderHandler AfterRenderEvent;
     }
 }

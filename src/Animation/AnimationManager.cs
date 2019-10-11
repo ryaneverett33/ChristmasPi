@@ -1,12 +1,12 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using ChristmasPi.Animations.Interfaces;
-using ChristmasPi.Animations.Animations;
-using ChristmasPi.Animations.Legacy;
+using ChristmasPi.Animation.Interfaces;
+using ChristmasPi.Animation.Animations;
+using ChristmasPi.Animation.Branch;
 using ChristmasPi.Data.Exceptions;
 
-namespace ChristmasPi.Animations {
+namespace ChristmasPi.Animation {
     public class AnimationManager {
         #region Singleton Methods
         private static readonly AnimationManager _instance = new AnimationManager();
@@ -14,11 +14,12 @@ namespace ChristmasPi.Animations {
         #endregion
 
         private Dictionary<string, IAnimation> animations;
-        private Dictionary<string, ILegacyAnimation> legacyAnimations;
+        private Dictionary<string, IBranchAnimation> branchAnimations;
 
         private string _currentAnimation = null;
-        private bool currentAnimationIsLegacy = false;
+        private bool currentAnimationIsBranch = false;
         private bool _animating = false;
+        private Animator animator;
     
 
         public string CurrentAnimation => _currentAnimation;
@@ -26,37 +27,40 @@ namespace ChristmasPi.Animations {
 
         public void Init() {
             animations = new Dictionary<string, IAnimation>();
-            legacyAnimations = new Dictionary<string, ILegacyAnimation>();
+            branchAnimations = new Dictionary<string, IBranchAnimation>();
             string[] animationsClasses = getAnimationClasses();
-            string[] legacyAnimationsClasses = getLegacyAnimationClasses();
+            string[] branchAnimationClasses = getBranchAnimationClasses();
             foreach (string classname in animationsClasses) {
                 /// TODO Handle if exception occurs when creating instance or casting
                 IAnimation anim = (IAnimation)Activator.CreateInstance(Type.GetType(classname));
                 animations.Add(anim.Name, anim);
             }
-            foreach (string classname in legacyAnimationsClasses) {
+            foreach (string classname in branchAnimationClasses) {
                 /// TODO Handle if exception occurs when creating instance or casting
-                ILegacyAnimation anim = (ILegacyAnimation)Activator.CreateInstance(Type.GetType(classname));
-                legacyAnimations.Add(anim.Name, anim);
+                IBranchAnimation anim = (IBranchAnimation)Activator.CreateInstance(Type.GetType(classname));
+                branchAnimations.Add(anim.Name, anim);
             }
             _animating = false;
+            animator = null;
         }
 
         /// <summary>
         /// Gets a list of all animations in the executing assembly that implement the IAnimation interface
         /// </summary>
-        /// <returns>List of animations</returns>
+        /// <returns>List of animations to instantiate</returns>
         private string[] getAnimationClasses() {
+            /// TODO iuse reflection to get classes
             return new string[] {
                 typeof(flash).FullName
             };
         }
 
         /// <summary>
-        /// Gets a list of all legacy animations in the executing assembly that implement the IAnimation interface
+        /// Gets a list of all branch animations in the executing assembly that implement the IBranchAnimation interface
         /// </summary>
-        /// <returns>List of legacy animations</returns>
-        private string[] getLegacyAnimationClasses() {
+        /// <returns>List of branch animations to instantiate</returns>
+        private string[] getBranchAnimationClasses() {
+            /// TODO iuse reflection to get classes
             return new string[] {
                 typeof(toggleeachbranch).FullName
             };
@@ -66,20 +70,22 @@ namespace ChristmasPi.Animations {
             ICollection<string> keys = animations.Keys;
             return keys.ToArray<string>();
         }
-        public string[] GetLegacyAnimations() {
-            ICollection<string> keys = legacyAnimations.Keys;
+        public string[] GetBranchAnimations() {
+            ICollection<string> keys = branchAnimations.Keys;
             return keys.ToArray<string>();
         }
 
         public void StartAnimation(string animation, bool legacy = false) {
-
+            /// TODO implement
         }
         public void PauseAnimation() {
-            if (currentAnimationIsLegacy)
-                throw new InvalidAnimationActionException("Cannot pause a legacy animation");
+            if (currentAnimationIsBranch && (branchAnimations[CurrentAnimation] as IAnimatable).isLegacyAnimation)
+                throw new InvalidAnimationActionException("This legacy animation does not support pausing");
+            /// TODO implement
         }
         public void StopAnimation() {
-
+            /// TODO implement
         }
+
     }
 }

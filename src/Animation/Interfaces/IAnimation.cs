@@ -1,11 +1,14 @@
 using ChristmasPi.Data.Models;
+using ChristmasPi.Animation.Interfaces;
 
-namespace ChristmasPi.Animations.Interfaces {
-    public interface IAnimation {
+namespace ChristmasPi.Animation.Interfaces {
+    public interface IAnimation : IAnimatable {
         string Name { get; }
         float TotalTime { get; }    // in s
         int TotalFrames { get; }
+        int FPS { get; }
+        int LightCount { get; }
 
-        AnimationFrame[] GetFrames(int fps);
+        AnimationFrame[] GetFrames(int fps, int lightcount);
     }
 }
