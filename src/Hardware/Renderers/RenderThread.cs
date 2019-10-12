@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using ChristmasPi.Hardware.Interfaces;
+using ChristmasPi.Util;
 using ChristmasPi.Data;
 
 namespace ChristmasPi.Hardware.Renderers {
@@ -11,6 +12,7 @@ namespace ChristmasPi.Hardware.Renderers {
         private int waitTime;               // How long to wait (in ms) before rendering a new "frame"
         private int syncTime;               // Time left over from flooring the fps time
         private int fps;                    // How many "frames" are rendered per second
+        private CancellationTokenSource currentToken;
         private object locker;
         private bool disposed;
         public bool Rendering { get; private set; } = false;
@@ -32,10 +34,17 @@ namespace ChristmasPi.Hardware.Renderers {
         public void Stop() {
             lock (locker) {
                 Rendering = false;
+                ThreadHelpers.WakeUpThread(currentToken);
             }
         }
-        private void work() {
-            while (Rendering) {
+        private async void work() {
+            bool doRender = false;
+            lock (locker) {
+                doRender = Rendering;
+                currentToken = ThreadHelpers.RegisterWakeUp();
+            }
+
+            while (doRender) {
                 for (int i = 0; i < fps; i++) {
                     try {
                         renderer.Render(renderer);
@@ -48,14 +57,17 @@ namespace ChristmasPi.Hardware.Renderers {
                         Rendering = false;
                         return;
                     }
-                    lock (locker) {
-                        Monitor.Wait(locker, waitTime);
+                    bool slept = await ThreadHelpers.SafeSleep(currentToken, waitTime);
+                    if (!slept) {
+                        // sleep was cancelled, exit thread
+                        return;
                     }
                 }
                 if (syncTime != 0) {
-                    lock (locker) {
-                        Monitor.Wait(locker, syncTime);
-                    }
+                    await ThreadHelpers.SafeSleep(currentToken, syncTime);
+                }
+                lock (locker) {
+                    doRender = Rendering;
                 }
             }
         }
