@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ChristmasPi.Data;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -46,6 +47,30 @@ namespace ChristmasPi.Util {
         /// <param name="token">Cancellation token</param>
         public static void WakeUpThread(CancellationTokenSource token) {
             token.Cancel();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="fps"></param>
+        /// <param name="waitTime"></param>
+        /// <returns></returns>
+        public static int CalculateSyncTime(int fps, int waitTime) {
+            return Math.Clamp(1000 - (fps * waitTime), 0, 10);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="fps"></param>
+        /// <returns></returns>
+        public static int CalculateWaitTime(int fps) {
+            if (fps <= 0 || fps > Constants.FPS_MAX) {
+                fps = Constants.FPS_DEFAULT;
+                Console.WriteLine("LOGTHIS Invalid fps value. Using default fps");
+            }
+            float value = (1f / (float)fps) * 1000f;
+            return (int)Math.Floor(value);
         }
     }
 }

@@ -86,6 +86,7 @@ namespace ChristmasPi.Hardware.Renderers {
                 if (!thread.Join(500))
                     thread.Abort();
                 renderer.Dispose();
+                disposed = true;
             }
         }
     }

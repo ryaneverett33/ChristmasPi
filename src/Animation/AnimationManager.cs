@@ -49,7 +49,7 @@ namespace ChristmasPi.Animation {
         /// </summary>
         /// <returns>List of animations to instantiate</returns>
         private string[] getAnimationClasses() {
-            /// TODO iuse reflection to get classes
+            /// TODO use reflection to get classes
             return new string[] {
                 typeof(flash).FullName
             };
