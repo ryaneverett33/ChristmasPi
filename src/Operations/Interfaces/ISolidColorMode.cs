@@ -10,6 +10,7 @@ namespace ChristmasPi.Operations.Interfaces {
         /// Sets a new color to be displayed
         /// </summary>
         /// <param name="newColor">The new color to be shown</param>
-        void SetColor(Color newColor);
+        /// <returns>Status code to return to client</returns>
+        int SetColor(Color newColor);
     }
 }

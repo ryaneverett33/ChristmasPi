@@ -8,6 +8,8 @@ using System.Drawing;
 using ChristmasPi.Hardware.Factories;
 using ChristmasPi.Hardware.Interfaces;
 using ChristmasPi.Data.Exceptions;
+using ChristmasPi.Operations;
+using ChristmasPi.Operations.Interfaces;
 
 namespace ChristmasPi.Controllers
 {
@@ -20,29 +22,11 @@ namespace ChristmasPi.Controllers
             // /api/solid/update
             if (color == null)
                 return new StatusCodeResult(StatusCodes.Status400BadRequest);
-            try {
-                IRenderer renderer = RenderFactory.GetRenderer();
-                Color colorConverted = ChristmasPi.Util.ColorConverter.Convert(color);
-                renderer.SetAllLEDColors(colorConverted);
-                if (!renderer.AutoRender)
-                    renderer.Render(renderer);
-                return new OkResult();
-            }
-            catch (InvalidRendererException e) {
-                Console.WriteLine("LOGTHIS SolidController::Update failed to get renderer");
-                Console.WriteLine(e.Message);
-                Console.WriteLine(e.StackTrace);
-                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
-            }
-            catch (InvalidColorFormatException) {
-                return new StatusCodeResult(StatusCodes.Status400BadRequest);
-            }
-            catch (Exception e) {
-                Console.WriteLine("LOGTHIS SolidController::Update failed, an exception occured");
-                Console.WriteLine(e.Message);
-                Console.WriteLine(e.StackTrace);
-                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
-            }
+            if (OperationManager.Instance.CurrentOperatingModeName != "SolidColorMode")
+                OperationManager.Instance.SwitchModes("SolidColorMode");
+            Color newColor = ChristmasPi.Util.ColorConverter.Convert(color);
+            int result = (OperationManager.Instance.CurrentOperatingMode as ISolidColorMode).SetColor(newColor);
+            return new StatusCodeResult(result);
         }
     }
 }

@@ -20,14 +20,16 @@ namespace ChristmasPi.Hardware.Renderers {
         public RenderThread(IRenderer renderer, int fps) {
             this.renderer = renderer;
             this.fps = fps;
-            waitTime = calculateWaitTime();
-            syncTime = Math.Clamp(1000 - (fps * waitTime), 0, 10);
+            waitTime = ThreadHelpers.CalculateWaitTime(fps);
+            syncTime = ThreadHelpers.CalculateSyncTime(fps, waitTime);
             locker = new object();
             thread = new Thread(work);
         }
         public void Start() {
             lock (locker) {
                 Rendering = true;
+                if (thread.ThreadState == ThreadState.Stopped)
+                    thread = new Thread(work);
                 thread.Start();
             }
         }
@@ -46,6 +48,7 @@ namespace ChristmasPi.Hardware.Renderers {
 
             while (doRender) {
                 for (int i = 0; i < fps; i++) {
+                    DateTime beforeRender = DateTime.Now;
                     try {
                         renderer.Render(renderer);
                     }
@@ -57,7 +60,16 @@ namespace ChristmasPi.Hardware.Renderers {
                         Rendering = false;
                         return;
                     }
-                    bool slept = await ThreadHelpers.SafeSleep(currentToken, waitTime);
+                    TimeSpan renderTime = DateTime.Now - beforeRender;
+                    int newWaitTime = waitTime;
+                    if (renderTime.TotalMilliseconds > waitTime) {
+                        Console.WriteLine("LOGTHIS Took longer to render frame than fps waittime");
+                        Console.WriteLine($"waitTime: {waitTime}, renderTime: {renderTime}");
+                    }
+                    else {
+                        newWaitTime = waitTime - (int)renderTime.TotalMilliseconds;
+                    }
+                    bool slept = await ThreadHelpers.SafeSleep(currentToken, newWaitTime);
                     if (!slept) {
                         // sleep was cancelled, exit thread
                         return;
@@ -70,14 +82,6 @@ namespace ChristmasPi.Hardware.Renderers {
                     doRender = Rendering;
                 }
             }
-        }
-        private int calculateWaitTime() {
-            if (fps <= 0 || fps > Constants.FPS_MAX) {
-                fps = Constants.FPS_DEFAULT;
-                Console.WriteLine("LOGTHIS Invalid fps value. Using default fps");
-            }
-            float value = (1f / (float)fps) * 1000f;
-            return (int)Math.Floor(value);
         }
 
         public void Dispose() {

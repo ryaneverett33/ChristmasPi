@@ -6,6 +6,9 @@ using System.Drawing;
 using ChristmasPi.Operations.Interfaces;
 using ChristmasPi.Hardware.Interfaces;
 using ChristmasPi.Hardware.Factories;
+using ChristmasPi.Data.Exceptions;
+using ChristmasPi.Data;
+using Microsoft.AspNetCore.Http;
 
 namespace ChristmasPi.Operations.Modes {
     public class SolidColorMode : IOperationMode, ISolidColorMode {
@@ -23,11 +26,12 @@ namespace ChristmasPi.Operations.Modes {
         #region IOperationMode Methods
         public void Activate() {
             renderer.Start();
+            SetColor(ConfigurationManager.Instance.TreeConfiguration.tree.color.DefaultColor);
             Console.WriteLine("Activated Solid Color Mode");
         }
         public void Deactivate() {
             renderer.Stop();
-            Console.WriteLine("Deactivate Solid Color Mode");
+            Console.WriteLine("Deactivated Solid Color Mode");
         }
         public object Info() {
             return new {
@@ -40,11 +44,29 @@ namespace ChristmasPi.Operations.Modes {
         /// Sets the current color being shown
         /// </summary>
         /// <param name="newColor">The new color to show</param>
-        public void SetColor(Color newColor) {
-            _currentColor = newColor;
-            renderer.SetAllLEDColors(_currentColor);
-            if (!renderer.AutoRender)
-                renderer.Render(renderer);
+        public int SetColor(Color newColor) {
+            try {
+                _currentColor = newColor;
+                renderer.SetAllLEDColors(newColor);
+                if (!renderer.AutoRender)
+                    renderer.Render(renderer);
+                return 200;
+            }
+            catch (InvalidRendererException e) {
+                Console.WriteLine("LOGTHIS SolidController::Update failed to get renderer");
+                Console.WriteLine(e.Message);
+                Console.WriteLine(e.StackTrace);
+                return StatusCodes.Status500InternalServerError;
+            }
+            catch (InvalidColorFormatException) {
+                return StatusCodes.Status400BadRequest;
+            }
+            catch (Exception e) {
+                Console.WriteLine("LOGTHIS SolidController::Update failed, an exception occured");
+                Console.WriteLine(e.Message);
+                Console.WriteLine(e.StackTrace);
+                return StatusCodes.Status500InternalServerError;
+            }
         }
         #endregion
     }

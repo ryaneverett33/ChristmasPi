@@ -22,7 +22,7 @@ namespace ChristmasPi.Controllers {
             // /api/tree
             var configuration = new {
                 lightcount = ConfigurationManager.Instance.TreeConfiguration.hardware.lightcount,
-                mode = OperationManager.Instance.CurrentOperatingMode,
+                mode = OperationManager.Instance.CurrentOperatingModeName,
                 name = ConfigurationManager.Instance.TreeConfiguration.tree.name
             };
             return new JsonResult(configuration);

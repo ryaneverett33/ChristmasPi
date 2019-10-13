@@ -8,7 +8,7 @@ namespace ChristmasPi.Data.Models {
     public delegate void BeforeRenderHandler(object sender, RenderArgs args);
     public delegate void AfterRenderHandler(object sender, RenderArgs args);
     #endregion
-    #region Argument Objects
+    #region ArgumentObjects
     public class RenderArgs : EventArgs {
 
     }

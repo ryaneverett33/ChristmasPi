@@ -30,7 +30,7 @@ namespace ChristmasPi.Hardware.Renderers {
         /// </summary>
         /// <param name="ledCount">Number of LEDs to render</param>
         /// <param name="pin">GPIO pin to connect to</param>
-        public WS281xRenderer(int ledCount, int pin, int fps) {
+        public WS281xRenderer(int ledCount, int pin, int fps) : base() {
             var settings = Settings.CreateDefaultSettings();
             settings.Channel_1 = new Channel(ledCount, 
                                             pin, 
@@ -38,8 +38,7 @@ namespace ChristmasPi.Hardware.Renderers {
                                             ConfigurationManager.Instance.TreeConfiguration.hardware.invert, 
                                             getStripTypeFromColorOrder(ConfigurationManager.Instance.TreeConfiguration.tree.color.colororder));
             rpi = new WS281x(settings);
-            base.ledColors = new List<Color>(ledCount);
-            base.InitList();
+            Console.WriteLine($"List size: {ledColors.Length}");
             var defaultColor = ConfigurationManager.Instance.TreeConfiguration.tree.color.DefaultColor;
             for (int i = 0; i < ledCount; i++) {
                 ledColors[i] = defaultColor;
@@ -49,12 +48,13 @@ namespace ChristmasPi.Hardware.Renderers {
             base.LightCount = ledCount;
         }
         public override void Render(IRenderer obj) {
-            BeforeRenderEvent.Invoke(this, new RenderArgs());
+            if (BeforeRenderEvent != null)
+                BeforeRenderEvent.Invoke(this, new RenderArgs());
             WS281xRenderer renderer = (WS281xRenderer)obj;
             lock (renderer.locker) {
                 // only render if the colors table has been updated
                 if (renderer.colorsChanged) {
-                    for (int i = 0; i < ledColors.Capacity; i++) {
+                    for (int i = 0; i < ledColors.Length; i++) {
                         rpi.SetLEDColor(0, i, ledColors[i]);
                     }
                     rpi.Render();
@@ -62,7 +62,8 @@ namespace ChristmasPi.Hardware.Renderers {
                     renderer.colorsChanged = false;
                 }
             }
-            AfterRenderEvent.Invoke(this, new RenderArgs());
+            if (AfterRenderEvent != null)
+                AfterRenderEvent.Invoke(this, new RenderArgs());
         }
         public override void Start() {
             renderThread.Start();

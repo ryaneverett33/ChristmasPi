@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using ChristmasPi.Data;
 using ChristmasPi.Data.Models;
 using ChristmasPi.Operations;
+using ChristmasPi.Animation;
 using System.IO;
 using Microsoft.Extensions.Hosting;
 
@@ -90,6 +91,7 @@ namespace ChristmasPi
         /// </summary>
         public void StartTree() {
             OperationManager.Instance.Init();
+            AnimationManager.Instance.Init();
         }
     }
 }

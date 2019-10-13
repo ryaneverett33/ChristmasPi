@@ -22,6 +22,8 @@ namespace ChristmasPi.Util {
         /// <remarks>A cancellation token should be registered first before using</remarks>
         /// <see cref="RegisterWakeUp"/>
         public static async Task<bool> SafeSleep(CancellationTokenSource token, TimeSpan sleep) {
+            if (sleep.TotalMilliseconds <= 0)
+                return true;
             try {
                 await Task.Delay(sleep, token.Token);
                 return true;
@@ -50,20 +52,21 @@ namespace ChristmasPi.Util {
         }
 
         /// <summary>
-        /// 
+        /// Calculates the remaining ms in a second needed for synchronization
         /// </summary>
-        /// <param name="fps"></param>
-        /// <param name="waitTime"></param>
-        /// <returns></returns>
+        /// <param name="fps">The current running fps</param>
+        /// <param name="waitTime">The calculated waitTime for a thread</param>
+        /// <returns>Time in ms to wait</returns>
+        /// <seealso cref="CalculateWaitTime(int)"/>
         public static int CalculateSyncTime(int fps, int waitTime) {
             return Math.Clamp(1000 - (fps * waitTime), 0, 10);
         }
 
         /// <summary>
-        /// 
+        /// Calculates the time a thread should sleep to maintain current fps
         /// </summary>
-        /// <param name="fps"></param>
-        /// <returns></returns>
+        /// <param name="fps">The desired fps</param>
+        /// <returns>Time in ms to wait</returns>
         public static int CalculateWaitTime(int fps) {
             if (fps <= 0 || fps > Constants.FPS_MAX) {
                 fps = Constants.FPS_DEFAULT;

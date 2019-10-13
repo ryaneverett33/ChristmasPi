@@ -3,14 +3,14 @@
     "name": "",
     "color": {
       "colororder": "RGB",
-      "default": "#fff"
+      "default": "#db6e00"
     }
   },
   "setup": {
     "firstrun": false
   },
   "hardware": {
-    "lightcount": 0,
+    "lightcount": 50,
     "fps": 30,
     "datapin": 18,
     "brightness" : 255,

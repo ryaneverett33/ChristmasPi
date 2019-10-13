@@ -3,7 +3,6 @@ using ChristmasPi.Animation.Interfaces;
 
 namespace ChristmasPi.Animation.Interfaces {
     public interface IAnimation : IAnimatable {
-        string Name { get; }
         float TotalTime { get; }    // in s
         int TotalFrames { get; }
         int FPS { get; }

@@ -7,5 +7,6 @@ namespace ChristmasPi.Animation.Interfaces {
     public interface IAnimatable {
         bool isBranchAnimation { get; }
         bool isLegacyAnimation { get; }
+        string Name { get; }
     }
 }

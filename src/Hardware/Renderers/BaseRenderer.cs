@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using ChristmasPi.Hardware.Interfaces;
@@ -8,7 +9,7 @@ using ChristmasPi.Data.Extensions;
 
 namespace ChristmasPi.Hardware.Renderers {
     public abstract class BaseRenderer : IRenderer {
-        protected List<Color> ledColors;                  // a list of all the current color values to render, same size as the amount of LEDs
+        protected Color[] ledColors;                  // a list of all the current color values to render, same size as the amount of LEDs
         protected bool colorsChanged = false;
 
         public int LightCount { get; protected set; }
@@ -18,13 +19,17 @@ namespace ChristmasPi.Hardware.Renderers {
         public abstract event BeforeRenderHandler BeforeRenderEvent;
         public abstract event AfterRenderHandler AfterRenderEvent;
         public abstract void Render(IRenderer obj);
+
+        public BaseRenderer() {
+            ledColors = new Color[50];
+        }
         /// <summary>
         /// Sets the LED color at the position and applies color flips if needed
         /// </summary>
         /// <param name="index">Position of the LED</param>
         /// <param name="color">New color for the LED</param>
         public void SetLEDColor(int index, Color color) {
-            if (index < 0 || index >= ledColors.Count)
+            if (index < 0 || index >= ledColors.Length)
                 throw new ArgumentOutOfRangeException("index");
             ledColors[index] = color;
             colorsChanged = true;
@@ -34,24 +39,16 @@ namespace ChristmasPi.Hardware.Renderers {
         /// </summary>
         /// <param name="color">the new color</param>
         public void SetAllLEDColors(Color color) {
-            for (int i = 0; i < ledColors.Count; i++) {
+            for (int i = 0; i < ledColors.Length; i++) {
                 SetLEDColor(i, color);
             }
         }
 
-        /// <summary>
-        /// Initializes the color list
-        /// </summary>
-        public void InitList() {
-            for (int i = 0; i < ledColors.Count; i++) {
-                ledColors.Add(Color.Empty);
-            }
-        }
         public abstract void Start();
         public abstract void Stop();
 
         public virtual void Dispose() {
-            ledColors.Clear();
+            
         }
     }
 }
