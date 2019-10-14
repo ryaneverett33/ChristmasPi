@@ -8,36 +8,16 @@ using ChristmasPi.Data;
 using System.Linq;
 
 namespace ChristmasPi.Animation.Animations {
-    public class flash : IAnimation {
-        private int lightcount;
-        private int fps;
-        private FrameList list;
+    public class flash : BaseAnimation {
         private Color color;
         
-        public string Name => "Flash";
-        public int TotalFrames => list.Count;
-        public float TotalTime => 1f;
-        public int LightCount => lightcount;
-        public int FPS => fps;
-        public bool isBranchAnimation => false;
+        public new string Name => "Flash";
 
-        
-
-        public flash() {
-            list = new FrameList();
+        public flash() : base() {
             color = ConfigurationManager.Instance.CurrentTreeConfig.tree.color.DefaultColor;
         }
 
-        public RenderFrame[] GetFrames(int fps, int lightcount) {
-            if (list.Count != 0 && this.fps == fps && this.lightcount == lightcount) {
-                return list.ToFrames(fps);
-            }
-            else {
-                construct(lightcount, fps);
-                return list.ToFrames(fps);
-            }
-        }
-        private void construct(int lightcount, int fps) {
+        public override void construct(int lightcount, int fps) {
             /* Original animation
                 allOn();
                 Thread.Sleep(500);

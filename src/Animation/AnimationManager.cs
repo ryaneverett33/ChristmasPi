@@ -34,6 +34,7 @@ namespace ChristmasPi.Animation {
             /// TODO use reflection to get classes
             return new string[] {
                 typeof(toggleeachbranch).FullName,
+                typeof(random).FullName,
                 typeof(flash).FullName
             };
         }
