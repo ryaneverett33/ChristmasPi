@@ -20,11 +20,11 @@ namespace ChristmasPi.Hardware.Factories {
 
         public static IRenderer GetRenderer() {
             lock (locker) {
-                var hardware = ConfigurationManager.Instance.TreeConfiguration.hardware;
+                var hardware = ConfigurationManager.Instance.CurrentTreeConfig.hardware;
                 switch (hardware.type) {
                     case HardwareType.RPI_WS281x: {
                             if (WS281xRenderer == null)
-                                WS281xRenderer = new WS281xRenderer(hardware.lightcount, hardware.datapin, ConfigurationManager.Instance.TreeConfiguration.hardware.fps);
+                                WS281xRenderer = new WS281xRenderer(hardware.lightcount, hardware.datapin, ConfigurationManager.Instance.CurrentTreeConfig.hardware.fps);
                             return WS281xRenderer;
                         }
                     case HardwareType.TEST_RENDER: {

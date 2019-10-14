@@ -34,12 +34,12 @@ namespace ChristmasPi.Hardware.Renderers {
             var settings = Settings.CreateDefaultSettings();
             settings.Channel_1 = new Channel(ledCount, 
                                             pin, 
-                                            (byte)ConfigurationManager.Instance.TreeConfiguration.hardware.brightness, 
-                                            ConfigurationManager.Instance.TreeConfiguration.hardware.invert, 
-                                            getStripTypeFromColorOrder(ConfigurationManager.Instance.TreeConfiguration.tree.color.colororder));
+                                            (byte)ConfigurationManager.Instance.CurrentTreeConfig.hardware.brightness, 
+                                            ConfigurationManager.Instance.CurrentTreeConfig.hardware.invert, 
+                                            getStripTypeFromColorOrder(ConfigurationManager.Instance.CurrentTreeConfig.tree.color.colororder));
             rpi = new WS281x(settings);
             Console.WriteLine($"List size: {ledColors.Length}");
-            var defaultColor = ConfigurationManager.Instance.TreeConfiguration.tree.color.DefaultColor;
+            var defaultColor = ConfigurationManager.Instance.CurrentTreeConfig.tree.color.DefaultColor;
             for (int i = 0; i < ledCount; i++) {
                 ledColors[i] = defaultColor;
             }

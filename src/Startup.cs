@@ -78,12 +78,13 @@ namespace ChristmasPi
             // Load tree configuration
             if (!File.Exists("configuration.json")) {
                 Console.WriteLine("LOGTHIS Tree Configuration file not found, using default configuration values");
-                ConfigurationManager.Instance.TreeConfiguration = TreeConfiguration.DefaultSettings();
+                ConfigurationManager.Instance.StartupTreeConfig = TreeConfiguration.DefaultSettings();
             }
             else {
                 string json = File.ReadAllText("configuration.json");
-                ConfigurationManager.Instance.TreeConfiguration = JsonConvert.DeserializeObject<TreeConfiguration>(json);
+                ConfigurationManager.Instance.StartupTreeConfig = JsonConvert.DeserializeObject<TreeConfiguration>(json);
             }
+            ConfigurationManager.Instance.CurrentTreeConfig = ConfigurationManager.Instance.StartupTreeConfig;
             ConfigurationManager.Instance.Configuration = Configuration;
         }
         /// <summary>

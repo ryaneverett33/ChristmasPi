@@ -25,7 +25,7 @@ namespace ChristmasPi.Animation.Animations {
 
         public flash() {
             list = new FrameList();
-            color = ConfigurationManager.Instance.TreeConfiguration.tree.color.DefaultColor;
+            color = ConfigurationManager.Instance.CurrentTreeConfig.tree.color.DefaultColor;
         }
 
         public RenderFrame[] GetFrames(int fps, int lightcount) {

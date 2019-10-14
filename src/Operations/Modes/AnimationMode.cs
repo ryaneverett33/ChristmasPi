@@ -56,8 +56,8 @@ namespace ChristmasPi.Operations.Modes {
             if (!animationManager.Animations.ContainsKey(animationName))
                 return StatusCodes.Status400BadRequest;
             IAnimatable animation = animationManager.Animations[animationName];
-            animator = new Animator(animation, ConfigurationManager.Instance.TreeConfiguration.hardware.fps,
-                ConfigurationManager.Instance.TreeConfiguration.hardware.lightcount,
+            animator = new Animator(animation, ConfigurationManager.Instance.CurrentTreeConfig.hardware.fps,
+                ConfigurationManager.Instance.CurrentTreeConfig.hardware.lightcount,
                 0);
             try {
                 animator.Start();

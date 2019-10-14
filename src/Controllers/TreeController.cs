@@ -21,9 +21,9 @@ namespace ChristmasPi.Controllers {
         public IActionResult GetTreeInfo() {
             // /api/tree
             var configuration = new {
-                lightcount = ConfigurationManager.Instance.TreeConfiguration.hardware.lightcount,
+                lightcount = ConfigurationManager.Instance.CurrentTreeConfig.hardware.lightcount,
                 mode = OperationManager.Instance.CurrentOperatingModeName,
-                name = ConfigurationManager.Instance.TreeConfiguration.tree.name
+                name = ConfigurationManager.Instance.CurrentTreeConfig.tree.name
             };
             return new JsonResult(configuration);
         }

@@ -12,11 +12,12 @@ namespace ChristmasPi.Data {
         public static ConfigurationManager Instance { get { return _instance; } }
         #endregion
         public IConfiguration Configuration;
-        public TreeConfiguration TreeConfiguration;
+        public TreeConfiguration StartupTreeConfig;
+        public TreeConfiguration CurrentTreeConfig;
 
         public void Save() {
             try {
-                string json = JsonConvert.SerializeObject(TreeConfiguration, Formatting.Indented);
+                string json = JsonConvert.SerializeObject(CurrentTreeConfig, Formatting.Indented);
                 if (File.Exists("configuration.json")) {
                     File.Move("configuration.json", "configuration.old.json");
                     File.WriteAllText("configuration.json", json);
