@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using ChristmasPi.Animation.Interfaces;
 using ChristmasPi.Data.Models;
 using ChristmasPi.Data.Models.Animation;
@@ -40,7 +41,7 @@ namespace ChristmasPi.Animation {
             this.branchcount = branchcount;
             disposed = false;
             locker = new object();
-            currentFrames = animation.isBranchAnimation ? null : (animation as IAnimation).GetFrames(fps, lightcount);
+            currentFrames = getFrames();
             _currentState = AnimationState.Stopped;
             renderer = RenderFactory.GetRenderer();
             if (renderer.AutoRender) {
@@ -203,8 +204,23 @@ namespace ChristmasPi.Animation {
         /// </summary>
         private void incrementFrame() {
             currentFrameIndex++;
-            if (currentFrameIndex >= currentFrames.Length)
+            if (currentFrameIndex >= currentFrames.Length) {
                 currentFrameIndex = 0;
+                currentFrames = nextFrames;             // set current frames to the next set of evaluated frames
+                nextFrames = getFrames();
+            }
+            else if (currentFrameIndex >= (currentFrames.Length / 2)) {
+                // evaluate the next set of frames
+                Task.Run(() => {
+                    for (int i = 0; i < nextFrames.Length; i++) {
+                        nextFrames[i].Colors.Evaluate();
+                    }
+                });
+            }
+        }
+
+        private RenderFrame[] getFrames() {
+            return animation.isBranchAnimation ? null : (animation as IAnimation).GetFrames(fps, lightcount);
         }
 
         public void Dispose() {

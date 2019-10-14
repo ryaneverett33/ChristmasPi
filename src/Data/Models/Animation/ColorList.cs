@@ -8,7 +8,7 @@ namespace ChristmasPi.Data.Models.Animation {
     public class ColorList {
         private bool evaluated;
         private List<ColorValue> list;
-        private Color[] evaluatedColors;
+        private Color[] evaluatedColors;            // Current list of evaluated colors
 
         public int Count => list.Count;
 
@@ -73,28 +73,29 @@ namespace ChristmasPi.Data.Models.Animation {
         /// <summary>
         /// Evaluates any randomcolor objects to primitive colors and stores the resultant array
         /// </summary>
-        public void Evaluate(int randomA, int randomB, int randomC) {
-            if (!evaluated) {
+        /// <remarks>If Evaluate is called multiple times, the stored array will be the result of the last call</remarks>
+        public void Evaluate() {
+            if (!evaluated)
                 evaluatedColors = new Color[list.Count];
-                for (int i = 0; i < list.Count; i++) {
-                    ColorValue value = list[i];
-                    if (!value.IsPrimitiveColor)
-                        evaluatedColors[i] = value.RandomColor.Evaluate();
-                    else
-                        evaluatedColors[i] = value.PrimitiveColor;
-                }
+            for (int i = 0; i < list.Count; i++) {
+                ColorValue value = list[i];
+                if (!value.IsPrimitiveColor)
+                    evaluatedColors[i] = value.RandomColor.Evaluate();
+                else
+                    evaluatedColors[i] = value.PrimitiveColor;
             }
+            evaluated = true;
         }
 
         /// <summary>
         /// Gets the primitive color array.
         /// </summary>
         /// <returns>Array of primitive colors</returns>
-        /// <exception cref="InvalidOperationException">Thrown if Evaluate() has been called prior</exception>
+        /// <remarks>If not previously evaluated, Evaluate() is called before returnning colors</remarks>
         /// <seealso cref="Evaluate"/>
         public Color[] GetColors() {
             if (!evaluated) {
-                throw new InvalidOperationException("ColorList must be evaluated before returning colors");
+                Evaluate();
             }
             return evaluatedColors;
         }

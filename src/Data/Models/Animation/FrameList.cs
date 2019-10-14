@@ -30,7 +30,7 @@ namespace ChristmasPi.Data.Models.Animation {
         /// </summary>
         /// <param name="fps">The desired frame rate</param>
         /// <returns>List of render frames</returns>
-        /// <remarks>Some Aniamtion frames are time sensitive, so calls with differnt fps values may return different size lists</remarks>
+        /// <remarks>Some Aniamtion frames are time sensitive, so calls with different fps values may return different size lists</remarks>
         public RenderFrame[] ToFrames(int fps) {
             List<RenderFrame> renderFrames = new List<RenderFrame>();
             foreach (IAnimationFrame frame in animationFrames) {
