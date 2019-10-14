@@ -1,19 +1,18 @@
-using System;
-using System.Drawing;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using ChristmasPi.Animation.Interfaces;
 using ChristmasPi.Data.Models.Animation;
-using ChristmasPi.Util;
 using ChristmasPi.Data;
-using System.Linq;
+using ChristmasPi.Data.Models;
 
 namespace ChristmasPi.Animation.Animations {
-    public class flash : IAnimation {
+    public class random : IAnimation {
         private int lightcount;
         private int fps;
         private FrameList list;
-        private Color color;
-        
+
         public string Name => "Flash";
         public int TotalFrames => list.Count;
         public float TotalTime => 1f;
@@ -21,11 +20,8 @@ namespace ChristmasPi.Animation.Animations {
         public int FPS => fps;
         public bool isBranchAnimation => false;
 
-        
-
-        public flash() {
+        public random() {
             list = new FrameList();
-            color = ConfigurationManager.Instance.TreeConfiguration.tree.color.DefaultColor;
         }
 
         public RenderFrame[] GetFrames(int fps, int lightcount) {
@@ -37,19 +33,14 @@ namespace ChristmasPi.Animation.Animations {
                 return list.ToFrames(fps);
             }
         }
+
         private void construct(int lightcount, int fps) {
-            /* Original animation
-                allOn();
-                Thread.Sleep(500);
-                allOff();
-                Thread.Sleep(500);
-            */
             this.fps = fps;
             this.lightcount = lightcount;
-            list.Add(new ColorFrame(color, lightcount));
-            list.Add(new SleepFrame(0.5f));
-            list.Add(new ColorFrame(Color.Black, lightcount));
-            list.Add(new SleepFrame(0.5f));
+            list.Add(new ColorFrame(new RandomColor(RandomColor.RandomColorGenerator), lightcount));
+            list.Add(new SleepFrame(0.2f));
+            list.Add(new ColorFrame(new RandomColor(RandomColor.RandomColorGenerator), lightcount));
+            list.Add(new SleepFrame(0.2f));
         }
     }
 }

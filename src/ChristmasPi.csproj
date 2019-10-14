@@ -23,11 +23,6 @@
 
 
   <ItemGroup>
-    <Folder Include="Data\Interfaces\" />
-  </ItemGroup>
-
-
-  <ItemGroup>
     <Reference Include="rpi-ws281x">
       <HintPath>lib\netcoreapp3.0\rpi-ws281x.dll</HintPath>
     </Reference>

@@ -78,7 +78,7 @@ namespace ChristmasPi.Operations.Modes {
         }
 
         public int PauseAnimation() {
-            if (currentAnimationIsBranch && animationManager.Animations[CurrentAnimation].isLegacyAnimation)
+            if (currentAnimationIsBranch)
                 return StatusCodes.Status405MethodNotAllowed;
             if (animator == null || animator.CurrentState == Data.Models.AnimationState.Stopped ||
                 animator.CurrentState == AnimationState.Error)

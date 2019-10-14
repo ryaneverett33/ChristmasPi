@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ChristmasPi.Data.Models {
+namespace ChristmasPi.Data.Models.Animation {
     public enum FrameAction {
         /// <summary>
         /// Update the current frame with new values

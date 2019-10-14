@@ -16,5 +16,10 @@ namespace ChristmasPi.Data {
         // Operations
         public static readonly string DEFAULT_OPERATING_MODE = "SolidColorMode";
         public static readonly int ACTIVATION_TIMEOUT = 1000;           // in ms
+
+        // Colors
+        public static readonly int RANDOM_DEFAULT = 255;
+        public static readonly int RANDOM_MAX = 255;                    // exclusive range
+        public static readonly int RANDOM_MIN = 0;
     }
 }

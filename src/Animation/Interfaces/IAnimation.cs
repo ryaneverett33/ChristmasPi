@@ -1,4 +1,4 @@
-using ChristmasPi.Data.Models;
+using ChristmasPi.Data.Models.Animation;
 using ChristmasPi.Animation.Interfaces;
 
 namespace ChristmasPi.Animation.Interfaces {
@@ -8,6 +8,6 @@ namespace ChristmasPi.Animation.Interfaces {
         int FPS { get; }
         int LightCount { get; }
 
-        AnimationFrame[] GetFrames(int fps, int lightcount);
+        RenderFrame[] GetFrames(int fps, int lightcount);
     }
 }
