@@ -4,7 +4,29 @@
     "color": {
       "colororder": "RGB",
       "default": "#db6e00"
-    }
+    },
+    "branches" : [
+      {
+        "start" : 0,
+        "end" : 9
+      },
+      {
+        "start" : 10,
+        "end" : 19
+      },
+      {
+        "start" : 20,
+        "end" : 29
+      },
+      {
+        "start" : 30,
+        "end" : 39
+      },
+      {
+        "start" : 40,
+        "end" : 49
+      }
+    ]
   },
   "setup": {
     "firstrun": false

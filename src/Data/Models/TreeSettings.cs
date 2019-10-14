@@ -16,6 +16,8 @@ namespace ChristmasPi.Data.Models {
         /// </summary>
         public ColorSettings color { get; set; }
 
+        public List<Branch> branches { get; set;}
+
         /// <summary>
         /// Returns the default tree settings
         /// </summary>
@@ -23,6 +25,7 @@ namespace ChristmasPi.Data.Models {
             TreeSettings settings = new TreeSettings();
             settings.name = "Christmas Tree";
             settings.color = ColorSettings.DefaultSettings();
+            settings.branches = new List<Branch>();
             return settings;
         }
     }
