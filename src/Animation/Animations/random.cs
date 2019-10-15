@@ -10,7 +10,7 @@ using ChristmasPi.Data.Models;
 namespace ChristmasPi.Animation.Animations {
     public class random : BaseAnimation {
 
-        public new string Name => "Flash";
+        public override string Name => "random";
 
         public override void construct(int lightcount, int fps) {
             this.fps = fps;

@@ -11,7 +11,7 @@ namespace ChristmasPi.Animation.Animations {
     public class flash : BaseAnimation {
         private Color color;
         
-        public new string Name => "Flash";
+        public override string Name => "Flash";
 
         public flash() : base() {
             color = ConfigurationManager.Instance.CurrentTreeConfig.tree.color.DefaultColor;

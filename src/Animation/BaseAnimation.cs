@@ -7,13 +7,13 @@ namespace ChristmasPi.Animation {
         public int LightCount => lightcount;
         public int FPS => fps;
         public bool isBranchAnimation => false;
-        public string Name { get; set; }
+        public virtual string Name { get { throw new NotImplementedException(); } }
 
         public int lightcount;
         public int fps;
         public FrameList list;
 
-        public BaseAnimation() { }
+        public BaseAnimation() { list = new FrameList(); }
 
         public virtual RenderFrame[] GetFrames(int fps, int lightcount) {
             if (list.Count != 0 && this.fps == fps && this.lightcount == lightcount) {
@@ -21,7 +21,7 @@ namespace ChristmasPi.Animation {
             }
             else {
                 this.list = new FrameList();
-                construct(lightcount, fps);
+                this.construct(lightcount, fps);
                 return list.ToFrames(fps);
             }
         }

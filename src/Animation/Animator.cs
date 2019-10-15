@@ -28,6 +28,7 @@ namespace ChristmasPi.Animation {
         private RenderFrame[] currentFrames;
         private RenderFrame[] nextFrames;
         private int currentFrameIndex;          // What frame we're on
+        private bool evaluatedNextFrames;       // Whether or not the next set of frames has been evaluated yet
         private CancellationTokenSource currentToken;
 
 
@@ -42,6 +43,10 @@ namespace ChristmasPi.Animation {
             disposed = false;
             locker = new object();
             currentFrames = getFrames();
+            for (int i = 0; i < currentFrames.Length; i++) {
+                if (currentFrames[i].Colors != null)
+                    currentFrames[i].Colors.Evaluate();
+            }
             _currentState = AnimationState.Stopped;
             renderer = RenderFactory.GetRenderer();
             if (renderer.AutoRender) {
@@ -207,15 +212,18 @@ namespace ChristmasPi.Animation {
             if (currentFrameIndex >= currentFrames.Length) {
                 currentFrameIndex = 0;
                 currentFrames = nextFrames;             // set current frames to the next set of evaluated frames
-                nextFrames = getFrames();
+                evaluatedNextFrames = false;
             }
-            else if (currentFrameIndex >= (currentFrames.Length / 2)) {
+            else if (currentFrameIndex >= (currentFrames.Length / 2) && !evaluatedNextFrames) {
+                nextFrames = getFrames();
                 // evaluate the next set of frames
                 Task.Run(() => {
                     for (int i = 0; i < nextFrames.Length; i++) {
-                        nextFrames[i].Colors.Evaluate();
+                        if (nextFrames[i].Colors != null)
+                            nextFrames[i].Colors.Evaluate();
                     }
                 });
+                evaluatedNextFrames = true;
             }
         }
 
