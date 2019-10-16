@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using ChristmasPi.Animation.Interfaces;
+using ChristmasPi.Data;
 using ChristmasPi.Data.Models;
 using ChristmasPi.Data.Models.Animation;
 
@@ -35,6 +35,8 @@ namespace ChristmasPi.Animation {
                 }
                 // assemble each animation into one
                 RenderFrame[][] frameLists = getAnimations(fps);
+                ColorList[] lastColors = new ColorList[branchList.Count];   // array of last used colors for each branch
+                initLastColors(ref lastColors);
                 int totalFrames = frameLists.Max(list => list.Length);
                 padFrames(ref frameLists, totalFrames);
                 for (int i = 0; i < totalFrames; i++) {
@@ -46,7 +48,14 @@ namespace ChristmasPi.Animation {
                     else {
                         // join all renderframe arrays to one render frame array
                         for (int j = 0; j < frameLists[i].Length; j++) {
-                            
+                            var frame = frameLists[i][j];
+                            if (frame.Action == FrameAction.Blank || frame.Action == FrameAction.Sleep) {
+                                ColorValue[] lastColor = lastColors[j].GetNonEvaluatedColors();
+                                
+                            }
+                            else {
+
+                            }
                         }
                     }
                 }
@@ -80,6 +89,15 @@ namespace ChristmasPi.Animation {
                         newFrames[j] = new RenderFrame(FrameAction.Blank);
                 }
                 frames[i] = newFrames;
+            }
+        }
+
+        private void initLastColors(ref ColorList[] arr) {
+            for (int i = 0; i < arr.Length; i++) {
+                BranchData data = branchList.GetBranch(i);
+                for (int j = 0; j < data.LightCount; j++) {
+                    arr[i].Add(Constants.COLOR_OFF);
+                }
             }
         }
     }

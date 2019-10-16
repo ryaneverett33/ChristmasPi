@@ -6,7 +6,7 @@ using System.Drawing;
 
 namespace ChristmasPi.Data.Models {
     public class RandomColor {
-        // Delegate function that generates the entire random colors
+        // Delegate function that generates the entire color
         private Func<Color> generatorDelegate;
         private Func<int> rDelegate;       // Delegate function that generates the Red value of the color
         private Func<int> gDelegate;       // Delegate function that generates the Green value of the color
@@ -117,6 +117,11 @@ namespace ChristmasPi.Data.Models {
             int g = RandomGenerator.Instance.Number();
             int b = RandomGenerator.Instance.Number();
             return Color.FromArgb(255, r, g, b);
+        };
+
+        public static Func<Color> RandomKnownColorGenerator = () => {
+            int num = RandomGenerator.Instance.Number(0, ColorTable.KnownColorTable.Count + 1);
+            return ColorTable.KnownColorTable[num];
         };
     }
     /// <summary>

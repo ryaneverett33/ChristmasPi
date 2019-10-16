@@ -99,6 +99,11 @@ namespace ChristmasPi.Data.Models.Animation {
             }
             return evaluatedColors;
         }
+
+        // return a list of colors but don't evaluate them
+        public ColorValue[] GetNonEvaluatedColors() {
+            return list.ToArray();
+        }
     }
     public struct ColorValue {
         public bool IsPrimitiveColor;

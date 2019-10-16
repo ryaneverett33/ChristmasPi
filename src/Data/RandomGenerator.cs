@@ -13,5 +13,9 @@ namespace ChristmasPi.Data {
         public int Number() {
             return random.Next(Constants.RANDOM_MIN, Constants.RANDOM_MAX);
         }
+
+        public int Number(int min, int max) {
+            return random.Next(min, max);
+        }
     }
 }
