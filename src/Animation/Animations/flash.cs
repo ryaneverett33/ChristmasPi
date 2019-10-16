@@ -24,8 +24,7 @@ namespace ChristmasPi.Animation.Animations {
                 allOff();
                 Thread.Sleep(500);
             */
-            this.fps = fps;
-            this.lightcount = lightcount;
+            base.construct(lightcount, fps);
             list.Add(new ColorFrame(color, lightcount));
             list.Add(new SleepFrame(0.5f));
             list.Add(new ColorFrame(Color.Black, lightcount));

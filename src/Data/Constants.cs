@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Drawing;
 
 namespace ChristmasPi.Data {
     public class Constants {
@@ -21,5 +19,6 @@ namespace ChristmasPi.Data {
         public static readonly int RANDOM_DEFAULT = 255;
         public static readonly int RANDOM_MAX = 255;                    // exclusive range
         public static readonly int RANDOM_MIN = 0;
+        public static readonly Color COLOR_OFF = Color.Black;
     }
 }

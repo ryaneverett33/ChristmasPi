@@ -3,6 +3,9 @@ using ChristmasPi.Util;
 using ChristmasPi.Data.Interfaces;
 
 namespace ChristmasPi.Data.Models.Animation {
+    /// <summary>
+    /// Allow the animation to sleep for x time
+    /// </summary>
     public class SleepFrame : IAnimationFrame {
         /// <summary>
         /// The length of time to sleep for (in seconds)

@@ -13,8 +13,7 @@ namespace ChristmasPi.Animation.Animations {
         public override string Name => "random";
 
         public override void construct(int lightcount, int fps) {
-            this.fps = fps;
-            this.lightcount = lightcount;
+            base.construct(lightcount, fps);
             list.Add(new ColorFrame(new RandomColor(RandomColor.RandomColorGenerator), lightcount));
             list.Add(new SleepFrame(0.2f));
             list.Add(new ColorFrame(new RandomColor(RandomColor.RandomColorGenerator), lightcount));

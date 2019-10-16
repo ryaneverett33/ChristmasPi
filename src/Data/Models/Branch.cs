@@ -10,6 +10,8 @@ namespace ChristmasPi.Data.Models {
 
         public int end { get; set; }
 
+        public int LightCount => (end - start) + 1; // offset for zero-based indexing
+
         /// <summary>
         /// Returns the default settings for the setup process
         /// </summary>

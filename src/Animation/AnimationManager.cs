@@ -3,7 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using ChristmasPi.Animation.Interfaces;
 using ChristmasPi.Animation.Animations;
-using ChristmasPi.Animation.Branch;
+using ChristmasPi.Animation.BranchAnimations;
 using ChristmasPi.Data.Exceptions;
 using ChristmasPi.Data;
 

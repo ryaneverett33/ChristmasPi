@@ -9,8 +9,8 @@ namespace ChristmasPi.Animation {
         public bool isBranchAnimation => false;
         public virtual string Name { get { throw new NotImplementedException(); } }
 
-        public int lightcount;
-        public int fps;
+        private int lightcount;
+        private int fps;
         public FrameList list;
 
         public BaseAnimation() { list = new FrameList(); }
@@ -20,12 +20,15 @@ namespace ChristmasPi.Animation {
                 return list.ToFrames(fps);
             }
             else {
-                this.list = new FrameList();
+                // this.list = new FrameList();
                 this.construct(lightcount, fps);
                 return list.ToFrames(fps);
             }
         }
 
-        public abstract void construct(int lightcount, int fps);
+        public virtual void construct(int lightcount, int fps) {
+            this.fps = fps;
+            this.lightcount = lightcount;
+        }
     }
 }

@@ -4,6 +4,9 @@ using ChristmasPi.Data.Interfaces;
 using ChristmasPi.Util;
 
 namespace ChristmasPi.Data.Models.Animation {
+    /// <summary>
+    /// Allow the animation to repeat colors
+    /// </summary>
     public class ColorFrame : RenderFrame, IAnimationFrame {
         /// <summary>
         /// Creates a new frame whose lights are all the same color
