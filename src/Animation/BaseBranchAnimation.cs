@@ -17,9 +17,12 @@ namespace ChristmasPi.Animation {
         BranchList branchList;
         public List<RenderFrame> frames;
 
-        public BaseBranchAnimation(Branch[] branches) {
-            branchList = new BranchList(branches);
+        public BaseBranchAnimation() {
             frames = new List<RenderFrame>();
+        }
+
+        public void Init(Branch[] branches) {
+            branchList = new BranchList(branches);
         }
 
         public virtual RenderFrame[] GetFrames(int fps) {

@@ -40,9 +40,9 @@ namespace ChristmasPi.Data.Models {
                 if (_knownColorTable == null) {
                     List<Tuple<string, Color>> colors = new List<Tuple<string, Color>>();
                     string[] names = Enum.GetNames(typeof(KnownColor));
-                    Color[] knownValues = (Color[])Enum.GetValues(typeof(KnownColor));
+                    KnownColor[] knownValues = (KnownColor[])Enum.GetValues(typeof(KnownColor));
                     for (int i = 0; i < names.Length; i++) {
-                        colors.Add(new Tuple<string, Color>(names[i], knownValues[i]));
+                        colors.Add(new Tuple<string, Color>(names[i], Color.FromKnownColor(knownValues[i])));
                     }
                     _knownColorTable = new ColorTable(colors.ToArray());
                 }

@@ -12,7 +12,7 @@ namespace ChristmasPi.Animation.BranchAnimations {
         private readonly float SLEEP_TIME = 0.25f;
         private readonly int WAIT_FRAMES = 3;
 
-        public toggleeachbranch(Branch[] branches) : base(branches) {
+        public toggleeachbranch() : base() {
             color = ConfigurationManager.Instance.CurrentTreeConfig.tree.color.DefaultColor;
         }
 

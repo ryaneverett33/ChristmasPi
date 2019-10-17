@@ -22,6 +22,8 @@ namespace ChristmasPi.Animation {
             foreach (string classname in animationsClasses) {
                 /// TODO Handle if exception occurs when creating instance or casting
                 IAnimatable anim = (IAnimatable)Activator.CreateInstance(Type.GetType(classname));
+                if (anim.isBranchAnimation)
+                    (anim as BaseBranchAnimation).Init(ConfigurationManager.Instance.CurrentTreeConfig.tree.branches.ToArray());
                 Animations.Add(anim.Name, anim);
             }
         }
@@ -35,7 +37,9 @@ namespace ChristmasPi.Animation {
             return new string[] {
                 typeof(toggleeachbranch).FullName,
                 typeof(random).FullName,
-                typeof(flash).FullName
+                typeof(flash).FullName,
+                typeof(rainbow).FullName,
+                typeof(randomcolor).FullName
             };
         }
 
