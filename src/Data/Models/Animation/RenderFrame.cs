@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using ChristmasPi.Data;
 
 namespace ChristmasPi.Data.Models.Animation {
     public class RenderFrame {
@@ -28,6 +29,29 @@ namespace ChristmasPi.Data.Models.Animation {
         public RenderFrame(FrameAction action, ColorList colors) {
             Action = action;
             Colors = colors;
+        }
+
+        public RenderFrame operator+(RenderFrame other) {
+            if (this.Action == FrameAction.Sleep || this.Action == FrameAction.Blank) {
+                if (other.Action == FrameAction.Sleep || other.Action == FrameAction.Sleep)
+                    return this;
+                else
+                    return other;
+            }
+            else if (other.Action == FrameAction.Sleep || other.Action == FrameAction.Sleep)
+                return this;
+            Colorlist newlist = new Colorlist();
+            if (this.Colors.Count != other.Colors.Count)
+                throw new Exception("Cannot add two render frames together, they are different sizes");
+            for (int i = 0; i < this.Colors.Count; i++) {
+                if (this.Colors[i] == Constants.COLOR_OFF)
+                    newlist.Add(other.Colors[i]);
+                else if (other.Colors[i] == Constants.COLOR_OFF)
+                    newlist.Add(this.Colors[i]);
+                else
+                    throw new Exception("Cannot add two render frames together, would result in color clashing");
+            }
+            return new RenderFrame(newlist);
         }
     }
 }
