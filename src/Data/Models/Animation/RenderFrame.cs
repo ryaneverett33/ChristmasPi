@@ -31,23 +31,24 @@ namespace ChristmasPi.Data.Models.Animation {
             Colors = colors;
         }
 
-        public RenderFrame operator+(RenderFrame other) {
-            if (this.Action == FrameAction.Sleep || this.Action == FrameAction.Blank) {
+        public static RenderFrame operator+(RenderFrame a, RenderFrame other) {
+            if (a.Action == FrameAction.Sleep || a.Action == FrameAction.Blank) {
                 if (other.Action == FrameAction.Sleep || other.Action == FrameAction.Sleep)
-                    return this;
+                    return a;
                 else
                     return other;
             }
             else if (other.Action == FrameAction.Sleep || other.Action == FrameAction.Sleep)
-                return this;
-            Colorlist newlist = new Colorlist();
-            if (this.Colors.Count != other.Colors.Count)
+                return a;
+            ColorList newlist = new ColorList();
+            ColorValue off = new ColorValue(Constants.COLOR_OFF);
+            if (a.Colors.Count != other.Colors.Count)
                 throw new Exception("Cannot add two render frames together, they are different sizes");
-            for (int i = 0; i < this.Colors.Count; i++) {
-                if (this.Colors[i] == Constants.COLOR_OFF)
+            for (int i = 0; i < a.Colors.Count; i++) {
+                if (a.Colors[i] == off)
                     newlist.Add(other.Colors[i]);
-                else if (other.Colors[i] == Constants.COLOR_OFF)
-                    newlist.Add(this.Colors[i]);
+                else if (other.Colors[i] == off)
+                    newlist.Add(a.Colors[i]);
                 else
                     throw new Exception("Cannot add two render frames together, would result in color clashing");
             }

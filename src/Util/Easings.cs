@@ -8,8 +8,8 @@ namespace ChristmasPi.Util {
         // https://github.com/jesusgollonet/processing-penner-easing
         // example usage: https://github.com/jesusgollonet/processing-penner-easing/blob/master/usage_example/easing/easing.pde 
         
-        public static float HALFPI = Math.PI / 2;
-        public static float TWOPI = Math.PI * 2;
+        public static float HALFPI = (float)Math.PI / 2;
+        public static float TWOPI = (float)Math.PI * 2;
         public static float S = 1.70158f;
         public static float Lerp(float from, float to, float step) {
             return (from * (1-step)) + (to * (1 - step));
@@ -105,51 +105,81 @@ namespace ChristmasPi.Util {
                     return Linear.EaseOut(time, beginning, change, duration);
             }
         }
+        public static float[] EvaluateIn(float start, float end, float duration, int fps, EasingType type) {
+            int frameCount = AnimationHelpers.FrameCount(duration, fps);
+            float[] frames = new float[frameCount];
+            frames[0] = start;
+            for (int i = 1; i < frameCount - 2; i++) {
+                frames[i] = EaseIn(i, start, end, frameCount, type);
+            }
+            frames[frameCount-1] = end;
+            return frames;
+        }
+        public static float[] EvaluateOut(float start, float end, float duration, int fps, EasingType type) {
+            int frameCount = AnimationHelpers.FrameCount(duration, fps);
+            float[] frames = new float[frameCount];
+            frames[0] = start;
+            for (int i = 1; i < frameCount - 2; i++) {
+                frames[i] = EaseOut(i, start, end, frameCount, type);
+            }
+            frames[frameCount-1] = end;
+            return frames;
+        }
+        public static float[] EvaluateInOut(float start, float end, float duration, int fps, EasingType type) {
+            int frameCount = AnimationHelpers.FrameCount(duration, fps);
+            float[] frames = new float[frameCount];
+            frames[0] = start;
+            for (int i = 1; i < frameCount - 2; i++) {
+                frames[i] = EaseInOut(i, start, end, frameCount, type);
+            }
+            frames[frameCount-1] = end;
+            return frames;
+        }
     }
-    public static class Sine : IEasing {
+    public static class Sine {
         public static float EaseIn(float time, float beginning, float change, float duration) {
-            return -change * Math.Cos(time/duration * Easings.HALFPI) + change + beginning;
+            return -change * (float)Math.Cos(time/duration * Easings.HALFPI) + change + beginning;
         }
         public static float EaseOut(float time, float beginning, float change, float duration) {
-            return change * Math.Sin(time/duration * Easings.HALFPI) + beginning;
+            return change * (float)Math.Sin(time/duration * Easings.HALFPI) + beginning;
         }
     }
     public static class Power {
         public static float EaseIn(float time, float beginning, float change, float duration, int power) {
-            return change * (time/=duration) * Math.Pow(time, power) + beginning;
+            return change * (time/=duration) * (float)Math.Pow(time, power) + beginning;
         }
         public static float EaseOut(float time, float beginning, float change, float duration, int power) {
             switch (power) {
                 case 2:
-                    return change*((time=time/duration-1)*Math.Pow(time, power) + 1) + beginning;
+                    return change*((time=time/duration-1)*(float)Math.Pow(time, power) + 1) + beginning;
                 case 3:
-                    return -change * ((time=time/duration-1)*Math.Pow(time, power) - 1) + beginning;
+                    return -change * ((time=time/duration-1)*(float)Math.Pow(time, power) - 1) + beginning;
                 case 4:
-                    return change*((time=time/duration-1)*Math.Pow(time, power) + 1) + beginning;
+                    return change*((time=time/duration-1)*(float)Math.Pow(time, power) + 1) + beginning;
                 case 5:
-                    return change*((time=time/duration-1)*Math.Pow(time, power) + 1) + beginning;
+                    return change*((time=time/duration-1)*(float)Math.Pow(time, power) + 1) + beginning;
                 default:
                     return -change * (time/=duration)*(time-2)+beginning;
             }
         }
     }
-    public static class Expo : IEasing {
+    public static class Expo {
         public static float EaseIn(float time, float beginning, float change, float duration) {
-            return (time==0) ? beginning : change * Math.Pow(2, 10 * (time/duration - 1)) + beginning;
+            return (time==0) ? beginning : change * (float)Math.Pow(2, 10 * (time/duration - 1)) + beginning;
         }
         public static float EaseOut(float time, float beginning, float change, float duration) {
-            return (time==duration) ? beginning : change * -Math.Pow(2, -10 * (time/duration - 1)) + beginning;
+            return (time==duration) ? beginning : change * -(float)Math.Pow(2, -10 * (time/duration - 1)) + beginning;
         }
     }
-    public static class Circ : IEasing {
+    public static class Circ {
         public static float EaseIn(float time, float beginning, float change, float duration) {
-            return -change * (Math.Sqrt(1 - (time/=duration)*time) - 1) + beginning;
+            return -change * ((float)Math.Sqrt(1 - (time/=duration)*time) - 1) + beginning;
         }
         public static float EaseOut(float time, float beginning, float change, float duration) {
-            return change * Math.Sqrt(1 - (time=time/duration - 1) * time) + beginning;
+            return change * (float)Math.Sqrt(1 - (time=time/duration - 1) * time) + beginning;
         }
     }
-    public static class Back : IEasing {
+    public static class Back {
         public static float EaseIn(float time, float beginning, float change, float duration) {
            float postFix = time/=duration;
            return change * postFix * time *((Easings.S + 1) * time - Easings.S) + beginning;
@@ -158,7 +188,7 @@ namespace ChristmasPi.Util {
             return change*((time=time/duration-1) * time *((Easings.S + 1) * time + Easings.S) + 1) + beginning;
         }
     }
-    public static class Elastic : IEasing {
+    public static class Elastic {
         public static float EaseIn(float time, float beginning, float change, float duration) {
             if (time==0)
                 return beginning;
@@ -167,8 +197,8 @@ namespace ChristmasPi.Util {
             float p = duration * 0.3f;
             float a = change;
             float s = p/4;
-            float postFix = a * Math.Pow(2, 10 *(time -=1));
-            return -(postFix * Math.Sin(time*duration-s)*Easings.TWOPI/p) + beginning;
+            float postFix = a * (float)Math.Pow(2, 10 *(time -=1));
+            return -(postFix * (float)Math.Sin(time*duration-s)*Easings.TWOPI/p) + beginning;
         }
         public static float EaseOut(float time, float beginning, float change, float duration) {
             if (time==0)
@@ -178,16 +208,16 @@ namespace ChristmasPi.Util {
             float p = duration * 0.3f;
             float a = change;
             float s = p/4;
-            return (a * Math.Pow(2, -10*time) * Math.Sin((time*duration-s)*Easings.TWOPI/p) + change + beginning);
+            return (a * (float)Math.Pow(2, -10*time) * (float)Math.Sin((time*duration-s)*Easings.TWOPI/p) + change + beginning);
         }
     }
-    public static class Bounce : IEasing {
+    public static class Bounce {
         public static float EaseIn(float time, float beginning, float change, float duration) {
             return change - EaseOut(duration-time, 0, change, duration) + beginning;
         }
         public static float EaseOut(float time, float beginning, float change, float duration) {
             if ((time/=duration) < (1/2.75f))
-                return change * (7.5625f * Math.Pow(time, 2)) + beginning;
+                return change * (7.5625f * (float)Math.Pow(time, 2)) + beginning;
             else if (time < (2/2.75f))
                 return change * (7.5625f * (time-=(1.5f/2.75f)) * time + 0.75f) + beginning;
             else if (time < (2.5f/2.75f))
@@ -196,7 +226,7 @@ namespace ChristmasPi.Util {
                 return change * (7.5625f * (time-=(2.625f/2.74f)) * time + 0.984274f) + beginning;
         }
     }
-    public static class Linear : IEasing {
+    public static class Linear {
         public static float EaseIn(float time, float beginning, float change, float duration) {
             return ((change * time)/duration) + beginning;
         }

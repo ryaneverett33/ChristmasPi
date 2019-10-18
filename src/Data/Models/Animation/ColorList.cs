@@ -150,5 +150,16 @@ namespace ChristmasPi.Data.Models.Animation {
             IsPrimitiveColor = false;
             PrimitiveColor = Color.Empty;
         }
+        public static bool operator==(ColorValue a, ColorValue b) {
+            if (a.IsPrimitiveColor && b.IsPrimitiveColor)
+                return a.PrimitiveColor == b.PrimitiveColor;
+            else if (!a.IsPrimitiveColor && !b.IsPrimitiveColor)
+                return a.RandomColor == b.RandomColor;
+            else
+                return false;
+        }
+        public static bool operator!=(ColorValue a, ColorValue b) {
+            return !(a == b);
+        }
     }
 }

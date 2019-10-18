@@ -91,6 +91,11 @@ namespace ChristmasPi
         /// Starts tree services
         /// </summary>
         public void StartTree() {
+            float[] arr = Util.Easings.EvaluateOut(0, 5f, 1f, 30, EasingType.EaseQuart);
+            foreach (float a in arr) {
+                Console.WriteLine(a);
+            }
+
             OperationManager.Instance.Init();
             AnimationManager.Instance.Init();
         }
