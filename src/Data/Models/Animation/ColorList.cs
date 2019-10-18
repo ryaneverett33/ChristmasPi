@@ -5,10 +5,11 @@ using System.Drawing;
 using ChristmasPi.Data.Exceptions;
 
 namespace ChristmasPi.Data.Models.Animation {
-    public class ColorList {
+    public class ColorList : IDisposable {
         private bool evaluated;
         private List<ColorValue> list;
         private Color[] evaluatedColors;            // Current list of evaluated colors
+        private bool disposed;
 
         public int Count => list.Count;
 
@@ -17,6 +18,8 @@ namespace ChristmasPi.Data.Models.Animation {
         /// </summary>
         public ColorList() {
             list = new List<ColorValue>();
+            disposed = false;
+            evaluated = false;
         }
 
         /// <summary>
@@ -69,6 +72,25 @@ namespace ChristmasPi.Data.Models.Animation {
             list.Add(value);
         }
 
+        public ColorValue this[int index] {
+            get {
+                if (index > Count)
+                    throw new IndexOutOfRangeException();
+                return list[index];
+            }
+        }
+
+        public void SetColor(int index, Color color) {
+            SetColor(index, new ColorValue(color));
+        }
+        public void SetColor(int index, RandomColor color) {
+            SetColor(index, new ColorValue(color));
+        }
+        public void SetColor(int index, ColorValue color) {
+            if (index > Count)
+                throw new IndexOutOfRangeException();
+            list[index] = color;
+        }
 
         /// <summary>
         /// Evaluates any randomcolor objects to primitive colors and stores the resultant array
@@ -103,6 +125,13 @@ namespace ChristmasPi.Data.Models.Animation {
         // return a list of colors but don't evaluate them
         public ColorValue[] GetNonEvaluatedColors() {
             return list.ToArray();
+        }
+
+        public void Dispose() {
+            if (!disposed) {
+                list.Clear();
+                disposed = true;
+            }
         }
     }
     public struct ColorValue {

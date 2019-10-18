@@ -58,7 +58,10 @@ namespace ChristmasPi.Operations.Modes {
                 Console.WriteLine(e.StackTrace);
                 return StatusCodes.Status500InternalServerError;
             }
-            catch (InvalidColorFormatException) {
+            catch (InvalidColorFormatException e) {
+                Console.WriteLine("LOGTHIS SolidController invalid color format exception");
+                Console.WriteLine(e.Message);
+                Console.WriteLine(e.StackTrace);
                 return StatusCodes.Status400BadRequest;
             }
             catch (Exception e) {

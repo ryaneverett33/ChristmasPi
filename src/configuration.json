@@ -3,7 +3,7 @@
     "name": "",
     "color": {
       "colororder": "RGB",
-      "default": "#db6e00"
+      "default": "#db7b26"
     },
     "branches" : [
       {
@@ -35,7 +35,7 @@
     "lightcount": 50,
     "fps": 30,
     "datapin": 18,
-    "brightness" : 255,
+    "brightness" : 100,
     "invert" : false,
     "type": "RPI_WS281x"
   }

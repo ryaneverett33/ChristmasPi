@@ -8,10 +8,13 @@ namespace ChristmasPi.Data.Models {
     public class RandomColor {
         // Delegate function that generates the entire color
         private Func<Color> generatorDelegate;
+        private Func<object, Color> generatorDelegateWithState;
         private Func<int> rDelegate;       // Delegate function that generates the Red value of the color
         private Func<int> gDelegate;       // Delegate function that generates the Green value of the color
         private Func<int> bDelegate;       // Delegate function that generates the Blue value of the color
         private bool useGenerator;              // Whether or not to use the generator or component delegates
+        private bool useState;                  // Whether or not to use generator supplied state info
+        private object generatorStateObj;       // Generator specific state object to pass during generation
         private DelegateUsage usage;            // How to use the delegates
 
         /// <summary>
@@ -21,6 +24,14 @@ namespace ChristmasPi.Data.Models {
         public RandomColor(Func<Color> generatorDelegate) {
             this.generatorDelegate = generatorDelegate;
             this.useGenerator = true;
+            this.useState = false;
+        }
+
+        public RandomColor(Func<object, Color> generatorDelegateWithState, object stateObj) {
+            this.generatorDelegateWithState = generatorDelegateWithState;
+            this.generatorStateObj = stateObj;
+            this.useGenerator = true;
+            this.useState = true;
         }
 
         /// <summary>
@@ -45,6 +56,7 @@ namespace ChristmasPi.Data.Models {
             this.bDelegate = delegateB;
             this.usage = usage;
             this.useGenerator = false;
+            this.useState = false;
         }
 
         /// <summary>
@@ -64,6 +76,7 @@ namespace ChristmasPi.Data.Models {
                 bDelegate = delegateFunc;
             this.usage = usage;
             this.useGenerator = false;
+            this.useState = false;
         }
 
         /// <summary>
@@ -72,8 +85,12 @@ namespace ChristmasPi.Data.Models {
         /// <returns>A primitive color</returns>
         public Color Evaluate() {
             int r = -1, g = -1, b = -1;
-            if (useGenerator)
-                return generatorDelegate();
+            if (useGenerator) {
+                if (useState)
+                    return generatorDelegateWithState(generatorStateObj);
+                else
+                    return generatorDelegate();
+            }
             else {
                 if (usage.HasFlag(DelegateUsage.RedDelegate)) {
                     r = rDelegate();
@@ -122,6 +139,11 @@ namespace ChristmasPi.Data.Models {
         public static Func<Color> RandomKnownColorGenerator = () => {
             int num = RandomGenerator.Instance.Number(0, ColorTable.KnownColorTable.Count + 1);
             return ColorTable.KnownColorTable[num];
+        };
+
+        public static Func<object, Color> RandomColorFromColorTable = (object stateObj) => {
+            ColorTable table = (ColorTable)stateObj;
+            return table[RandomGenerator.Instance.Number(0, table.Count)];
         };
     }
     /// <summary>

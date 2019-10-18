@@ -10,6 +10,7 @@ namespace ChristmasPi.Data {
         // Regexs
         public static readonly string REGEX_RGB_FORMAT = @"rgb\((\ *[0-9]{1,3}\ *),(\ *[0-9]{1,3}\ *),(\ *[0-9]{1,3}\ *)\)";
         public static readonly string REGEX_HEX_FORMAT = @"#[0-9a-fA-F]{3,6}";
+        public static readonly string REGEX_HEX_WEB_FORMAT = @"[0-9a-fA-F]{3,6}";
 
         // Operations
         public static readonly string DEFAULT_OPERATING_MODE = "SolidColorMode";

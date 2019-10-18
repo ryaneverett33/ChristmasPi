@@ -228,7 +228,7 @@ namespace ChristmasPi.Animation {
         }
 
         private RenderFrame[] getFrames() {
-            return animation.isBranchAnimation ? null : (animation as IAnimation).GetFrames(fps, lightcount);
+            return animation.isBranchAnimation ? (animation as IBranchAnimation).GetFrames(fps) : (animation as IAnimation).GetFrames(fps, lightcount);
         }
 
         public void Dispose() {

@@ -16,6 +16,8 @@ namespace ChristmasPi.Util {
                 return ConvertFromHex(value.Trim());
             else if (Regex.IsMatch(value, Constants.REGEX_RGB_FORMAT))
                 return ConvertFromRgb(value.Trim());
+            else if (Regex.IsMatch(value, Constants.REGEX_HEX_WEB_FORMAT))
+                return ConvertFromHex('#' + value.Trim());
             else
                 throw new InvalidColorFormatException();
         }

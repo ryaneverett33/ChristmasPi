@@ -20,8 +20,10 @@ namespace ChristmasPi.Controllers
         [HttpPost("update")]
         public IActionResult Update(string color) {
             // /api/solid/update
-            if (color == null)
+            if (color == null) {
+                Console.WriteLine("Color is null!");
                 return new StatusCodeResult(StatusCodes.Status400BadRequest);
+            }
             if (OperationManager.Instance.CurrentOperatingModeName != "SolidColorMode")
                 OperationManager.Instance.SwitchModes("SolidColorMode");
             Color newColor = ChristmasPi.Util.ColorConverter.Convert(color);
