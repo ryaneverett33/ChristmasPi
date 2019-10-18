@@ -9,15 +9,12 @@ namespace ChristmasPi.Animation.BranchAnimations {
     public class randombranchcolor : BaseBranchAnimation {
         public override string Name => "Random Color Branch";
         private readonly float SLEEP_TIME = 0.25f;
-        public objectstate? state;
-
 
         public randombranchcolor() : base() { }
 
         public override void constructbranch(int fps, ref BranchData branch) {
             base.constructbranch(fps, ref branch);
-            if (state == null)
-                state = new objectstate(this.BranchCount);
+            objectstate state = new objectstate(branch.LightCount);
 
             branch.Add(new ColorFrame(new RandomColor(generator, state), branch.LightCount));
             branch.Add(new SleepFrame(SLEEP_TIME));
@@ -27,7 +24,7 @@ namespace ChristmasPi.Animation.BranchAnimations {
 
         public Color generator(object state) {
             objectstate objState = (objectstate)state;
-            if (objState.count == objState.branchcount) {
+            if (objState.count == objState.lightcount) {
                 objState.count = 0;
                 objState.color = RandomColor.RandomKnownColorGenerator();
             }
@@ -40,12 +37,12 @@ namespace ChristmasPi.Animation.BranchAnimations {
     // structs are passed by copy
     public class objectstate {
         public int count;
-        public int branchcount;
+        public int lightcount;
         public Color color;
 
-        public objectstate(int branchcount) {
+        public objectstate(int lightcount) {
             this.count = 0;
-            this.branchcount = branchcount;
+            this.lightcount = lightcount;
             this.color = Constants.COLOR_OFF;
         }
     }
