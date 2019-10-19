@@ -11,7 +11,7 @@ using ChristmasPi.Util;
 namespace ChristmasPi.Animation.Animations {
     public class rainbow : BaseAnimation {
         public override string Name => "Rainbow";
-        private float SLEEP_TIME = 0.01f;
+        //private float SLEEP_TIME = 0.01f;
 
         public override void construct(int lightcount, int fps) {
             base.construct(lightcount, fps);

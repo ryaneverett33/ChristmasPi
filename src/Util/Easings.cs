@@ -15,101 +15,137 @@ namespace ChristmasPi.Util {
             return (from * (1-step)) + (to * (1 - step));
         }
         public static float EaseIn(float time, float beginning, float change, float duration, EasingType type) {
+            float value;
             switch (type) {
                 case EasingType.EaseSine:
-                    return Sine.EaseIn(time, beginning, change, duration);
+                    value = Sine.EaseIn(time, beginning, change, duration);
+                    return Math.Clamp(value, beginning, change);
                 case EasingType.EaseQuad:
-                    return Power.EaseIn(time, beginning, change, duration, 2);
+                    value = Power.EaseIn(time, beginning, change, duration, 2);
+                    return Math.Clamp(value, beginning, change);
                 case EasingType.EaseCubic:
-                    return Power.EaseIn(time, beginning, change, duration, 3);
+                    value = Power.EaseIn(time, beginning, change, duration, 3);
+                    return Math.Clamp(value, beginning, change);
                 case EasingType.EaseQuart:
-                    return Power.EaseIn(time, beginning, change, duration, 4);
+                    value = Power.EaseIn(time, beginning, change, duration, 4);
+                    return Math.Clamp(value, beginning, change);
                 case EasingType.EaseQuint:
-                    return Power.EaseIn(time, beginning, change, duration, 5);
+                    value = Power.EaseIn(time, beginning, change, duration, 5);
+                    return Math.Clamp(value, beginning, change);
                 case EasingType.EaseExpo:
-                    return Expo.EaseIn(time, beginning, change, duration);
+                    value = Expo.EaseIn(time, beginning, change, duration);
+                    return Math.Clamp(value, beginning, change);
                 case EasingType.EaseCirc:
-                    return Circ.EaseIn(time, beginning, change, duration);
+                    value = Circ.EaseIn(time, beginning, change, duration);
+                    return Math.Clamp(value, beginning, change);
                 case EasingType.EaseBack:
-                    return Back.EaseIn(time, beginning, change, duration);
+                    value = Back.EaseIn(time, beginning, change, duration);
+                    return Math.Clamp(value, beginning, change);
                 case EasingType.EaseElastic:
-                    return Elastic.EaseIn(time, beginning, change, duration);
+                    value = Elastic.EaseIn(time, beginning, change, duration);
+                    return Math.Clamp(value, beginning, change);
                 case EasingType.EaseBounce:
-                    return Bounce.EaseIn(time, beginning, change, duration);
+                    value = Bounce.EaseIn(time, beginning, change, duration);
+                    return Math.Clamp(value, beginning, change);
                 default:
                     // linear
-                    return Linear.EaseIn(time, beginning, change, duration);
+                    value = Linear.EaseIn(time, beginning, change, duration);
+                    return Math.Clamp(value, beginning, change);
             }
         }
         public static float EaseOut(float time, float beginning, float change, float duration, EasingType type) {
+            float value;
             switch (type) {
                 case EasingType.EaseSine:
-                    return Sine.EaseOut(time, beginning, change, duration);
+                    value = Sine.EaseOut(time, beginning, change, duration);
+                    return Math.Clamp(value, beginning, change);
                 case EasingType.EaseQuad:
-                    return Power.EaseOut(time, beginning, change, duration, 2);
+                    value = Power.EaseOut(time, beginning, change, duration, 2);
+                    return Math.Clamp(value, beginning, change);
                 case EasingType.EaseCubic:
-                    return Power.EaseOut(time, beginning, change, duration, 3);
+                    value = Power.EaseOut(time, beginning, change, duration, 3);
+                    return Math.Clamp(value, beginning, change);
                 case EasingType.EaseQuart:
-                    return Power.EaseOut(time, beginning, change, duration, 4);
+                    value = Power.EaseOut(time, beginning, change, duration, 4);
+                    return Math.Clamp(value, beginning, change);
                 case EasingType.EaseQuint:
-                    return Power.EaseOut(time, beginning, change, duration, 5);
+                    value = Power.EaseOut(time, beginning, change, duration, 5);
+                    return Math.Clamp(value, beginning, change);
                 case EasingType.EaseExpo:
-                    return Expo.EaseOut(time, beginning, change, duration);
+                    value = Expo.EaseOut(time, beginning, change, duration);
+                    return Math.Clamp(value, beginning, change);
                 case EasingType.EaseCirc:
-                    return Circ.EaseOut(time, beginning, change, duration);
+                    value = Circ.EaseOut(time, beginning, change, duration);
+                    return Math.Clamp(value, beginning, change);
                 case EasingType.EaseBack:
-                    return Back.EaseOut(time, beginning, change, duration);
+                    value = Back.EaseOut(time, beginning, change, duration);
+                    return Math.Clamp(value, beginning, change);
                 case EasingType.EaseElastic:
-                    return Elastic.EaseOut(time, beginning, change, duration);
+                    value = Elastic.EaseOut(time, beginning, change, duration);
+                    return Math.Clamp(value, beginning, change);
                 case EasingType.EaseBounce:
-                    return Bounce.EaseOut(time, beginning, change, duration);
+                    value = Bounce.EaseOut(time, beginning, change, duration);
+                    return Math.Clamp(value, beginning, change);
                 default:
                     // linear
-                    return Linear.EaseOut(time, beginning, change, duration);
+                    value = Linear.EaseOut(time, beginning, change, duration);
+                    return Math.Clamp(value, beginning, change);
             }
         }
         public static float EaseInOut(float time, float beginning, float change, float duration, EasingType type) {
+            float value;
             switch (type) {
                 case EasingType.EaseSine:
-                    return (time > (duration/2)) ? Sine.EaseIn(time, beginning, change, duration) :
+                    value = (time > (duration/2)) ? Sine.EaseIn(time, beginning, change, duration) :
                     Sine.EaseOut(time, beginning, change, duration);
+                    return Math.Clamp(value, beginning, change);
                 case EasingType.EaseQuad:
-                    return (time > (duration/2)) ? Power.EaseIn(time, beginning, change, duration, 2) :
+                    value = (time > (duration/2)) ? Power.EaseIn(time, beginning, change, duration, 2) :
                     Power.EaseOut(time, beginning, change, duration, 2);
+                    return Math.Clamp(value, beginning, change);
                 case EasingType.EaseCubic:
-                    return (time > (duration/2)) ? Power.EaseIn(time, beginning, change, duration, 3) :
+                    value = (time > (duration/2)) ? Power.EaseIn(time, beginning, change, duration, 3) :
                     Power.EaseOut(time, beginning, change, duration, 3);
+                    return Math.Clamp(value, beginning, change);
                 case EasingType.EaseQuart:
-                    return (time > (duration/2)) ? Power.EaseIn(time, beginning, change, duration, 4) :
+                    value = (time > (duration/2)) ? Power.EaseIn(time, beginning, change, duration, 4) :
                     Power.EaseOut(time, beginning, change, duration, 4);
+                    return Math.Clamp(value, beginning, change);
                 case EasingType.EaseQuint:
-                    return (time > (duration/2)) ? Power.EaseIn(time, beginning, change, duration, 5) :
+                    value = (time > (duration/2)) ? Power.EaseIn(time, beginning, change, duration, 5) :
                     Power.EaseOut(time, beginning, change, duration, 5);
+                    return Math.Clamp(value, beginning, change);
                 case EasingType.EaseExpo:
-                    return (time > (duration/2)) ? Expo.EaseIn(time, beginning, change, duration) :
+                    value = (time > (duration/2)) ? Expo.EaseIn(time, beginning, change, duration) :
                     Expo.EaseOut(time, beginning, change, duration);
+                    return Math.Clamp(value, beginning, change);
                 case EasingType.EaseCirc:
-                    return (time > (duration/2)) ? Circ.EaseIn(time, beginning, change, duration) :
+                    value = (time > (duration/2)) ? Circ.EaseIn(time, beginning, change, duration) :
                     Circ.EaseOut(time, beginning, change, duration);
+                    return Math.Clamp(value, beginning, change);
                 case EasingType.EaseBack:
-                    return (time > (duration/2)) ? Back.EaseIn(time, beginning, change, duration) :
+                    value = (time > (duration/2)) ? Back.EaseIn(time, beginning, change, duration) :
                     Back.EaseOut(time, beginning, change, duration);
+                    return Math.Clamp(value, beginning, change);
                 case EasingType.EaseElastic:
-                    return (time > (duration/2)) ? Elastic.EaseIn(time, beginning, change, duration) :
+                    value = (time > (duration/2)) ? Elastic.EaseIn(time, beginning, change, duration) :
                     Elastic.EaseOut(time, beginning, change, duration);
+                    return Math.Clamp(value, beginning, change);
                 case EasingType.EaseBounce:
-                    return (time > (duration/2)) ? Bounce.EaseIn(time, beginning, change, duration) :
+                    value = (time > (duration/2)) ? Bounce.EaseIn(time, beginning, change, duration) :
                     Bounce.EaseOut(time, beginning, change, duration);
+                    return Math.Clamp(value, beginning, change);
                 default:
                     // linear
-                    return Linear.EaseOut(time, beginning, change, duration);
+                    value = Linear.EaseOut(time, beginning, change, duration);
+                    return Math.Clamp(value, beginning, change);
             }
         }
         public static float[] EvaluateIn(float start, float end, float duration, int fps, EasingType type) {
             int frameCount = AnimationHelpers.FrameCount(duration, fps);
             float[] frames = new float[frameCount];
             frames[0] = start;
-            for (int i = 1; i < frameCount - 2; i++) {
+            for (int i = 1; i < frameCount - 1; i++) {
                 frames[i] = EaseIn(i, start, end, frameCount, type);
             }
             frames[frameCount-1] = end;
@@ -119,7 +155,7 @@ namespace ChristmasPi.Util {
             int frameCount = AnimationHelpers.FrameCount(duration, fps);
             float[] frames = new float[frameCount];
             frames[0] = start;
-            for (int i = 1; i < frameCount - 2; i++) {
+            for (int i = 1; i < frameCount - 1; i++) {
                 frames[i] = EaseOut(i, start, end, frameCount, type);
             }
             frames[frameCount-1] = end;
@@ -129,7 +165,7 @@ namespace ChristmasPi.Util {
             int frameCount = AnimationHelpers.FrameCount(duration, fps);
             float[] frames = new float[frameCount];
             frames[0] = start;
-            for (int i = 1; i < frameCount - 2; i++) {
+            for (int i = 1; i < frameCount - 1; i++) {
                 frames[i] = EaseInOut(i, start, end, frameCount, type);
             }
             frames[frameCount-1] = end;
