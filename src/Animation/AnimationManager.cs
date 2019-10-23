@@ -41,7 +41,8 @@ namespace ChristmasPi.Animation {
                 typeof(rainbow).FullName,
                 typeof(randomcolor).FullName,
                 typeof(randomcolorwstate).FullName,
-                typeof(randombranchcolor).FullName
+                typeof(randombranchcolor).FullName,
+                typeof(twinkle).FullName
             };
         }
 

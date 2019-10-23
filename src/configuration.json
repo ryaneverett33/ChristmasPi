@@ -37,6 +37,17 @@
     "datapin": 18,
     "brightness" : 100,
     "invert" : false,
-    "type": "RPI_WS281x"
-  }
+    "type": "TEST_RENDER"
+  },
+  "animations" : [
+    {
+      "name" : "Twinkle",
+      "properties" : [
+        {
+          "name" : "SLEEP_TIME",
+          "value" : "0.2s"
+        }
+      ]
+    }
+  ]
 }

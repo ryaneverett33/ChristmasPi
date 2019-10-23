@@ -14,10 +14,13 @@ namespace ChristmasPi.Hardware.Renderers {
 
         // write current value to file
         public override void Render(IRenderer renderer) {
-            BeforeRenderEvent.Invoke(this, new RenderArgs());
+            if (BeforeRenderEvent != null)
+                BeforeRenderEvent.Invoke(this, new RenderArgs());
             Color color = base.ledColors[0];
             writer.WriteLine($"{DateTime.Now.ToShortTimeString()} - RGB:({color.R},{color.G},{color.B})");
-            AfterRenderEvent.Invoke(this, new RenderArgs());
+            writer.Flush();
+            if (AfterRenderEvent != null)
+                AfterRenderEvent.Invoke(this, new RenderArgs());
         }
         // Create file for writing out values to
         public override void Start() {
