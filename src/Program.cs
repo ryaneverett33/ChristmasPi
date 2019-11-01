@@ -21,7 +21,7 @@ namespace ChristmasPi
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
                 .ConfigureKestrel(options => {
-                    options.ListenAnyIP(8080);
+                    //options.ListenAnyIP(8080);
                 })
                 .UseKestrel();
     }
