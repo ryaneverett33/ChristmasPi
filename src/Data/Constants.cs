@@ -11,6 +11,8 @@ namespace ChristmasPi.Data {
         public static readonly string REGEX_RGB_FORMAT = @"rgb\((\ *[0-9]{1,3}\ *),(\ *[0-9]{1,3}\ *),(\ *[0-9]{1,3}\ *)\)";
         public static readonly string REGEX_HEX_FORMAT = @"#[0-9a-fA-F]{3,6}";
         public static readonly string REGEX_HEX_WEB_FORMAT = @"[0-9a-fA-F]{3,6}";
+        public static readonly string REGEX_AMPM_FORMAT = @"(0|1)[0-9]:[0-5][0-9] *((AM)|(PM))";
+        public static readonly string REGEX_24HR_FORMAT = @"(0|1|2)[0-9]:[0-5][0-9]";
 
         // Operations
         public static readonly string DEFAULT_OPERATING_MODE = "SolidColorMode";

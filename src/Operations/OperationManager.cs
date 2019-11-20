@@ -17,6 +17,7 @@ namespace ChristmasPi.Operations {
         private string _currentOperatingMode = null;
         public IOperationMode CurrentOperatingMode => operatingModes[_currentOperatingMode];
         public string CurrentOperatingModeName => _currentOperatingMode;
+        public string DefaultOperatingMode => Constants.DEFAULT_OPERATING_MODE;
         public object CurrentOperatingInfo => operatingModes[_currentOperatingMode].Info();
 
         public void Init() {
@@ -43,7 +44,8 @@ namespace ChristmasPi.Operations {
             /// TODO use reflection to get classes instead of a hardcoded list
             return new string[] {
                 typeof(SolidColorMode).FullName,
-                typeof(AnimationMode).FullName
+                typeof(AnimationMode).FullName,
+                typeof(OffMode).FullName
             };
         }
 

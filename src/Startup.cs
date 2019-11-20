@@ -14,6 +14,7 @@ using ChristmasPi.Data;
 using ChristmasPi.Data.Models;
 using ChristmasPi.Operations;
 using ChristmasPi.Animation;
+using ChristmasPi.Scheduler.Models;
 using System.IO;
 using Microsoft.Extensions.Hosting;
 
@@ -75,16 +76,8 @@ namespace ChristmasPi
         /// Loads the tree and animation configurations
         /// </summary>
         public void ConfigureTree() {
-            // Load tree configuration
-            if (!File.Exists("configuration.json")) {
-                Console.WriteLine("LOGTHIS Tree Configuration file not found, using default configuration values");
-                ConfigurationManager.Instance.StartupTreeConfig = TreeConfiguration.DefaultSettings();
-            }
-            else {
-                string json = File.ReadAllText("configuration.json");
-                ConfigurationManager.Instance.StartupTreeConfig = JsonConvert.DeserializeObject<TreeConfiguration>(json);
-            }
-            ConfigurationManager.Instance.CurrentTreeConfig = ConfigurationManager.Instance.StartupTreeConfig;
+            loadConfiguration();
+            loadSchedule();
             ConfigurationManager.Instance.Configuration = Configuration;
         }
         /// <summary>
@@ -98,6 +91,28 @@ namespace ChristmasPi
             Environment.Exit(0);*/
             OperationManager.Instance.Init();
             AnimationManager.Instance.Init();
+        }
+
+        private void loadConfiguration() {
+            if (!File.Exists("configuration.json")) {
+                Console.WriteLine("LOGTHIS Tree Configuration file not found, using default configuration values");
+                ConfigurationManager.Instance.StartupTreeConfig = TreeConfiguration.DefaultSettings();
+            }
+            else {
+                string json = File.ReadAllText("configuration.json");
+                ConfigurationManager.Instance.StartupTreeConfig = JsonConvert.DeserializeObject<TreeConfiguration>(json);
+            }
+            ConfigurationManager.Instance.CurrentTreeConfig = ConfigurationManager.Instance.StartupTreeConfig;
+        }
+
+        private void loadSchedule() {
+            if (!File.Exists("schedule.json")) {
+                ConfigurationManager.Instance.CurrentSchedule = WeekSchedule.DefaultSchedule();
+            }
+            else {
+                string json = File.ReadAllText("schedule.json");
+                ConfigurationManager.Instance.CurrentSchedule = JsonConvert.DeserializeObject<WeekSchedule>(json);
+            }
         }
     }
 }

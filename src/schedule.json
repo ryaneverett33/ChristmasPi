@@ -1,0 +1,9 @@
+{
+  "rules": [
+    {
+      "start": "07:00 PM",
+      "stop": "09:00 PM",
+      "repeats": 1
+    }
+  ]
+}

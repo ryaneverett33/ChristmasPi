@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 
 namespace ChristmasPi.Data.Models {
+    [JsonConverter(typeof(HardwareTypeConverter))]
     public enum HardwareType {
         RPI_WS281x,
         TEST_RENDER,
