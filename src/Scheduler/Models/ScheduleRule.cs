@@ -5,7 +5,9 @@ using Newtonsoft.Json;
 
 namespace ChristmasPi.Scheduler.Models {
     public class ScheduleRule : IComparable {
+        [JsonIgnore]
         public DateTime OnTime { get; set; }
+        [JsonIgnore]
         public DateTime OffTime { get; set; }
 
         public string start { 
@@ -38,6 +40,8 @@ namespace ChristmasPi.Scheduler.Models {
         /// <param name="obj">The other object being compared against</param>
         /// <returns>10 - non-comparable</returns>
         /// <returns>-10 - overlap</returns>
+        /// <returns>20 - Repeat Usage for other is less</returns>
+        /// /// <returns>-20 - Repeat Usage is less than other</returns>
         /// <returns>-1 - this comes before b</returns>
         /// <returns>0 - objects are the same</returns>
         /// <returns>1 - this comes after a</returns>
@@ -56,6 +60,10 @@ namespace ChristmasPi.Scheduler.Models {
                     return -1;
                 if (OnTime > other.OffTime)
                     return 1;
+                if (repeats < other.repeats)
+                    return -20;
+                if (repeats > other.repeats)
+                    return 20;
                 return 0;
             }
         }
@@ -87,7 +95,7 @@ namespace ChristmasPi.Scheduler.Models {
         }
 
         public override void WriteJson(JsonWriter writer, RepeatUsage value, JsonSerializer serializer) {
-            writer.WriteValue(value.ToString());
+            writer.WriteValue((int)value);
         }
     }
 }

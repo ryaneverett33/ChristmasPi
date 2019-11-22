@@ -2,17 +2,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using ChristmasPi.Data;
 
 namespace ChristmasPi.Scheduler.Models {
+    [JsonConverter(typeof(WeekScheduleConverter))]
     public class WeekSchedule {
 
-        private Schedule Monday;
-        private Schedule Tuesday;
-        private Schedule Wednesday;
-        private Schedule Thursday;
-        private Schedule Friday;
-        private Schedule Saturday;
-        private Schedule Sunday;
+        public Schedule Monday;
+        public Schedule Tuesday;
+        public Schedule Wednesday;
+        public Schedule Thursday;
+        public Schedule Friday;
+        public Schedule Saturday;
+        public Schedule Sunday;
         private bool createdSchedules;
         private ScheduleRule[] _rules;
 
@@ -23,6 +27,13 @@ namespace ChristmasPi.Scheduler.Models {
         }
         public WeekSchedule() {
             createdSchedules = false;
+            Monday = new Schedule();
+            Tuesday = new Schedule();
+            Wednesday = new Schedule();
+            Thursday = new Schedule();
+            Friday = new Schedule();
+            Saturday = new Schedule();
+            Sunday = new Schedule();
         }
         
         /// <summary>
@@ -35,17 +46,17 @@ namespace ChristmasPi.Scheduler.Models {
             if (Monday != null && Monday.RuleCount != 0)
                 times[0] = Monday.GetRules();
             if (Tuesday != null && Tuesday.RuleCount != 0)
-                times[1] = Monday.GetRules();
+                times[1] = Tuesday.GetRules();
             if (Wednesday != null && Wednesday.RuleCount != 0)
-                times[2] = Monday.GetRules();
+                times[2] = Wednesday.GetRules();
             if (Thursday != null && Thursday.RuleCount != 0)
-                times[3] = Monday.GetRules();
+                times[3] = Thursday.GetRules();
             if (Friday != null && Friday.RuleCount != 0)
-                times[4] = Monday.GetRules();
+                times[4] = Friday.GetRules();
             if (Saturday != null && Saturday.RuleCount != 0)
-                times[5] = Monday.GetRules();
+                times[5] = Saturday.GetRules();
             if (Sunday != null && Sunday.RuleCount != 0)
-                times[6] = Monday.GetRules();
+                times[6] = Sunday.GetRules();
             return times;
         }
 
@@ -108,6 +119,140 @@ namespace ChristmasPi.Scheduler.Models {
         }
 
         /// <summary>
+        /// Adds a new rule to the schedule
+        /// </summary>
+        /// <param name="start">Start time of the rule</param>
+        /// <param name="end">End time of the rule</param>
+        /// <param name="repeats">Days on which to run rule (must be at least one day</param>
+        /// <returns>True if added to the schedule, false if unable to add</returns>
+        /// <remarks>Makes a call to ConfigurationManager.SaveSchedule upon successfully adding rule</remarks>
+        public bool AddRule(DateTime start, DateTime end, int repeats) {
+            if (start == end || start > end)
+                return false;
+            RepeatUsage repeatUsage = (RepeatUsage)repeats;
+            bool added = false, error = false;
+            if (repeatUsage.HasFlag(RepeatUsage.RepeatMonday)) {
+                if (Monday.AddRule(start, end))
+                    added = true;
+                else
+                    error = true;
+            }
+            else if (repeatUsage.HasFlag(RepeatUsage.RepeatTuesday) && !error) {
+                if (Tuesday.AddRule(start, end))
+                    added = true;
+                else
+                    error = true;
+            }
+            else if (repeatUsage.HasFlag(RepeatUsage.RepeatWednesday) && !error) {
+                if (Wednesday.AddRule(start, end))
+                    added = true;
+                else
+                    error = true;
+            }
+            else if (repeatUsage.HasFlag(RepeatUsage.RepeatThursday) && !error) {
+                if (Thursday.AddRule(start, end))
+                    added = true;
+                else
+                    error = true;
+            }
+            else if (repeatUsage.HasFlag(RepeatUsage.RepeatFriday) && !error) {
+                if (Friday.AddRule(start, end))
+                    added = true;
+                else
+                    error = true;
+            }
+            else if (repeatUsage.HasFlag(RepeatUsage.RepeatSaturday) && !error) {
+                if (Saturday.AddRule(start, end))
+                    added = true;
+                else
+                    error = true;
+            }
+            else if (repeatUsage.HasFlag(RepeatUsage.RepeatSunday) && !error) {
+                if (Sunday.AddRule(start, end))
+                    added = true;
+                else
+                    error = true;
+            }
+            if (error) {
+                // remove rules
+                if (!RemoveRule(start, end, repeats, true)) {
+                    Console.WriteLine("LOGTHIS Failed to remove overlapping rule from schedule");
+                    Console.WriteLine("Schedule may be corrupted");
+                    return false;
+                }
+                return false;
+            }
+            if (added)
+                Task.Run(() => {
+                    ConfigurationManager.Instance.SaveSchedule();
+                });
+            return added;
+        }
+
+        /// <summary>
+        /// Removes a rule from the schedule
+        /// </summary>
+        /// <param name="start">Start time of the rule</param>
+        /// <param name="end">End time of the rule</param>
+        /// <param name="repeats">Days on which to run rule (must be at least one day</param>
+        /// <returns>True if removed from the schedule, false if unable to remove</returns>
+        /// <remarks>Makes a call to ConfigurationManager.SaveSchedule upon successfully removing rule</remarks>
+        public bool RemoveRule(DateTime start, DateTime end, int repeats, bool ignoreErrors = false) {
+            if (start == end || start > end)
+                return false;
+            RepeatUsage repeatUsage = (RepeatUsage)repeats;
+            bool removed = false, error = false;
+            if (repeatUsage.HasFlag(RepeatUsage.RepeatMonday)) {
+                if (Monday.RemoveRule(start, end))
+                    removed = true;
+                else
+                    error = true;
+            }
+            if (repeatUsage.HasFlag(RepeatUsage.RepeatTuesday) && (!error || ignoreErrors)) {
+                if (Tuesday.RemoveRule(start, end))
+                    removed = true;
+                else
+                    error = true;
+            }
+            if (repeatUsage.HasFlag(RepeatUsage.RepeatWednesday) && (!error || ignoreErrors)) {
+                if (Wednesday.RemoveRule(start, end))
+                    removed = true;
+                else
+                    error = true;
+            }
+            if (repeatUsage.HasFlag(RepeatUsage.RepeatThursday) && (!error || ignoreErrors)) {
+                if (Thursday.RemoveRule(start, end))
+                    removed = true;
+                else
+                    error = true;
+            }
+            if (repeatUsage.HasFlag(RepeatUsage.RepeatFriday) && (!error || ignoreErrors)) {
+                if (Friday.RemoveRule(start, end))
+                    removed = true;
+                else
+                    error = true;
+            }
+            if (repeatUsage.HasFlag(RepeatUsage.RepeatSaturday) && (!error || ignoreErrors)) {
+                if (Saturday.RemoveRule(start, end))
+                    removed = true;
+                else
+                    error = true;
+            }
+            if (repeatUsage.HasFlag(RepeatUsage.RepeatSunday) && (!error || ignoreErrors)) {
+                if (Sunday.RemoveRule(start, end))
+                    removed = true;
+                else
+                    error = true;
+            }
+            if (error && !ignoreErrors) {
+                Console.WriteLine("LOGTHIS An error occurred removing a rule from the schedule");
+                Console.WriteLine("Schedule may be corrupted");
+                return false;
+            }
+            return removed;
+        }
+
+        /// <summary>
         /// Creates the default schedule (empty)
         /// </summary>
         /// <returns>A new WeekSchedule object with default values</returns>
@@ -115,6 +260,57 @@ namespace ChristmasPi.Scheduler.Models {
             WeekSchedule @default = new WeekSchedule();
             @default.Rules = null;
             return @default;
+        }
+    }
+    public class WeekScheduleConverter : JsonConverter<WeekSchedule> {
+        /// <see cref="https://stackoverflow.com/a/22539730"/>
+        public override WeekSchedule ReadJson(JsonReader reader, Type objectType, WeekSchedule existingValue, bool hasExistingValue, JsonSerializer serializer) {
+            JObject jo = JObject.Load(reader);
+            WeekSchedule schedule = new WeekSchedule();
+            JArray rulesArr = (JArray)jo["schedule"];
+            ScheduleConverter schedConverter = new ScheduleConverter();
+            for (int i = 0; i < rulesArr.Count; i++) {
+                Schedule daySchedule = schedConverter.JTokenToObject(rulesArr[i]);
+                switch (i) {
+                    case 0:
+                        schedule.Monday = daySchedule;
+                        break;
+                    case 1:
+                        schedule.Tuesday = daySchedule;
+                        break;
+                    case 2:
+                        schedule.Wednesday = daySchedule;
+                        break;
+                    case 3:
+                        schedule.Thursday = daySchedule;
+                        break;
+                    case 4:
+                        schedule.Friday = daySchedule;
+                        break;
+                    case 5:
+                        schedule.Saturday = daySchedule;
+                        break;
+                    case 6:
+                        schedule.Sunday = daySchedule;
+                        break;
+                }
+            }
+            return schedule;
+        }
+        public override void WriteJson(JsonWriter writer, WeekSchedule value, JsonSerializer serializer) {
+            writer.WriteStartObject();
+            writer.WritePropertyName("schedule");
+            writer.WriteStartArray();
+            ScheduleConverter converter = new ScheduleConverter();
+            converter.WriteJson(writer, value.Monday, serializer);
+            converter.WriteJson(writer, value.Tuesday, serializer);
+            converter.WriteJson(writer, value.Wednesday, serializer);
+            converter.WriteJson(writer, value.Thursday, serializer);
+            converter.WriteJson(writer, value.Friday, serializer);
+            converter.WriteJson(writer, value.Saturday, serializer);
+            converter.WriteJson(writer, value.Sunday, serializer);
+            writer.WriteEndArray();
+            writer.WriteEndObject();
         }
     }
 }

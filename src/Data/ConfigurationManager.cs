@@ -37,11 +37,12 @@ namespace ChristmasPi.Data {
         /// Saves the current tree configuration to a json file
         /// </summary>
         public void Save() {
+            Console.WriteLine("Saving configuration");
             try {
                 string json = JsonConvert.SerializeObject(CurrentTreeConfig, Formatting.Indented);
-                if (File.Exists("configuration.json"))
-                    File.Move("configuration.json", "configuration.old.json");
-                File.WriteAllText("configuration.json", json);
+                if (File.Exists(Constants.CONFIGURATION_FILE))
+                    File.Move(Constants.CONFIGURATION_FILE, Constants.CONFIGURATION_FILE_OLD);
+                File.WriteAllText(Constants.CONFIGURATION_FILE, json);
             }
             catch (Exception e) {
                 Console.WriteLine("LOGTHIS Failed to save tree configuration, an exception occurred");
@@ -54,11 +55,12 @@ namespace ChristmasPi.Data {
         /// Saves the current schedule to a json file
         /// </summary>
         public void SaveSchedule() {
+            Console.WriteLine("Saving schedule");
             try {
                 string json = JsonConvert.SerializeObject(CurrentSchedule, Formatting.Indented);
-                if (File.Exists("schedule.json"))
-                    File.Move("schedule.json", "schedule.old.json");
-                File.WriteAllText("schedule.json", json);
+                if (File.Exists(Constants.SCHEDULE_FILE))
+                    File.Move(Constants.SCHEDULE_FILE, Constants.SCHEDULE_FILE_OLD, true);
+                File.WriteAllText(Constants.SCHEDULE_FILE, json);
             }
             catch (Exception e) {
                 Console.WriteLine("LOGTHIS Failed to save schedule info, an exception occurred");

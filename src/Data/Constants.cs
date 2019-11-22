@@ -17,11 +17,23 @@ namespace ChristmasPi.Data {
         // Operations
         public static readonly string DEFAULT_OPERATING_MODE = "SolidColorMode";
         public static readonly int ACTIVATION_TIMEOUT = 1000;           // in ms
+        public static readonly int SCHEDULER_MAX_ATTEMPTS = 5;
+        public static readonly TimeSpan SCHEDULER_ERR_SLEEP = new TimeSpan(0, 30, 0);
+        public static readonly TimeSpan SCHEDULER_LONG_SLEEP = new TimeSpan(1, 0, 0);
 
         // Colors
         public static readonly int RANDOM_DEFAULT = 255;
         public static readonly int RANDOM_MAX = 255;                    // exclusive range
         public static readonly int RANDOM_MIN = 0;
         public static readonly Color COLOR_OFF = Color.Black;
+
+        // Files
+        public static readonly string CONFIGURATION_FILE = "configuration.json";
+        public static readonly string CONFIGURATION_FILE_OLD = "configuration.old.json";
+        public static readonly string SCHEDULE_FILE = "schedule.json";
+        public static readonly string SCHEDULE_FILE_OLD = "schedule.old.json";
+
+        // Networking
+        public static readonly int PORT = 50808;                        // set in asp.net configuration
     }
 }
