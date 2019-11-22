@@ -130,7 +130,7 @@ namespace ChristmasPi.Scheduler.Models {
             return CompareTo(obj) == 0;
         }
 
-        public static override bool operator ==(TimeSlot a, object b) {
+        public static bool operator ==(TimeSlot a, object b) {
             if (!(b is TimeSlot))
                 return false;
             TimeSlot other = (TimeSlot)b;

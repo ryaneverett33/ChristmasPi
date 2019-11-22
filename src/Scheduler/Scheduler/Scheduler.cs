@@ -67,16 +67,44 @@ namespace ChristmasPi.Scheduler {
                                     // check if we just left a rule
                                     if (lastRule != null) {
                                         // turn off
+                                        lastRule = null;
+                                        for (int i = 0; i < Constants.SCHEDULER_MAX_ATTEMPTS; i++) {
+                                            bool success = await TurnOff();
+                                            if (success)
+                                                break;
+                                            else {
+                                                Console.WriteLine($"Failed to turnon, {i+1}/{Constants.SCHEDULER_MAX_ATTEMPTS}");
+                                            }
+                                        }
                                     }
-                                    // wait for rule
+                                    else {
+                                        // wait for rule to start
+                                        TimeSpan sleepTime = currentRules[closestRuleIndex].StartTime - current;
+                                        currentSleepToken = ThreadHelpers.RegisterWakeUp();
+                                        ThreadHelpers.SafeSleep(sleepTime);
+                                        currentSleepToken = null;
+                                    }
                                 }
                                 else {
                                     // check if we've already turned on 
                                     if (lastRule != null && lastRule.Value == currentRules[closestRuleIndex]) {
                                         // wait for the end of the rule
+                                        TimeSpan sleepTime = currentRules[closestRuleIndex].EndTime - current;
+                                        currentSleepToken = ThreadHelpers.RegisterWakeUp();
+                                        ThreadHelpers.SafeSleep(sleepTime);
+                                        currentSleepToken = null;
                                     }
                                     else {
                                         // turn on
+                                        lastRule = currentRules[closestRuleIndex];
+                                        for (int i = 0; i < Constants.SCHEDULER_MAX_ATTEMPTS; i++) {
+                                            bool success = await TurnOn();
+                                            if (success)
+                                                break;
+                                            else {
+                                                Console.WriteLine($"Failed to turnon, {i+1}/{Constants.SCHEDULER_MAX_ATTEMPTS}");
+                                            }
+                                        }
                                     }
                                 }
                             }
