@@ -20,8 +20,9 @@ namespace ChristmasPi.Hardware.Renderers {
         public abstract event AfterRenderHandler AfterRenderEvent;
         public abstract void Render(IRenderer obj);
 
-        public BaseRenderer() {
-            ledColors = new Color[50];
+        public BaseRenderer(int ledCount) {
+            LightCount = ledCount;
+            ledColors = new Color[ledCount];
         }
         /// <summary>
         /// Sets the LED color at the position and applies color flips if needed
@@ -29,8 +30,10 @@ namespace ChristmasPi.Hardware.Renderers {
         /// <param name="index">Position of the LED</param>
         /// <param name="color">New color for the LED</param>
         public void SetLEDColor(int index, Color color) {
-            if (index < 0 || index >= ledColors.Length)
+            if (index < 0 || index >= ledColors.Length) {
+                Console.WriteLine($"index: {index}, range [0, {LightCount - 1}], ledColors length: {ledColors.Length}");
                 throw new ArgumentOutOfRangeException("index");
+            }
             ledColors[index] = color;
             colorsChanged = true;
         }

@@ -12,6 +12,8 @@ namespace ChristmasPi.Hardware.Renderers {
         public override event AfterRenderHandler AfterRenderEvent;
         private TextWriter writer;
 
+        public TestRenderer() : base(1) { }
+
         // write current value to file
         public override void Render(IRenderer renderer) {
             if (BeforeRenderEvent != null)

@@ -19,6 +19,7 @@ namespace ChristmasPi.Scheduler {
     public class Scheduler {
         public bool Running;
         public bool Scheduling;
+        public string ScheduleFileLoc { get; private set; }
 
         private FileSystemWatcher watcher;
         private WeekSchedule schedule;
@@ -28,7 +29,24 @@ namespace ChristmasPi.Scheduler {
         private TimeSlot? lastRule;
 
         public Scheduler(string[] args) {
-            watcher = new FileSystemWatcher(Constants.SCHEDULE_FILE);
+            for (int i = 0; i < args.Length; i++) {
+                if (args[i].Equals("--config", StringComparison.CurrentCultureIgnoreCase) ||
+                    args[i].Equals("-config", StringComparison.CurrentCultureIgnoreCase)) {
+                    if (i + 1 < args.Length) {
+                        ScheduleFileLoc = args[i + 1];
+                        break;
+                    }
+                    Console.WriteLine("Invalid config argument");
+                    printHelp();
+                }
+                if (args[i].Equals("--h", StringComparison.CurrentCultureIgnoreCase) ||
+                    args[i].Equals("-h", StringComparison.CurrentCultureIgnoreCase) ||
+                    args[i].Equals("help", StringComparison.CurrentCultureIgnoreCase))
+                    printHelp();
+            }
+            if (ScheduleFileLoc == null)
+                ScheduleFileLoc = Constants.SCHEDULE_FILE;
+            watcher = new FileSystemWatcher(ScheduleFileLoc);
             watcher.Changed += FileChanged;
             watcher.Created += FileChanged;
             watcher.Deleted += FileChanged;
@@ -81,7 +99,7 @@ namespace ChristmasPi.Scheduler {
                                         // wait for rule to start
                                         TimeSpan sleepTime = currentRules[closestRuleIndex].StartTime - current;
                                         currentSleepToken = ThreadHelpers.RegisterWakeUp();
-                                        ThreadHelpers.SafeSleep(sleepTime);
+                                        ThreadHelpers.SafeSleep(currentSleepToken, sleepTime);
                                         currentSleepToken = null;
                                     }
                                 }
@@ -91,7 +109,7 @@ namespace ChristmasPi.Scheduler {
                                         // wait for the end of the rule
                                         TimeSpan sleepTime = currentRules[closestRuleIndex].EndTime - current;
                                         currentSleepToken = ThreadHelpers.RegisterWakeUp();
-                                        ThreadHelpers.SafeSleep(sleepTime);
+                                        ThreadHelpers.SafeSleep(currentSleepToken, sleepTime);
                                         currentSleepToken = null;
                                     }
                                     else {
@@ -154,9 +172,9 @@ namespace ChristmasPi.Scheduler {
 
         // loads the schedule if the schedule file exists
         private bool loadSchedule() {
-            if (File.Exists(Constants.SCHEDULE_FILE)) {
+            if (File.Exists(ScheduleFileLoc)) {
                 try {
-                    string json = File.ReadAllText(Constants.SCHEDULE_FILE);
+                    string json = File.ReadAllText(ScheduleFileLoc);
                     schedule = JsonConvert.DeserializeObject<WeekSchedule>(json);
                     return true;
                 }
@@ -198,6 +216,15 @@ namespace ChristmasPi.Scheduler {
                     return i;
             }
             return -1;
+        }
+
+        // Prins help and exits program
+        private void printHelp() {
+            Console.WriteLine("Usage: Scheduler --config {schedule.json}");
+            Console.WriteLine("-----------------------------------------\n");
+            Console.WriteLine("-h/--h\t\t\tPrints this help screen");
+            Console.WriteLine("-config/--config\tUse this schedule config");
+            Environment.Exit(0);
         }
     }
 }

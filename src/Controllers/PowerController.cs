@@ -15,6 +15,7 @@ namespace ChristmasPi.Controllers
     public class PowerController : ControllerBase {
         [HttpPost("off")]
         public IActionResult Off() {
+            // /api/power/off
             if (OperationManager.Instance.CurrentOperatingMode is IOffMode) {
                 (OperationManager.Instance.CurrentOperatingMode as IOffMode).TurnOff();
             }
@@ -26,6 +27,7 @@ namespace ChristmasPi.Controllers
         }
         [HttpPost("on")]
         public IActionResult On() {
+            // /api/power/on
             if (OperationManager.Instance.CurrentOperatingMode is IOffMode) {
                 // Switch to Default Operating Mode
                 OperationManager.Instance.SwitchModes(OperationManager.Instance.DefaultOperatingMode);
@@ -34,6 +36,14 @@ namespace ChristmasPi.Controllers
             else {
                 return BadRequest("Tree is already on, can't turn on");
             }
+        }
+        [HttpGet]
+        public IActionResult Get() {
+            // /api/power/
+            if (OperationManager.Instance.CurrentOperatingMode is IOffMode)
+                return new JsonResult(new { on = true });
+            else
+                return new JsonResult(new { on = false });
         }
     }
 }

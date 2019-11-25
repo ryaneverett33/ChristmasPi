@@ -5,6 +5,7 @@
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <AssemblyName>Scheduler</AssemblyName>
     <RootNamespace>ChristmasPi.Scheduler</RootNamespace>
+    <StartupObject>ChristmasPi.Scheduler.Program</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>

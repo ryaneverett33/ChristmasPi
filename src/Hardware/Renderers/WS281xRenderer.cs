@@ -30,7 +30,8 @@ namespace ChristmasPi.Hardware.Renderers {
         /// </summary>
         /// <param name="ledCount">Number of LEDs to render</param>
         /// <param name="pin">GPIO pin to connect to</param>
-        public WS281xRenderer(int ledCount, int pin, int fps) : base() {
+        public WS281xRenderer(int ledCount, int pin, int fps) : base(ledCount) {
+            Console.WriteLine($"Creating a new Renderer with {ledCount} leds on pin {pin}");
             var settings = Settings.CreateDefaultSettings();
             settings.Channel_1 = new Channel(ledCount, 
                                             pin, 
@@ -44,7 +45,7 @@ namespace ChristmasPi.Hardware.Renderers {
             }
             locker = new object();
             renderThread = new RenderThread(this, fps);
-            base.LightCount = ledCount;
+            // base.LightCount = ledCount;
         }
         public override void Render(IRenderer obj) {
             if (BeforeRenderEvent != null)

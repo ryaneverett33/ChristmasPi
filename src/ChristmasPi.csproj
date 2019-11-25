@@ -5,6 +5,7 @@
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
     <AssemblyName>ChristmasPi</AssemblyName>
     <RootNamespace>ChristmasPi</RootNamespace>
+    <StartupObject>ChristmasPi.Program</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>
