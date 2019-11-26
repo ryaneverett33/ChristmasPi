@@ -1,0 +1,13 @@
+﻿@{
+    ViewData["Title"] = "Animation Page";
+    ViewData["ActivePage"] = "Animation";
+    @model ChristmasPi.Models.AnimationModel;
+}
+    <div class="list-group">
+        <ul>
+            @foreach (string animation in Model.Animations) {
+                <li class="list-item">@animation</li>
+            }
+        </ul>
+    </div>
+    
