@@ -6,6 +6,7 @@ using ChristmasPi.Animation.Animations;
 using ChristmasPi.Animation.BranchAnimations;
 using ChristmasPi.Data.Exceptions;
 using ChristmasPi.Data;
+using ChristmasPi.Data.Models;
 
 namespace ChristmasPi.Animation {
     public class AnimationManager {
@@ -24,6 +25,13 @@ namespace ChristmasPi.Animation {
                 IAnimatable anim = (IAnimatable)Activator.CreateInstance(Type.GetType(classname));
                 if (anim.isBranchAnimation)
                     (anim as IBranchAnimation).Init(ConfigurationManager.Instance.CurrentTreeConfig.tree.branches.ToArray());
+                // resolve properties
+                AnimationInfo config = ConfigurationManager.Instance.CurrentTreeConfig.GetAnimation(anim.Name);
+                if (anim is IAnimation) {
+                    if (config != null)
+                        (anim as IAnimation).AddProperties(config.Properties);
+                    (anim as IAnimation).RegisterProperties();
+                }
                 Animations.Add(anim.Name, anim);
             }
         }
@@ -49,7 +57,6 @@ namespace ChristmasPi.Animation {
         public string[] GetAnimations() {
             ICollection<string> keys = Animations.Keys;
             return keys.ToArray<string>();
-        }
-
+        } 
     }
 }

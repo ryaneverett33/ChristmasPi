@@ -45,7 +45,7 @@
       "properties" : [
         {
           "name" : "SLEEP_TIME",
-          "value" : "0.2s"
+          "value" : "0.2"
         }
       ]
     }

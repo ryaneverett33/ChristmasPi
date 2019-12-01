@@ -130,6 +130,12 @@ namespace ChristmasPi.Scheduler.Models {
             return CompareTo(obj) == 0;
         }
 
+        public override int GetHashCode() {
+            int startHash = StartTime.GetHashCode();
+            int endHash = EndTime.GetHashCode();
+            return startHash + endHash;
+        }
+
         public static bool operator ==(TimeSlot a, object b) {
             if (!(b is TimeSlot))
                 return false;

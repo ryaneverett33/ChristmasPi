@@ -18,6 +18,8 @@ namespace ChristmasPi.Data.Models {
         /// </summary>
         public HardwareSettings hardware { get; set; }
 
+        public AnimationInfo[] animations { get; set; }
+
         /// <summary>
         /// Returns the default settings for the entire tree
         /// </summary>
@@ -27,7 +29,20 @@ namespace ChristmasPi.Data.Models {
             config.tree = TreeSettings.DefaultSettings();
             config.setup = SetupSettings.DefaultSettings();
             config.hardware = HardwareSettings.DefaultSettings();
+            config.animations = null;
             return config;
+        }
+
+        /// <summary>
+        /// Gets info for an animation if it exists in the configuration
+        /// </summary>
+        /// <returns>An AnimationInfo object if the animation exists, else null</returns>
+        public AnimationInfo GetAnimation(string name) {
+            foreach (AnimationInfo info in animations) {
+                if (info.Name == name)
+                    return info;
+            }
+            return null;
         }
     }
 }

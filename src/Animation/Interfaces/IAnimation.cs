@@ -7,10 +7,14 @@ namespace ChristmasPi.Animation.Interfaces {
         int FPS { get; }
         int LightCount { get; }
 
-        AnimationProperty[] Properties { get; }
-
         RenderFrame[] GetFrames(int fps, int lightcount);
 
+        void RegisterProperties();
+
         void AddProperties(AnimationProperty[] properties);
+
+        bool RegisterProperty(Ref<object> reference, string name, object defaultValue);
+
+        void ResolveProperties();
     }
 }

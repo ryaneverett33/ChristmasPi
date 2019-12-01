@@ -17,7 +17,6 @@ namespace ChristmasPi.Scheduler.Models {
         public Schedule Friday;
         public Schedule Saturday;
         public Schedule Sunday;
-        private bool createdSchedules;
         private ScheduleRule[] _rules;
 
         public ScheduleRule[] Rules { get { return _rules; } set {
@@ -26,7 +25,6 @@ namespace ChristmasPi.Scheduler.Models {
             }
         }
         public WeekSchedule() {
-            createdSchedules = false;
             Monday = new Schedule();
             Tuesday = new Schedule();
             Wednesday = new Schedule();

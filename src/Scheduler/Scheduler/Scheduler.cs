@@ -99,7 +99,7 @@ namespace ChristmasPi.Scheduler {
                                         // wait for rule to start
                                         TimeSpan sleepTime = currentRules[closestRuleIndex].StartTime - current;
                                         currentSleepToken = ThreadHelpers.RegisterWakeUp();
-                                        ThreadHelpers.SafeSleep(currentSleepToken, sleepTime);
+                                        await ThreadHelpers.SafeSleep(currentSleepToken, sleepTime);
                                         currentSleepToken = null;
                                     }
                                 }
@@ -109,7 +109,7 @@ namespace ChristmasPi.Scheduler {
                                         // wait for the end of the rule
                                         TimeSpan sleepTime = currentRules[closestRuleIndex].EndTime - current;
                                         currentSleepToken = ThreadHelpers.RegisterWakeUp();
-                                        ThreadHelpers.SafeSleep(currentSleepToken, sleepTime);
+                                        await ThreadHelpers.SafeSleep(currentSleepToken, sleepTime);
                                         currentSleepToken = null;
                                     }
                                     else {
