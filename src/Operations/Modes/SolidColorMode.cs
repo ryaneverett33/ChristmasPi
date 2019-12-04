@@ -38,6 +38,13 @@ namespace ChristmasPi.Operations.Modes {
                 currentcolor = CurrentColor
             };
         }
+        public object GetProperty(string property) {
+            if (property.Equals(nameof(Name), StringComparison.CurrentCultureIgnoreCase))
+                return Name;
+            else if (property.Equals(nameof(CurrentColor), StringComparison.CurrentCultureIgnoreCase))
+                return CurrentColor;
+            return null;
+        }
         #endregion
         #region Methods
         /// <summary>

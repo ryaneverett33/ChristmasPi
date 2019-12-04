@@ -1,6 +1,8 @@
 ﻿@{
     ViewData["Title"] = "Solid Page";
     ViewData["ActivePage"] = "Solid";
+    @model ChristmasPi.Models.SolidModel;
 }
 
-<button class="btn btn-info">Testy</button>
+<div id="cp2" data-color="rgb(@Model.CurrentColor.R, @Model.CurrentColor.G, @Model.CurrentColor.B)"></div>
+<button class="btn btn-primary" onclick="SubmitColor()">Update</button>

@@ -81,5 +81,20 @@ namespace ChristmasPi.Operations {
             }
             _currentOperatingMode = newModeName;
         }
+
+        /// <summary>
+        /// Requests a property from an operating mode
+        /// </summary>
+        /// <param name="mode">The operating mode to request from</param>
+        /// <param name="property">The name of property to retrieve</param>
+        /// <returns>The value of the property on success, null on failure</returns>
+        public object GetProperty(string mode, string property) {
+            if (!operatingModes.ContainsKey(mode))
+                throw new InvalidOperatingModeException($"{mode} is not a valid operating mode");
+            else {
+                IOperationMode modeObj = operatingModes[mode];
+                return modeObj.GetProperty(property);
+            }
+        }
     }
 }

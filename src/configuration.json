@@ -32,7 +32,7 @@
     "firstrun": false
   },
   "hardware": {
-    "lightcount": 50,
+    "lightcount": 1,
     "fps": 30,
     "datapin": 18,
     "brightness" : 100,

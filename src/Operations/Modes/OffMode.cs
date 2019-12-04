@@ -39,6 +39,13 @@ namespace ChristmasPi.Operations.Modes {
                 TurnedOff = true
             };
         }
+        public object GetProperty(string property) {
+            if (property.Equals(nameof(Name), StringComparison.CurrentCultureIgnoreCase))
+                return Name;
+            if (property.Equals(nameof(TurnedOff), StringComparison.CurrentCultureIgnoreCase))
+                return Name;
+            return null;
+        }
         #endregion
         #region Methods
         public void TurnOff() {

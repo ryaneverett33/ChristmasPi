@@ -1,0 +1,11 @@
+﻿@{
+    ViewData["Title"] = "Power Settings";
+    ViewData["ActivePage"] = "Power";
+    @model ChristmasPi.Models.PowerModel;
+}
+@if (Model.PoweredOff) {
+    <button class="btn btn-primary" onclick="TurnOn()">Turn On</button>
+}
+else {
+    <button class="btn btn-primary" onclick="TurnOff()">Turn Off</button>
+}

@@ -22,5 +22,12 @@
         /// <remarks>This data is typically converted to JSON after calling()</remarks>
         /// <see cref="TreeController.GetTreeMode()" />
         object Info();
+
+        /// <summary>
+        /// Gets the value of a specific property
+        /// </summary>
+        /// <param name="property">The property to return</param>
+        /// <returns>The value of the property on success, null on failure</returns>
+        object GetProperty(string property);
     }
 }

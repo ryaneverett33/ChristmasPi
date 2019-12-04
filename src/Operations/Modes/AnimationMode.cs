@@ -14,6 +14,10 @@ namespace ChristmasPi.Operations.Modes {
     public class AnimationMode : IOperationMode, IAnimationMode {
         #region Properties
         public string Name => "AnimationMode";
+        public AnimationState CurrentState => animator == null ? AnimationState.Stopped : animator.CurrentState;
+        public string CurrentAnimation => animator != null ? animator.CurrentAnimation.Name : "None playing";
+        public bool Animating => animator != null ? animator.CurrentState == AnimationState.Animating : false;
+        public bool Paused => animator != null ? animator.CurrentState == AnimationState.Paused : false;
         #endregion
 
         #region Fields
@@ -21,10 +25,6 @@ namespace ChristmasPi.Operations.Modes {
         private Animator animator;                              // The current animator object (if an animation is playing)
         // If the current animation is a branch animation
         private bool currentAnimationIsBranch => (animator != null ? animator.CurrentAnimation.isBranchAnimation : false);                  
-
-        public string CurrentAnimation => (animator != null ? animator.CurrentAnimation.Name : "None playing");
-        public bool Animating => animator.CurrentState == AnimationState.Animating;
-        public bool Paused => animator.CurrentState == AnimationState.Paused;
         #endregion
         public AnimationMode() {
             animationManager = AnimationManager.Instance;
@@ -76,6 +76,19 @@ namespace ChristmasPi.Operations.Modes {
                 return StatusCodes.Status500InternalServerError;
             }
         }
+        public object GetProperty(string property) {
+            if (property.Equals(nameof(Name), StringComparison.CurrentCultureIgnoreCase))
+                return Name;
+            else if (property.Equals(nameof(CurrentState), StringComparison.CurrentCultureIgnoreCase))
+                return CurrentState;
+            else if (property.Equals(nameof(CurrentAnimation), StringComparison.CurrentCultureIgnoreCase))
+                return CurrentAnimation;
+            else if (property.Equals(nameof(Animating), StringComparison.CurrentCultureIgnoreCase))
+                return Animating;
+            else if (property.Equals(nameof(Paused), StringComparison.CurrentCultureIgnoreCase))
+                return Paused;
+            return null;
+        }
 
         public int PauseAnimation() {
             if (animator == null || animator.CurrentState == Data.Models.AnimationState.Stopped ||
@@ -104,6 +117,7 @@ namespace ChristmasPi.Operations.Modes {
                 return StatusCodes.Status405MethodNotAllowed;
             try {
                 animator.Stop();
+                animator = null;
                 return StatusCodes.Status200OK;
             }
             catch (InvalidAnimationActionException e) {
@@ -121,7 +135,7 @@ namespace ChristmasPi.Operations.Modes {
         }
 
         public int ResumeAnimation() {
-            if (animator.CurrentState != AnimationState.Paused)
+            if (animator == null || animator.CurrentState != AnimationState.Paused)
                 return StatusCodes.Status405MethodNotAllowed;
             try {
                 animator.Resume();

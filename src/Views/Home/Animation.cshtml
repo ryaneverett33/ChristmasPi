@@ -3,11 +3,38 @@
     ViewData["ActivePage"] = "Animation";
     @model ChristmasPi.Models.AnimationModel;
 }
-    <div class="list-group">
-        <ul>
-            @foreach (string animation in Model.Animations) {
-                <li class="list-item">@animation</li>
-            }
-        </ul>
-    </div>
-    
+<ul class="list-group">
+    @foreach (string animation in Model.Animations) {
+        @if (animation == Model.CurrentAnimation) {
+            <li class="list-group-item active">
+                @animation
+                @if (Model.CurrentState == ChristmasPi.Data.Models.AnimationState.Paused ||
+              Model.CurrentState == ChristmasPi.Data.Models.AnimationState.Stopped) {
+            <button class="btn btn-primary btn-just-icon">
+                <i class="nc-icon nc-button-play" onclick='PlayAnimation("@animation")'></i>
+            </button>
+        }
+        else {
+            <button class="btn btn-primary btn-just-icon" onclick="PauseAnimation()">
+                <i class="nc-icon nc-button-pause"></i>
+            </button>
+            <button class="btn btn-primary" onclick="StopAnimation()">Stop</button>
+        }
+            </li>
+
+        }
+        else {
+            <li class="list-group-item">
+                @animation
+            <button class="btn btn-primary btn-round btn-just-icon" onclick='PlayAnimation("@animation")'>
+                <i class="nc-icon nc-button-play"></i>
+            </button>
+        </li>
+    }
+        <!--<li class='list-group-item @((animation == Model.CurrentAnimation ? "active" : ""))'>
+            @animation
+        </li>-->
+    }
+</ul>
+
+
