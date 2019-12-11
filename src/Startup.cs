@@ -14,7 +14,7 @@ using ChristmasPi.Data;
 using ChristmasPi.Data.Models;
 using ChristmasPi.Operations;
 using ChristmasPi.Animation;
-using ChristmasPi.Scheduler.Models;
+using ChristmasPi.Data.Models.Scheduler;
 using System.IO;
 using Microsoft.Extensions.Hosting;
 

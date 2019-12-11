@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using ChristmasPi.Scheduler.Models;
+using ChristmasPi.Data.Models.Scheduler;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ChristmasPi.Data;

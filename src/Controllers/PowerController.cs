@@ -34,7 +34,8 @@ namespace ChristmasPi.Controllers
                 return Ok();
             }
             else {
-                return BadRequest("Tree is already on, can't turn on");
+                // Handle silently for the scheduler
+                return Ok();
             }
         }
         [HttpGet]

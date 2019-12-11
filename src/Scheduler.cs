@@ -4,8 +4,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Net.Http;
 using Newtonsoft.Json;
-using ChristmasPi.Scheduler.Models;
 using ChristmasPi.Data;
+using ChristmasPi.Data.Models.Scheduler;
 using ChristmasPi.Util;
 using ChristmasPi.Data.Extensions;
 
@@ -13,7 +13,9 @@ namespace ChristmasPi.Scheduler {
     class Program {
         static void Main(string[] args) {
             Scheduler scheduler = new Scheduler(args);
-            scheduler.Run();
+            Thread t = new Thread(() => scheduler.Run());
+            t.Start();
+            t.Join();
         }
     }
     public class Scheduler {
@@ -34,29 +36,43 @@ namespace ChristmasPi.Scheduler {
                     args[i].Equals("-config", StringComparison.CurrentCultureIgnoreCase)) {
                     if (i + 1 < args.Length) {
                         ScheduleFileLoc = args[i + 1];
-                        break;
+                        i++;
+                        continue;
                     }
                     Console.WriteLine("Invalid config argument");
                     printHelp();
                 }
-                if (args[i].Equals("--h", StringComparison.CurrentCultureIgnoreCase) ||
+                else if (args[i].Equals("--url", StringComparison.CurrentCultureIgnoreCase) ||
+                    args[i].Equals("-url", StringComparison.CurrentCultureIgnoreCase)) {
+                    if (i + 1 < args.Length) {
+                        apiURL = args[i + 1];
+                        i++;
+                        continue;
+                    }
+                    Console.WriteLine("Invalid config argument");
+                    printHelp();
+                }
+                else if (args[i].Equals("--h", StringComparison.CurrentCultureIgnoreCase) ||
                     args[i].Equals("-h", StringComparison.CurrentCultureIgnoreCase) ||
                     args[i].Equals("help", StringComparison.CurrentCultureIgnoreCase))
                     printHelp();
             }
             if (ScheduleFileLoc == null)
                 ScheduleFileLoc = Constants.SCHEDULE_FILE;
-            watcher = new FileSystemWatcher(ScheduleFileLoc);
+            if (apiURL == null)
+                apiURL = $"http://localhost:{Constants.PORT}/api";
+            ScheduleFileLoc = Path.GetFullPath(ScheduleFileLoc);
+            watcher = new FileSystemWatcher(Path.GetDirectoryName(ScheduleFileLoc));
+            watcher.Filter = Path.GetFileName(ScheduleFileLoc);
             watcher.Changed += FileChanged;
             watcher.Created += FileChanged;
             watcher.Deleted += FileChanged;
             Running = true;
             Scheduling = false;
-            apiURL = $"http://localhost:{Constants.PORT}/api";
             httpClient = new HttpClient();
         }
 
-        public async void Run() {
+        public void Run() {
             while (Running) {
                 // get schedule info
                 if (loadSchedule()) {
@@ -66,16 +82,21 @@ namespace ChristmasPi.Scheduler {
                         if (currentRules.Length == 0) {
                             // long sleep
                             currentSleepToken = ThreadHelpers.RegisterWakeUp();
-                            await ThreadHelpers.SafeSleep(currentSleepToken, Constants.SCHEDULER_LONG_SLEEP);            // ignore the result but wakeup if need be
+                            ThreadHelpers.SafeSleep(currentSleepToken, Constants.SCHEDULER_LONG_SLEEP).Wait();            // ignore the result but wakeup if need be
+                            // ThreadHelpers.UnSafeSleep(Constants.SCHEDULER_LONG_SLEEP);
                             currentSleepToken = null;
                         }
                         else {
                             // get current rule
                             int closestRuleIndex = getClosestRule(currentRules);
                             if (closestRuleIndex == -1) {
+                                if (lastRule != null) {
+                                    TurnOff();
+                                }
                                 // no more rules for the current day, go to sleep
                                 currentSleepToken = ThreadHelpers.RegisterWakeUp();
-                                await ThreadHelpers.SafeSleep(currentSleepToken, Constants.SCHEDULER_LONG_SLEEP);            // ignore the result but wakeup if need be
+                                ThreadHelpers.SafeSleep(currentSleepToken, Constants.SCHEDULER_LONG_SLEEP).Wait();            // ignore the result but wakeup if need be
+                                // ThreadHelpers.UnSafeSleep(Constants.SCHEDULER_LONG_SLEEP);
                                 currentSleepToken = null;
                             }
                             else {
@@ -85,21 +106,14 @@ namespace ChristmasPi.Scheduler {
                                     // check if we just left a rule
                                     if (lastRule != null) {
                                         // turn off
-                                        lastRule = null;
-                                        for (int i = 0; i < Constants.SCHEDULER_MAX_ATTEMPTS; i++) {
-                                            bool success = await TurnOff();
-                                            if (success)
-                                                break;
-                                            else {
-                                                Console.WriteLine($"Failed to turnon, {i+1}/{Constants.SCHEDULER_MAX_ATTEMPTS}");
-                                            }
-                                        }
+                                        TurnOff();
                                     }
                                     else {
                                         // wait for rule to start
                                         TimeSpan sleepTime = currentRules[closestRuleIndex].StartTime - current;
                                         currentSleepToken = ThreadHelpers.RegisterWakeUp();
-                                        await ThreadHelpers.SafeSleep(currentSleepToken, sleepTime);
+                                        ThreadHelpers.SafeSleep(currentSleepToken, sleepTime).Wait();
+                                        // ThreadHelpers.UnSafeSleep(sleepTime);
                                         currentSleepToken = null;
                                     }
                                 }
@@ -109,20 +123,14 @@ namespace ChristmasPi.Scheduler {
                                         // wait for the end of the rule
                                         TimeSpan sleepTime = currentRules[closestRuleIndex].EndTime - current;
                                         currentSleepToken = ThreadHelpers.RegisterWakeUp();
-                                        await ThreadHelpers.SafeSleep(currentSleepToken, sleepTime);
+                                        ThreadHelpers.SafeSleep(currentSleepToken, sleepTime).Wait();
+                                        // ThreadHelpers.UnSafeSleep(sleepTime);
                                         currentSleepToken = null;
                                     }
                                     else {
                                         // turn on
                                         lastRule = currentRules[closestRuleIndex];
-                                        for (int i = 0; i < Constants.SCHEDULER_MAX_ATTEMPTS; i++) {
-                                            bool success = await TurnOn();
-                                            if (success)
-                                                break;
-                                            else {
-                                                Console.WriteLine($"Failed to turnon, {i+1}/{Constants.SCHEDULER_MAX_ATTEMPTS}");
-                                            }
-                                        }
+                                        TurnOn();
                                     }
                                 }
                             }
@@ -132,7 +140,7 @@ namespace ChristmasPi.Scheduler {
                 else {
                     // sleep for a while and then try again
                     currentSleepToken = ThreadHelpers.RegisterWakeUp();
-                    await ThreadHelpers.SafeSleep(currentSleepToken, Constants.SCHEDULER_ERR_SLEEP);            // ignore the result but wakeup if need be
+                    ThreadHelpers.SafeSleep(currentSleepToken, Constants.SCHEDULER_ERR_SLEEP).Wait();            // ignore the result but wakeup if need be
                     currentSleepToken = null;
                 }
             }
@@ -146,26 +154,65 @@ namespace ChristmasPi.Scheduler {
                 ThreadHelpers.WakeUpThread(currentSleepToken);
         }
         
+        private void TurnOff() {
+            lastRule = null;
+            for (int i = 0; i < Constants.SCHEDULER_MAX_ATTEMPTS; i++) {
+                bool success = TurnOffAsync().Result;
+                if (success) {
+                    Console.WriteLine($"[{DateTime.Now.ToShortDateString()}-{DateTime.Now.ToShortTimeString()}]Successfully turned off");
+                    break;
+                }
+                else {
+                    Console.WriteLine($"Failed to turnon, {i + 1}/{Constants.SCHEDULER_MAX_ATTEMPTS}");
+                }
+            }
+        }
+        private void TurnOn() {
+            for (int i = 0; i < Constants.SCHEDULER_MAX_ATTEMPTS; i++) {
+                try {
+                    bool success = TurnOnAsync().Result;
+                    if (success) {
+                        Console.WriteLine($"[{DateTime.Now.ToShortDateString()}-{DateTime.Now.ToShortTimeString()}]Successfully turned on");
+                        break;
+                    }
+                    else {
+                        Console.WriteLine($"Failed to turnon, {i + 1}/{Constants.SCHEDULER_MAX_ATTEMPTS}");
+                    }
+                }
+                catch (Exception e) {
+                    Console.WriteLine(e);
+                }
+            }
+        }
+
         // Turns on the christmas tree
-        private async Task<bool> TurnOn() {
+        private async Task<bool> TurnOnAsync() {
             try {
-                HttpResponseMessage response = await httpClient.PostAsync($"{apiURL}/on", null);
+                HttpResponseMessage response = await httpClient.PostAsync($"{apiURL}/power/on", null);
                 return response.StatusCode == System.Net.HttpStatusCode.OK;
             }
             catch (HttpRequestException e) {
                 Console.WriteLine($"Failed to execute turnon command, exception: {e.Message}");
+            }
+            catch (Exception e) {
+                Console.WriteLine($"Exception occured turning on, {e}");
+                return false;
             }
             return false;
         }
         
         // Turns off the christmas tree
-        private async Task<bool> TurnOff() {
+        private async Task<bool> TurnOffAsync() {
             try {
-                HttpResponseMessage response = await httpClient.PostAsync($"{apiURL}/off", null);
+                HttpResponseMessage response = await httpClient.PostAsync($"{apiURL}/power/off", null);
                 return response.StatusCode == System.Net.HttpStatusCode.OK;
             }
             catch (HttpRequestException e) {
                 Console.WriteLine($"Failed to execute turnon command, exception: {e.Message}");
+            }
+            catch (Exception e) {
+                Console.WriteLine($"Exception occured turning off, {e}");
+                return false;
             }
             return false;
         }
@@ -213,6 +260,8 @@ namespace ChristmasPi.Scheduler {
                 TimeSlot rule = rules[i];
                 DateTime current = DateTime.Now.ZeroOut();
                 if (current < rule.StartTime)
+                    return i;
+                else if (current > rule.StartTime && current < rule.EndTime)
                     return i;
             }
             return -1;

@@ -1,0 +1,63 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <StartupObject>ChristmasPi.Scheduler.Program</StartupObject>
+    <RootNamespace>ChristmasPi.Scheduler</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Animation\**" />
+    <Compile Remove="Controllers\**" />
+    <Compile Remove="Hardware\**" />
+    <Compile Remove="lib\**" />
+    <Compile Remove="Models\**" />
+    <Compile Remove="Operations\**" />
+    <Compile Remove="Views\**" />
+    <Compile Remove="wwwroot\**" />
+    <EmbeddedResource Remove="Animation\**" />
+    <EmbeddedResource Remove="Controllers\**" />
+    <EmbeddedResource Remove="Hardware\**" />
+    <EmbeddedResource Remove="lib\**" />
+    <EmbeddedResource Remove="Models\**" />
+    <EmbeddedResource Remove="Operations\**" />
+    <EmbeddedResource Remove="Views\**" />
+    <EmbeddedResource Remove="wwwroot\**" />
+    <None Remove="Animation\**" />
+    <None Remove="Controllers\**" />
+    <None Remove="Hardware\**" />
+    <None Remove="lib\**" />
+    <None Remove="Models\**" />
+    <None Remove="Operations\**" />
+    <None Remove="Views\**" />
+    <None Remove="wwwroot\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Program.cs" />
+    <Compile Remove="Startup.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="appsettings.Development.json" />
+    <None Remove="appsettings.json" />
+    <None Remove="Bugs.md" />
+    <None Remove="configuration.json" />
+    <None Remove="schedule.old.json" />
+    <None Remove="test-renderer.txt" />
+    <None Remove="TODO.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Scheduler\Models\" />
+  </ItemGroup>
+
+</Project>

@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ChristmasPi.Data;
 
-namespace ChristmasPi.Scheduler.Models {
+namespace ChristmasPi.Data.Models.Scheduler {
     [JsonConverter(typeof(WeekScheduleConverter))]
     public class WeekSchedule {
 

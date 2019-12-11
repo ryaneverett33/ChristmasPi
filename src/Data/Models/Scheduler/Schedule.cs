@@ -6,7 +6,7 @@ using ChristmasPi.Data.Extensions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace ChristmasPi.Scheduler.Models {
+namespace ChristmasPi.Data.Models.Scheduler {
     [JsonConverter(typeof(ScheduleConverter))]
     public class Schedule {
         private List<TimeSlot> times;
@@ -99,9 +99,13 @@ namespace ChristmasPi.Scheduler.Models {
         /// <param name="other">The schedule rule to compare again</param>
         /// <returns>True if they overlap, false if they don't</returns>
         public bool doRulesOverlap(TimeSlot other) {
-            if (StartTime < other.StartTime && EndTime < other.EndTime)
+            /*if (StartTime < other.StartTime && EndTime < other.EndTime)
                 return true;
             else if (StartTime > other.StartTime && EndTime > other.EndTime)
+                return true;*/
+            if (StartTime < other.StartTime && other.StartTime < EndTime)
+                return true;
+            if (StartTime > other.StartTime && StartTime < other.EndTime)
                 return true;
             else if (StartTime == other.StartTime && EndTime == other.EndTime)
                 return true;

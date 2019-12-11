@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Microsoft.Extensions.Configuration;
 using ChristmasPi.Data.Models;
-using ChristmasPi.Scheduler.Models;
+using ChristmasPi.Data.Models.Scheduler;
 using Newtonsoft.Json;
 
 namespace ChristmasPi.Data {

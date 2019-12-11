@@ -74,7 +74,7 @@ namespace ChristmasPi.Data.Extensions {
             int s = time.Second;
             int m = time.Minute;
             int h = time.Hour;
-            return new DateTime(0, 0, 0, h, m, s, ms);
+            return new DateTime(1, 1, 1, h, m, s, ms);
         }
     }
 }

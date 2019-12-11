@@ -31,6 +31,16 @@ namespace ChristmasPi.Util {
             catch (TaskCanceledException) {
                 return false;
             }
+            catch (Exception e) {
+                Console.WriteLine(e);
+                return false;
+            }
+        }
+        public static void UnSafeSleep(TimeSpan sleep) {
+            Thread.Sleep(sleep);
+        }
+        public static void UnSafeSleep(int ms) {
+            UnSafeSleep(new TimeSpan(0, 0, 0, 0, ms));
         }
 
         /// <summary>

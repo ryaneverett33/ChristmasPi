@@ -1,6 +1,6 @@
-﻿{
+{
   "iisSettings": {
-    "windowsAuthentication": false, 
+    "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
       "applicationUrl": "http://localhost:13616",
@@ -16,12 +16,16 @@
       }
     },
     "src": {
-      "commandName": "Project",
+      "commandName": "Executable",
       "launchBrowser": true,
-      "applicationUrl": "http://localhost:50808",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "applicationUrl": "http://localhost:50808"
+    },
+    "Scheduler": {
+      "commandName": "Project",
+      "commandLineArgs": "--config C:\\Users\\ryane\\Repos\\ChristmasPi\\src\\schedule.json --url http://192.168.0.69:50808/api"
     }
   }
 }

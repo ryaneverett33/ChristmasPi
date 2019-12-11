@@ -27,12 +27,12 @@ namespace ChristmasPi.Operations.Modes {
             renderer.Start();
             TurnOff();
             _active = true;
-            Console.WriteLine("Activated Solid Color Mode");
+            Console.WriteLine("Activated Off Mode");
         }
         public void Deactivate() {
             renderer.Stop();
             _active = false;
-            Console.WriteLine("Deactivated Solid Color Mode");
+            Console.WriteLine("Deactivated Off Mode");
         }
         public object Info() {
             return new {

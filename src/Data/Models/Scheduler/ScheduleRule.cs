@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 using ChristmasPi.Data.Extensions;
 using Newtonsoft.Json;
 
-namespace ChristmasPi.Scheduler.Models {
+namespace ChristmasPi.Data.Models.Scheduler {
     public class ScheduleRule : IComparable {
         [JsonIgnore]
         public DateTime OnTime { get; set; }
