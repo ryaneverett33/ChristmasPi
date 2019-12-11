@@ -26,7 +26,10 @@ namespace ChristmasPi.Operations.Modes {
         #region IOperationMode Methods
         public void Activate() {
             renderer.Start();
-            SetColor(ConfigurationManager.Instance.CurrentTreeConfig.tree.color.DefaultColor);
+            if (_currentColor == null)
+                SetColor(ConfigurationManager.Instance.CurrentTreeConfig.tree.color.DefaultColor);
+            else
+                SetColor(_currentColor);
             Console.WriteLine("Activated Solid Color Mode");
         }
         public void Deactivate() {

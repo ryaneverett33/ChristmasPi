@@ -6,6 +6,7 @@ using ChristmasPi.Util;
 using ChristmasPi.Data;
 
 namespace ChristmasPi.Hardware.Renderers {
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1063:Implement IDisposable Correctly", Justification = "Using boolean signature causes compile errors")]
     public class RenderThread : IDisposable {
         private IRenderer renderer;         // The caller object 
         private Thread thread;              // worker thread
@@ -39,7 +40,7 @@ namespace ChristmasPi.Hardware.Renderers {
                 ThreadHelpers.WakeUpThread(currentToken);
             }
         }
-        private async void work() {
+        private void work() {
             bool doRender = false;
             lock (locker) {
                 doRender = Rendering;
@@ -69,14 +70,14 @@ namespace ChristmasPi.Hardware.Renderers {
                     else {
                         newWaitTime = waitTime - (int)renderTime.TotalMilliseconds;
                     }
-                    bool slept = await ThreadHelpers.SafeSleep(currentToken, newWaitTime);
+                    bool slept = ThreadHelpers.SafeSleep(currentToken, newWaitTime).Result;
                     if (!slept) {
                         // sleep was cancelled, exit thread
                         return;
                     }
                 }
                 if (syncTime != 0) {
-                    await ThreadHelpers.SafeSleep(currentToken, syncTime);
+                    ThreadHelpers.SafeSleep(currentToken, syncTime).Wait();
                 }
                 lock (locker) {
                     doRender = Rendering;

@@ -5,6 +5,8 @@
       "colororder": "RGB",
       "default": "#db7b26"
     },
+    "defaultmode" : "SolidColor",
+    "defaultanimation" : "Twinkle",
     "branches" : [
       {
         "start" : 0,

@@ -59,6 +59,10 @@ function showErrorModal(errorMessage) {
     $('#genericErrorModal').modal();
 }
 
+function SetColor(colorstring) {
+    $("#cp2").colorpicker('setValue', colorstring);
+}
+
 function SubmitColor() {
     // get color
     var color = currentColor;
@@ -88,6 +92,20 @@ function PlayAnimation(animation) {
         }
     });
     oReq.open("POST", "/api/animations/play?animation=" + animation);
+    oReq.send();
+}
+function ResumeAnimation() {
+    // /api/animations/play
+    var oReq = new XMLHttpRequest();
+    oReq.addEventListener("load", function () {
+        if (this.status !== 200) {
+            showErrorModal("Failed to play animation");
+        }
+        else {
+            location.reload();
+        }
+    });
+    oReq.open("POST", "/api/animations/play");
     oReq.send();
 }
 function PauseAnimation() {

@@ -137,7 +137,7 @@ namespace ChristmasPi.Data.Models {
         };
 
         public static Func<Color> RandomKnownColorGenerator = () => {
-            int num = RandomGenerator.Instance.Number(0, ColorTable.KnownColorTable.Count + 1);
+            int num = RandomGenerator.Instance.Number(0, ColorTable.KnownColorTable.Count);
             return ColorTable.KnownColorTable[num];
         };
 

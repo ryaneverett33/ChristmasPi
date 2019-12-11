@@ -21,6 +21,25 @@ namespace ChristmasPi.Util {
             else
                 throw new InvalidColorFormatException();
         }
+
+        /// <summary>
+        /// Converts a color struct to a hex string
+        /// </summary>
+        /// <param name="color">Color to convert</param>
+        /// <returns>A string with the color in hex format</returns>
+        public static string ToHex(Color color) {
+            return String.Format("#{0}{1}{2}", color.R.ToString("X2"), color.G.ToString("X2"), color.B.ToString("X2"));
+        }
+
+        /// <summary>
+        /// Converts a color struct to a rgb string
+        /// </summary>
+        /// <param name="color">Color to convert</param>
+        /// <returns>A string with the color in rgb format</returns>
+        public static string ToRGBString(Color color) {
+            return String.Format("rgb({0}, {1}, {2})", color.R, color.G, color.B);
+        }
+
         /// <summary>
         /// Converts a Color from it's hexadecimal representation
         /// </summary>

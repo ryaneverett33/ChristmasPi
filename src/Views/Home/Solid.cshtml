@@ -5,4 +5,8 @@
 }
 
 <div id="cp2" data-color="rgb(@Model.CurrentColor.R, @Model.CurrentColor.G, @Model.CurrentColor.B)"></div>
+<button class="btn btn-just-icon" id="default-color" style="background-color: @ChristmasPi.Util.ColorConverter.ToHex(Model.DefaultColor)"
+    onclick="SetColor('@ChristmasPi.Util.ColorConverter.ToHex(Model.DefaultColor)')">
+    <i class="nc-icon nc-palette"></i>
+</button>
 <button class="btn btn-primary" onclick="SubmitColor()">Update</button>

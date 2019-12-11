@@ -8,6 +8,7 @@ using ChristmasPi.Models;
 using ChristmasPi.Operations;
 using ChristmasPi.Operations.Interfaces;
 using ChristmasPi.Animation;
+using ChristmasPi.Data;
 using ChristmasPi.Data.Models;
 using System.Drawing;
 
@@ -31,7 +32,8 @@ namespace ChristmasPi.Controllers {
         [HttpGet("solid")]
         public IActionResult Solid() {
             var model = new SolidModel {
-                CurrentColor = (Color)OperationManager.Instance.GetProperty("SolidColorMode", "CurrentColor")
+                CurrentColor = (Color)OperationManager.Instance.GetProperty("SolidColorMode", "CurrentColor"),
+                DefaultColor = ConfigurationManager.Instance.CurrentTreeConfig.tree.color.DefaultColor
             };
             return View(model);
         }
