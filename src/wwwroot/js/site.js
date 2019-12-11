@@ -77,8 +77,10 @@ function SubmitColor() {
             location.reload();
         }
     });
-    oReq.open("POST", "/api/solid/update?color=" + color);
-    oReq.send();
+    //oReq.open("POST", "/api/solid/update?color=" + color);
+    oReq.open("POST", "/api/solid/update");
+    oReq.setRequestHeader("Content-Type", "application/json");
+    oReq.send(JSON.stringify({ color: color }));
 }
 function PlayAnimation(animation) {
     // /api/animations/play?animation=Twinkle
@@ -91,8 +93,10 @@ function PlayAnimation(animation) {
             location.reload();
         }
     });
-    oReq.open("POST", "/api/animations/play?animation=" + animation);
-    oReq.send();
+    // oReq.open("POST", "/api/animations/play?animation=" + animation);
+    oReq.open("POST", "/api/animations/play");
+    oReq.setRequestHeader("Content-Type", "application/json");
+    oReq.send(JSON.stringify({ animation: animation }));
 }
 function ResumeAnimation() {
     // /api/animations/play

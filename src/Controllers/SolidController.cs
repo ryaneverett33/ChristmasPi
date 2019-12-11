@@ -18,17 +18,20 @@ namespace ChristmasPi.Controllers
     public class SolidController : ControllerBase
     {
         [HttpPost("update")]
-        public IActionResult Update(string color) {
+        public IActionResult Update([FromBody]SolidUpdateArgument argument) {
             // /api/solid/update
-            if (color == null) {
-                Console.WriteLine("Color is null!");
-                return new StatusCodeResult(StatusCodes.Status400BadRequest);
-            }
+            if (argument == null)
+                return new BadRequestObjectResult("Argument is empty");
+            if (argument.color == null)
+                return new BadRequestObjectResult("Color argument is empty");
             if (OperationManager.Instance.CurrentOperatingModeName != "SolidColorMode")
                 OperationManager.Instance.SwitchModes("SolidColorMode");
-            Color newColor = ChristmasPi.Util.ColorConverter.Convert(color);
+            Color newColor = ChristmasPi.Util.ColorConverter.Convert(argument.color);
             int result = (OperationManager.Instance.CurrentOperatingMode as ISolidColorMode).SetColor(newColor);
             return new StatusCodeResult(result);
         }
+    }
+    public class SolidUpdateArgument {
+        public string color { get; set; }
     }
 }

@@ -16,17 +16,19 @@ namespace ChristmasPi.Controllers
     public class AnimationsController : ControllerBase
     {
         [HttpPost("play")]
-        public IActionResult PlayAnimation(string animation) {
+        public IActionResult PlayAnimation([FromBody]AnimationPlayArgument argument) {
             // /api/animations/play
-            if (animation == null) {
+            if (argument == null) {
                 // allow resume if animation is null
                 if (OperationManager.Instance.CurrentOperatingModeName != "AnimationMode")
                     return new StatusCodeResult(StatusCodes.Status405MethodNotAllowed);
                 return new StatusCodeResult((OperationManager.Instance.CurrentOperatingMode as IAnimationMode).ResumeAnimation());
             }
+            if (argument.animation == null)
+                return new BadRequestObjectResult("Animation argument is empty");
             if (OperationManager.Instance.CurrentOperatingModeName != "AnimationMode")
                 OperationManager.Instance.SwitchModes("AnimationMode");
-            int status = (OperationManager.Instance.CurrentOperatingMode as IAnimationMode).StartAnimation(animation);
+            int status = (OperationManager.Instance.CurrentOperatingMode as IAnimationMode).StartAnimation(argument.animation);
             return new StatusCodeResult(status);
         }
         [HttpPost("pause")]
@@ -55,5 +57,8 @@ namespace ChristmasPi.Controllers
             string[] animations = AnimationManager.Instance.GetAnimations();
             return new JsonResult(animations);
         }
+    }
+    public class AnimationPlayArgument {
+        public string animation { get; set; }
     }
 }
