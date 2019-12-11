@@ -16,7 +16,17 @@ namespace ChristmasPi.Hardware.Renderers {
         private CancellationTokenSource currentToken;
         private object locker;
         private bool disposed;
+
+        /// <summary>
+        /// Whether or not we are currently rendering
+        /// </summary>
         public bool Rendering { get; private set; } = false;
+
+        /// <summary>
+        /// Whether the renderer will be rendering the last frame in the time allotment
+        /// </summary>
+        /// <example>When FPS = 30, LastFrame will be true when rendering the 30th frame, else false</example>
+        public bool LastFrame { get; private set; } = false;
 
         public RenderThread(IRenderer renderer, int fps) {
             this.renderer = renderer;
@@ -49,6 +59,10 @@ namespace ChristmasPi.Hardware.Renderers {
 
             while (doRender) {
                 for (int i = 0; i < fps; i++) {
+                    if (i == fps - 1)
+                        LastFrame = true;
+                    else
+                        LastFrame = false;
                     DateTime beforeRender = DateTime.Now;
                     try {
                         renderer.Render(renderer);

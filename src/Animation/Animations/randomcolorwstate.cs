@@ -8,6 +8,7 @@ namespace ChristmasPi.Animation.Animations {
     public class randomcolorwstate : BaseAnimation {
 
         public override string Name => "Random Color With State";
+        public override bool isDebugAnimation => true;
 
         public override void construct(int lightcount, int fps) {
             base.construct(lightcount, fps);

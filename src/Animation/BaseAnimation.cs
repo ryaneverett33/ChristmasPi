@@ -11,6 +11,7 @@ namespace ChristmasPi.Animation {
         public int FPS => fps;
         public bool isBranchAnimation => false;
         public virtual string Name { get { throw new NotImplementedException(); } }
+        public virtual bool isDebugAnimation { get { return false; } }
 
         private int lightcount;
         private int fps;

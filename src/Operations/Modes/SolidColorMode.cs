@@ -22,14 +22,12 @@ namespace ChristmasPi.Operations.Modes {
         #endregion
         public SolidColorMode() {
             renderer = RenderFactory.GetRenderer();
+            _currentColor = ConfigurationManager.Instance.CurrentTreeConfig.tree.color.DefaultColor;
         }
         #region IOperationMode Methods
         public void Activate() {
             renderer.Start();
-            if (_currentColor == null)
-                SetColor(ConfigurationManager.Instance.CurrentTreeConfig.tree.color.DefaultColor);
-            else
-                SetColor(_currentColor);
+            SetColor(_currentColor);
             Console.WriteLine("Activated Solid Color Mode");
         }
         public void Deactivate() {

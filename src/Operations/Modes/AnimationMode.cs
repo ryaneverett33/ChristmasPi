@@ -50,11 +50,13 @@ namespace ChristmasPi.Operations.Modes {
         #endregion
         #region Methods
         public int StartAnimation(string animationName) {
-            if (animator != null && (animator.CurrentState == AnimationState.Animating ||
-                animator.CurrentState == AnimationState.Paused))
-                return StatusCodes.Status405MethodNotAllowed;
             if (!animationManager.Animations.ContainsKey(animationName))
                 return StatusCodes.Status400BadRequest;
+            if (animator != null && (animator.CurrentState == AnimationState.Animating ||
+                animator.CurrentState == AnimationState.Paused)) {
+                // stop currently playing animation
+                StopAnimation();
+            }
             IAnimatable animation = animationManager.Animations[animationName];
             animator = new Animator(animation, ConfigurationManager.Instance.CurrentTreeConfig.hardware.fps,
                 ConfigurationManager.Instance.CurrentTreeConfig.hardware.lightcount,

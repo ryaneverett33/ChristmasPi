@@ -45,7 +45,6 @@ namespace ChristmasPi.Hardware.Renderers {
             }
             locker = new object();
             renderThread = new RenderThread(this, fps);
-            // base.LightCount = ledCount;
         }
         public override void Render(IRenderer obj) {
             if (BeforeRenderEvent != null)
@@ -53,7 +52,10 @@ namespace ChristmasPi.Hardware.Renderers {
             WS281xRenderer renderer = (WS281xRenderer)obj;
             lock (renderer.locker) {
                 // only render if the colors table has been updated
-                if (renderer.colorsChanged) {
+                // Check if it's the last frame so that an update happens at least once per second
+                // Rationale: Setting a solid color on the tree and then adding more lights (but already configured) will not light up the next strand
+                // because the next strand hasn't been rendered
+                if (renderer.colorsChanged || renderThread.LastFrame) {
                     for (int i = 0; i < ledColors.Length; i++) {
                         rpi.SetLEDColor(0, i, ledColors[i]);
                     }

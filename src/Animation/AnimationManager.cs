@@ -54,9 +54,15 @@ namespace ChristmasPi.Animation {
             };
         }
 
-        public string[] GetAnimations() {
+        public string[] GetAnimations(bool includeDebug = false) {
             ICollection<string> keys = Animations.Keys;
-            return keys.ToArray<string>();
+            List<string> animationList = new List<string>();
+            foreach (string key in keys) {
+                if (Animations[key].isDebugAnimation && !includeDebug)
+                    continue;
+                animationList.Add(key);
+            }
+            return animationList.ToArray();
         } 
     }
 }
