@@ -1,0 +1,123 @@
+﻿@{
+    ViewData["Title"] = "Schedule";
+    ViewData["ActivePage"] = "Schedule";
+    @model ChristmasPi.Models.ScheduleModel;
+}
+<div>
+    <ul class="list-group list-group-horizontal">
+        @for (int i = 0; i < 8; i++) {
+            <!--Header-->
+            <li class="list-group-item schedule-cell">
+                @if (i > 0) {
+                    <!--Days-->
+                    <h3>@Model.GetDay(i - 1)</h3>
+                }
+                else {
+                    <!--Blank Space for left side-->
+                    <h3>&nbsp;</h3>
+                }
+                <ul class="list-group list-group-flush">
+                    @for (int j = 0; j < 24; j++) {
+                        if (i > 0) {
+                            <!--Rule Cells-->
+                            ColoredRule rule = Model.GetFirstRuleAt(i, j);
+                            @if (rule != null) {
+                                <!--Show rule-->
+                    <div class="schedule-rule schedule-cell" style="border-color: @rule.GetColorCode()">
+                        <p class="schedule-rule-label">@rule.ToString()</p>
+                        <button class="btn btn-sm badge-danger btn-primary btn-just-icon schedule-rule-rmv-btn" onclick="ShowRemoveRuleModal()">
+                            <i class="nc-icon nc-simple-remove"></i>
+                        </button>
+
+                        @{
+                            int rulecount = Model.GetRuleCountAt(i, j);
+                            if (rulecount > 1) {
+                                <span class="badge badge-info badge-pill schedule-rule-badge">@rulecount</span>
+                            }
+                        }
+                    </div>
+                            }
+                            else {
+                                <li class="list-group-item schedule-cell">
+                                <button class="btn btn-primary btn-just-icon" onclick="ShowAddRuleModal()">
+                                    <i class="nc-icon nc-simple-add"></i>
+                                </button>
+                            </li>
+                            }
+                        }
+                        else {
+                            <!--Time periods-->
+                            <li class="list-group-item schedule-cell"><p>@Model.GetTimePeriod(j)</p></li>
+                        }
+                    }
+                </ul>
+            </li>
+        }
+    </ul>
+</div>
+<div class="modal fade" id="ScheduleAddModal" tabindex="-1" role="dialog" aria-labelledby="SchedueAddModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="SchedueAddModalLabel">Add Rule</h6>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Start Time</label>
+                    <input id="addrule-starttime" type="text" class="form-control datetimepicker" placeholder="05:00 PM" />
+                </div>
+                <div class="form-group">
+                    <label>End Time</label>
+                    <input id="addrule-endtime" type="text" class="form-control datetimepicker" placeholder="07:00 PM" />
+                </div>
+                <div class="form-group">
+                    <input type="checkbox" class="form-check-input schedule-rule-check" id="monday-check">
+                    <input type="checkbox" class="form-check-input schedule-rule-check" id="tuesday-check">
+                    <input type="checkbox" class="form-check-input schedule-rule-check" id="wednesday-check">
+                    <input type="checkbox" class="form-check-input schedule-rule-check" id="thursday-check">
+                    <input type="checkbox" class="form-check-input schedule-rule-check" id="friday-check">
+                    <input type="checkbox" class="form-check-input schedule-rule-check" id="saturday-check">
+                    <input type="checkbox" class="form-check-input schedule-rule-check" id="sunday-check">
+                </div>
+                <div class="form-group" style="position: relative; bottom: 10px;">
+                    <label class="form-check-label schedule-rule-check-label" for="monday-check" title="Monday">Mon</label>
+                    <label class="form-check-label schedule-rule-check-label" for="tuesday-check" title="Tuesday">Tue</label>
+                    <label class="form-check-label schedule-rule-check-label" for="tuesday-check" title="Wednesday">Wed</label>
+                    <label class="form-check-label schedule-rule-check-label" for="tuesday-check" title="Thursday">Thu</label>
+                    <label class="form-check-label schedule-rule-check-label" for="monday-check" title="Friday">Fri</label>
+                    <label class="form-check-label schedule-rule-check-label" for="tuesday-check" title="Saturday">Sat</label>
+                    <label class="form-check-label schedule-rule-check-label" for="tuesday-check" title="Sunday">Sun</label>
+                </div>
+                <button class="btn btn-block btn-round" onclick="AddRule()">Add Rule</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="ScheduleRemoveModal" tabindex="-1" role="dialog" aria-labelledby="SchedueRemoveModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="SchedueRemoveModalLabel">Remove Rule - Confirmation</h6>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!--<p id="genericErrorModalMessage"></p>-->
+                <h5>Are you sure you want to remove the rule?</h5>
+            </div>
+            <div class="modal-footer">
+                <div class="left-side">
+                    <button type="button" class="btn btn-default btn-link" data-dismiss="modal">Cancel</button>
+                </div>
+                <div class="divider"></div>
+                <div class="right-side">
+                    <button type="button" class="btn btn-danger btn-link" onclick="RemoveRule()">Remove</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

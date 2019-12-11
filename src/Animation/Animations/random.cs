@@ -16,7 +16,6 @@ namespace ChristmasPi.Animation.Animations {
                 v=>{sleeptime=float.Parse(v.ToString());});
             base.RegisterProperty(reference, "SLEEP_TIME", 0.2f);
             base.ResolveProperties();
-            Console.WriteLine($"random sleeptime: {sleeptime}, default: 0.2");
         }
 
         public override void construct(int lightcount, int fps) {

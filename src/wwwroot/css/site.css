@@ -88,3 +88,39 @@ body {
     border-radius: 10px;
     margin: -5px 0 0 -5px;
 }
+.nav-active {
+    border-bottom: solid;
+    border-color: white;
+}
+.schedule-cell {
+    width: 185px;
+    height: 75px;
+}
+.schedule-rule {
+    position: relative;
+    right: 20px;
+    border: 1px solid;
+    border-radius: 16px;
+}
+.schedule-rule-label {
+    position: relative;
+    left: 16px;
+}
+.schedule-rule-rmv-btn {
+    position: absolute;
+    bottom: 0px;
+}
+.schedule-rule-badge {
+    position: absolute;
+    top: 0px;
+    right: 25px;
+}
+.schedule-rule-check {
+    width: 70px;
+    position: relative;
+}
+
+.schedule-rule-check-label {
+    position: relative;
+    width: 50px;
+}

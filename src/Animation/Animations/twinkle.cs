@@ -17,7 +17,6 @@ namespace ChristmasPi.Animation.Animations {
                 v=>{sleeptime=float.Parse(v.ToString());});
             base.RegisterProperty(reference, "SLEEP_TIME", 0.5f);
             base.ResolveProperties();
-            Console.WriteLine($"Twinkle sleeptime: {sleeptime}, default: 0.5");
         }
 
         public override void construct(int lightcount, int fps) {

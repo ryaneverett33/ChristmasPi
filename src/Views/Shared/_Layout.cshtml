@@ -4,7 +4,7 @@
     <title>@ViewData["Title"] - ChristmasPi</title>
     <!-- Required meta tags -->
     <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport" />
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=3.0, minimum-scale=0.1, user-scalable=1" name="viewport" />
 
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 
@@ -27,13 +27,14 @@
 <body>
 
     <!--    navbar come here          -->
-    <nav aria-label="Pages">
-        <ul class="pagination justify-content-center">
-            <li class='page-item @(((string)ViewData["ActivePage"] == "Solid" ? "active" : ""))' id="li-nav-solid"><a class="page-link" href="/solid/">Solid Color Mode</a></li>
-            <li class='page-item @(((string)ViewData["ActivePage"] == "Power" ? "active" : ""))' id="li-nav-home"><a class="page-link" href="/power/">Power Settings</a></li>
-            <li class='page-item @(((string)ViewData["ActivePage"] == "Schedule" ? "active" : ""))' id="li-nav-home"><a class="page-link" href="/schedule/">Schedule</a></li>
-            <li class='page-item @(((string)ViewData["ActivePage"] == "Animation" ? "active" : ""))' id="li-nav-animation"><a class="page-link" href="/animation/">Animation Mode</a></li>
-        </ul>
+    <nav class="navbar navbar-light bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">@ViewData["TreeName"]</a>
+            <a class='navbar-brand nav-link @((string)ViewData["ActivePage"] == "Solid" ? "nav-active" : "")' href="/solid">Solid</a>
+            <a class='navbar-brand nav-link @((string)ViewData["ActivePage"] == "Power" ? "nav-active" : "")' href="/power">Power</a>
+            <a class='navbar-brand nav-link @((string)ViewData["ActivePage"] == "Schedule" ? "nav-active" : "")' href="/schedule">Schedule</a>
+            <a class='navbar-brand nav-link @((string)ViewData["ActivePage"] == "Animation" ? "nav-active" : "")' href="/animation">Animation</a>
+        </div>
     </nav>
     <!-- end navbar  -->
 

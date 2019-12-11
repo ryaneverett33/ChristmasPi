@@ -53,10 +53,29 @@ $(function () {
     $('#cp2').on('colorpickerChange colorpickerCreate', function (event) {
         currentColor = event.color.toString();
     });
+    $("#power-checkbox").bootstrapSwitch();
+    $('#power-checkbox').on('switchChange.bootstrapSwitch', function (e, data) {
+        if (data)
+            TurnOn();
+        else
+            TurnOff();
+    });
 });
 function showErrorModal(errorMessage) {
     $("#genericErrorModalMessage").text(errorMessage);
     $('#genericErrorModal').modal();
+}
+function ShowAddRuleModal() {
+    $("#addrule-starttime").datetimepicker({
+        format: 'LT'
+    });
+    $("#addrule-endtime").datetimepicker({
+        format: 'LT'
+    });
+    $('#ScheduleAddModal').modal();
+}
+function ShowRemoveRuleModal() {
+    $('#ScheduleRemoveModal').modal();
 }
 
 function SetColor(colorstring) {
@@ -167,4 +186,15 @@ function TurnOff() {
     });
     oReq.open("POST", "/api/power/off");
     oReq.send();
+}
+// converts the checkbox values to a bitmask
+function checkListToBitmask(monday, tuesday, wednesday, thursday, friday, saturday, sunday) {
+
+}
+
+function RemoveRule() {
+
+}
+function AddRule() {
+
 }

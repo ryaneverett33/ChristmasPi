@@ -3,9 +3,10 @@
     ViewData["ActivePage"] = "Power";
     @model ChristmasPi.Models.PowerModel;
 }
-@if (Model.PoweredOff) {
+<!--@if (Model.PoweredOff) {
     <button class="btn btn-primary" onclick="TurnOn()">Turn On</button>
 }
 else {
     <button class="btn btn-primary" onclick="TurnOff()">Turn Off</button>
-}
+}-->
+<input type="checkbox" id="power-checkbox" @(Model.PoweredOff ? "" : "checked")>
