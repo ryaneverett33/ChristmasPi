@@ -70,7 +70,18 @@ function ShowAddRuleModal() {
         format: 'LT'
     });
     $("#addrule-endtime").datetimepicker({
-        format: 'LT'
+        format: 'LT',
+        icons: {
+            time: "fa fa-clock-o",
+            date: "fa fa-calendar",
+            up: "fa fa-chevron-up",
+            down: "fa fa-chevron-down",
+            previous: 'fa fa-chevron-left',
+            next: 'fa fa-chevron-right',
+            today: 'fa fa-screenshot',
+            clear: 'fa fa-trash',
+            close: 'fa fa-remove'
+        }
     });
     $('#ScheduleAddModal').modal();
 }
@@ -199,6 +210,57 @@ function TurnOff() {
     oReq.send();
 }
 
+function checkAddRuleDays() {
+    var monday = $("#monday-check:checked").val() === "on";
+    var tuesday = $("#tuesday-check:checked").val() === "on";
+    var wednesday = $("#wednesday-check:checked").val() === "on";
+    var thursday = $("#thursday-check:checked").val() === "on";
+    var friday = $("#friday-check:checked").val() === "on";
+    var saturday = $("#saturday-check:checked").val() === "on";
+    var sunday = $("#sunday-check:checked").val() === "on";
+    if (monday || tuesday || wednesday || thursday || friday || saturday || sunday)
+        $("#scheduleAddRuleBtn").prop('disabled', false);
+    else
+        $("#scheduleAddRuleBtn").prop('disabled', true);
+}
+
+// seealso ChristmasPi.Data.Models.Scheduler.RepeatUsage
+var REPEATMONDAY = 1;
+var REPEATTUESDAY = 2;
+var REPEATWEDNESDAY = 4;
+var REPEATTHURSDAY = 8;
+var REPEATFRIDAY = 16;
+var REPEATSATURDAY = 32;
+var REPEATSUNDAY = 64;
+
+function getRepeatUsage() {
+    var monday = $("#monday-check:checked").val() === "on";
+    var tuesday = $("#tuesday-check:checked").val() === "on";
+    var wednesday = $("#wednesday-check:checked").val() === "on";
+    var thursday = $("#thursday-check:checked").val() === "on";
+    var friday = $("#friday-check:checked").val() === "on";
+    var saturday = $("#saturday-check:checked").val() === "on";
+    var sunday = $("#sunday-check:checked").val() === "on";
+
+    var mask = 0;
+    if (monday)
+        mask = mask | REPEATMONDAY;
+    if (tuesday)
+        mask = mask | REPEATTUESDAY;
+    if (wednesday)
+        mask = mask | REPEATWEDNESDAY;
+    if (thursday)
+        mask = mask | REPEATTHURSDAY;
+    if (friday)
+        mask = mask | REPEATFRIDAY;
+    if (saturday)
+        mask = mask | REPEATSATURDAY;
+    if (sunday)
+        mask = mask | REPEATSUNDAY;
+
+    return mask;
+}
+
 function RemoveRule() {
     // /api/schedule/remove
     var i = parseInt($("#scheduleremove-i").val());
@@ -229,5 +291,26 @@ function RemoveRule() {
     }));
 }
 function AddRule() {
+    // /api/schedule/add
+    var start = $('#addrule-starttime').data("DateTimePicker").viewDate().format("HH:mm");
+    var end = $('#addrule-endtime').data("DateTimePicker").viewDate().format("HH:mm");
+    var repeat = getRepeatUsage();
+    closeAddRuleModal();
 
+    var oReq = new XMLHttpRequest();
+    oReq.addEventListener("load", function () {
+        if (this.status !== 200) {
+            showErrorModal("Failed to add rule");
+        }
+        else {
+            location.reload();
+        }
+    });
+    oReq.open("POST", "/api/schedule/add");
+    oReq.setRequestHeader("Content-Type", "application/json");
+    oReq.send(JSON.stringify({
+        start: start,
+        end: end,
+        repeat: repeat
+    }));
 }

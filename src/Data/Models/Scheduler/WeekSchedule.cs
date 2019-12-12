@@ -135,37 +135,37 @@ namespace ChristmasPi.Data.Models.Scheduler {
                 else
                     error = true;
             }
-            else if (repeatUsage.HasFlag(RepeatUsage.RepeatTuesday) && !error) {
+            if (repeatUsage.HasFlag(RepeatUsage.RepeatTuesday) && !error) {
                 if (Tuesday.AddRule(start, end))
                     added = true;
                 else
                     error = true;
             }
-            else if (repeatUsage.HasFlag(RepeatUsage.RepeatWednesday) && !error) {
+            if (repeatUsage.HasFlag(RepeatUsage.RepeatWednesday) && !error) {
                 if (Wednesday.AddRule(start, end))
                     added = true;
                 else
                     error = true;
             }
-            else if (repeatUsage.HasFlag(RepeatUsage.RepeatThursday) && !error) {
+            if (repeatUsage.HasFlag(RepeatUsage.RepeatThursday) && !error) {
                 if (Thursday.AddRule(start, end))
                     added = true;
                 else
                     error = true;
             }
-            else if (repeatUsage.HasFlag(RepeatUsage.RepeatFriday) && !error) {
+            if (repeatUsage.HasFlag(RepeatUsage.RepeatFriday) && !error) {
                 if (Friday.AddRule(start, end))
                     added = true;
                 else
                     error = true;
             }
-            else if (repeatUsage.HasFlag(RepeatUsage.RepeatSaturday) && !error) {
+            if (repeatUsage.HasFlag(RepeatUsage.RepeatSaturday) && !error) {
                 if (Saturday.AddRule(start, end))
                     added = true;
                 else
                     error = true;
             }
-            else if (repeatUsage.HasFlag(RepeatUsage.RepeatSunday) && !error) {
+            if (repeatUsage.HasFlag(RepeatUsage.RepeatSunday) && !error) {
                 if (Sunday.AddRule(start, end))
                     added = true;
                 else

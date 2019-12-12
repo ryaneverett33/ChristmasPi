@@ -70,20 +70,20 @@
             <div class="modal-body">
                 <div class="form-group">
                     <label>Start Time</label>
-                    <input id="addrule-starttime" type="text" class="form-control datetimepicker" placeholder="05:00 PM" />
+                    <input id="addrule-starttime" type="text" class="form-control datetimepicker" />
                 </div>
                 <div class="form-group">
                     <label>End Time</label>
-                    <input id="addrule-endtime" type="text" class="form-control datetimepicker" placeholder="07:00 PM" />
+                    <input id="addrule-endtime" type="text" class="form-control datetimepicker" />
                 </div>
                 <div class="form-group">
-                    <input type="checkbox" class="form-check-input schedule-rule-check" id="monday-check">
-                    <input type="checkbox" class="form-check-input schedule-rule-check" id="tuesday-check">
-                    <input type="checkbox" class="form-check-input schedule-rule-check" id="wednesday-check">
-                    <input type="checkbox" class="form-check-input schedule-rule-check" id="thursday-check">
-                    <input type="checkbox" class="form-check-input schedule-rule-check" id="friday-check">
-                    <input type="checkbox" class="form-check-input schedule-rule-check" id="saturday-check">
-                    <input type="checkbox" class="form-check-input schedule-rule-check" id="sunday-check">
+                    <input type="checkbox" class="form-check-input schedule-rule-check" id="monday-check" onchange="checkAddRuleDays()">
+                    <input type="checkbox" class="form-check-input schedule-rule-check" id="tuesday-check" onchange="checkAddRuleDays()">
+                    <input type="checkbox" class="form-check-input schedule-rule-check" id="wednesday-check" onchange="checkAddRuleDays()">
+                    <input type="checkbox" class="form-check-input schedule-rule-check" id="thursday-check" onchange="checkAddRuleDays()">
+                    <input type="checkbox" class="form-check-input schedule-rule-check" id="friday-check" onchange="checkAddRuleDays()">
+                    <input type="checkbox" class="form-check-input schedule-rule-check" id="saturday-check" onchange="checkAddRuleDays()">
+                    <input type="checkbox" class="form-check-input schedule-rule-check" id="sunday-check" onchange="checkAddRuleDays()">
                 </div>
                 <div class="form-group" style="position: relative; bottom: 10px;">
                     <label class="form-check-label schedule-rule-check-label" for="monday-check" title="Monday">Mon</label>
@@ -94,7 +94,7 @@
                     <label class="form-check-label schedule-rule-check-label" for="tuesday-check" title="Saturday">Sat</label>
                     <label class="form-check-label schedule-rule-check-label" for="tuesday-check" title="Sunday">Sun</label>
                 </div>
-                <button class="btn btn-block btn-round" onclick="AddRule()">Add Rule</button>
+                <button class="btn btn-block btn-round" id="scheduleAddRuleBtn" onclick="AddRule()" disabled>Add Rule</button>
             </div>
         </div>
     </div>
