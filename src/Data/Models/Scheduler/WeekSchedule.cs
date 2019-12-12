@@ -251,6 +251,49 @@ namespace ChristmasPi.Data.Models.Scheduler {
         }
 
         /// <summary>
+        /// Checks if a rule exists in the week
+        /// </summary>
+        /// <param name="start">The start time of the rule</param>
+        /// <param name="end">The end time of the rule</param>
+        /// <param name="repeats">The days the rule repeats on</param>
+        /// <returns>True if the schedule contains the rule, else false</returns>
+        public bool RuleExists(DateTime start, DateTime end, int repeats) {
+            if (start == end || start > end)
+                return false;
+            RepeatUsage repeatUsage = (RepeatUsage)repeats;
+            bool exists = false;
+            if (repeatUsage.HasFlag(RepeatUsage.RepeatMonday)) {
+                if (Monday.ContainsRule(start, end))
+                    exists = true;
+            }
+            if (repeatUsage.HasFlag(RepeatUsage.RepeatTuesday)) {
+                if (Tuesday.ContainsRule(start, end))
+                    exists = true;
+            }
+            if (repeatUsage.HasFlag(RepeatUsage.RepeatWednesday)) {
+                if (Wednesday.ContainsRule(start, end))
+                    exists = true;
+            }
+            if (repeatUsage.HasFlag(RepeatUsage.RepeatThursday)) {
+                if (Thursday.ContainsRule(start, end))
+                    exists = true;
+            }
+            if (repeatUsage.HasFlag(RepeatUsage.RepeatFriday)) {
+                if (Friday.ContainsRule(start, end))
+                    exists = true;
+            }
+            if (repeatUsage.HasFlag(RepeatUsage.RepeatSaturday)) {
+                if (Saturday.ContainsRule(start, end))
+                    exists = true;
+            }
+            if (repeatUsage.HasFlag(RepeatUsage.RepeatSunday)) {
+                if (Sunday.ContainsRule(start, end))
+                    exists = true;
+            }
+            return exists;
+        }
+
+        /// <summary>
         /// Creates the default schedule (empty)
         /// </summary>
         /// <returns>A new WeekSchedule object with default values</returns>

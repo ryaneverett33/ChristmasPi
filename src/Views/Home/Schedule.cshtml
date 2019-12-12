@@ -20,21 +20,24 @@
                     @for (int j = 0; j < 24; j++) {
                         if (i > 0) {
                             <!--Rule Cells-->
-                            ColoredRule rule = Model.GetFirstRuleAt(i, j);
+                            ColoredRule rule = Model.GetFirstRuleAt(i-1, j);
                             @if (rule != null) {
                                 <!--Show rule-->
                     <div class="schedule-rule schedule-cell" style="border-color: @rule.GetColorCode()">
                         <p class="schedule-rule-label">@rule.ToString()</p>
-                        <button class="btn btn-sm badge-danger btn-primary btn-just-icon schedule-rule-rmv-btn" onclick="ShowRemoveRuleModal()">
+                        <button class="btn btn-sm badge-danger btn-primary btn-just-icon schedule-rule-rmv-btn" onclick='ShowRemoveRuleModal(@String.Format("{0},{1}", i, j))'>
                             <i class="nc-icon nc-simple-remove"></i>
                         </button>
 
                         @{
-                            int rulecount = Model.GetRuleCountAt(i, j);
+                            int rulecount = Model.GetRuleCountAt(i-1, j);
                             if (rulecount > 1) {
                                 <span class="badge badge-info badge-pill schedule-rule-badge">@rulecount</span>
                             }
                         }
+                        <input type="hidden" id='@String.Format("rstart-{0}:{1}", i, j)' value='@rule.StartTime.ToShortTimeString()' />
+                        <input type="hidden" id='@String.Format("rend-{0}:{1}", i, j)' value='@rule.EndTime.ToShortTimeString()' />
+                        <input type="hidden" id='@String.Format("rday-{0}:{1}", i, j)' value='@Model.GetDay(i-1)' />
                     </div>
                             }
                             else {
@@ -106,7 +109,8 @@
                 </button>
             </div>
             <div class="modal-body">
-                <!--<p id="genericErrorModalMessage"></p>-->
+                <input type="hidden" id="scheduleremove-i" value="" />
+                <input type="hidden" id="scheduleremove-j" value="" />
                 <h5>Are you sure you want to remove the rule?</h5>
             </div>
             <div class="modal-footer">

@@ -74,6 +74,17 @@ namespace ChristmasPi.Data.Models.Scheduler {
             }
             return false;
         }
+
+        /// <summary>
+        /// Checks if the schedule contains the rule
+        /// </summary>
+        /// <param name="start">The start time of the rule</param>
+        /// <param name="end">The end time of the rule</param>
+        /// <returns>True if the schedule contains the rule, else false</returns>
+        public bool ContainsRule(DateTime start, DateTime end) {
+            TimeSlot t = new TimeSlot(start, end);
+            return times.Contains(t);
+        }
     }
     [JsonConverter(typeof(TimeSlotConverter))]
     public struct TimeSlot : IComparable {

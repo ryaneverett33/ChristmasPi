@@ -74,8 +74,19 @@ function ShowAddRuleModal() {
     });
     $('#ScheduleAddModal').modal();
 }
-function ShowRemoveRuleModal() {
+function closeAddRuleModal() {
+    $('#ScheduleAddModal').modal('hide');
+}
+
+function ShowRemoveRuleModal(i, j) {
+    $('#scheduleremove-i').val(i);
+    $('#scheduleremove-j').val(j);
     $('#ScheduleRemoveModal').modal();
+}
+function closeRemoveRuleModal() {
+    $('#scheduleremove-i').val("");
+    $('#scheduleremove-j').val("");
+    $('#ScheduleRemoveModal').modal('hide');
 }
 
 function SetColor(colorstring) {
@@ -187,13 +198,35 @@ function TurnOff() {
     oReq.open("POST", "/api/power/off");
     oReq.send();
 }
-// converts the checkbox values to a bitmask
-function checkListToBitmask(monday, tuesday, wednesday, thursday, friday, saturday, sunday) {
-
-}
 
 function RemoveRule() {
+    // /api/schedule/remove
+    var i = parseInt($("#scheduleremove-i").val());
+    var j = parseInt($("#scheduleremove-j").val());
+    closeRemoveRuleModal();
+    //var start = $(`#rstart-${i}:${j}`).val();
+    var start = document.getElementById(`rstart-${i}:${j}`).value;
+    //var end = $(`#rend-${i}:${j}`).val();
+    var end = document.getElementById(`rend-${i}:${j}`).value;
+    //var day = $(`#rday-${i}:${j}`).val();
+    var day = document.getElementById(`rday-${i}:${j}`).value;
 
+    var oReq = new XMLHttpRequest();
+    oReq.addEventListener("load", function () {
+        if (this.status !== 200) {
+            showErrorModal("Failed to remove rule");
+        }
+        else {
+            location.reload();
+        }
+    });
+    oReq.open("POST", "/api/schedule/remove");
+    oReq.setRequestHeader("Content-Type", "application/json");
+    oReq.send(JSON.stringify({
+        start: start,
+        end: end,
+        day: day
+    }));
 }
 function AddRule() {
 
