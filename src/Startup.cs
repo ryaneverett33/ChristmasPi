@@ -76,8 +76,8 @@ namespace ChristmasPi
         /// Loads the tree and animation configurations
         /// </summary>
         public void ConfigureTree() {
-            loadConfiguration();
-            loadSchedule();
+            ConfigurationManager.Instance.LoadConfiguration();
+            ConfigurationManager.Instance.LoadSchedule();
             ConfigurationManager.Instance.Configuration = Configuration;
         }
         /// <summary>
@@ -91,28 +91,6 @@ namespace ChristmasPi
             Environment.Exit(0);*/
             AnimationManager.Instance.Init();
             OperationManager.Instance.Init();
-        }
-
-        private void loadConfiguration() {
-            if (!File.Exists("configuration.json")) {
-                Console.WriteLine("LOGTHIS Tree Configuration file not found, using default configuration values");
-                ConfigurationManager.Instance.StartupTreeConfig = TreeConfiguration.DefaultSettings();
-            }
-            else {
-                string json = File.ReadAllText("configuration.json");
-                ConfigurationManager.Instance.StartupTreeConfig = JsonConvert.DeserializeObject<TreeConfiguration>(json);
-            }
-            ConfigurationManager.Instance.CurrentTreeConfig = ConfigurationManager.Instance.StartupTreeConfig;
-        }
-
-        private void loadSchedule() {
-            if (!File.Exists("schedule.json")) {
-                ConfigurationManager.Instance.CurrentSchedule = WeekSchedule.DefaultSchedule();
-            }
-            else {
-                string json = File.ReadAllText("schedule.json");
-                ConfigurationManager.Instance.CurrentSchedule = JsonConvert.DeserializeObject<WeekSchedule>(json);
-            }
         }
     }
 }

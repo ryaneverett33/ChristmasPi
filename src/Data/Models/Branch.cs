@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace ChristmasPi.Data.Models {
     public class Branch {
@@ -10,6 +8,7 @@ namespace ChristmasPi.Data.Models {
 
         public int end { get; set; }
 
+        [JsonIgnore]
         public int LightCount => (end - start) + 1; // offset for zero-based indexing
 
         /// <summary>

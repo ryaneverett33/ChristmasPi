@@ -3,7 +3,8 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-    <StartupObject>BranchConfigurator.Program</StartupObject>
+    <StartupObject>ChristmasPi.BranchConfigurator.Program</StartupObject>
+    <RootNamespace>ChristmasPi.BranchConfigurator</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

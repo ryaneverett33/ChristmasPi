@@ -33,16 +33,44 @@ namespace ChristmasPi.Data {
         /// </summary>
         public WeekSchedule CurrentSchedule;
 
+        public void LoadConfiguration(string configuration = null) {
+            if (configuration == null)
+                configuration = Constants.CONFIGURATION_FILE;
+            if (!File.Exists(configuration)) {
+                Console.WriteLine("LOGTHIS Tree Configuration file not found, using default configuration values");
+                StartupTreeConfig = TreeConfiguration.DefaultSettings();
+            }
+            else {
+                string json = File.ReadAllText(configuration);
+                StartupTreeConfig = JsonConvert.DeserializeObject<TreeConfiguration>(json);
+            }
+            CurrentTreeConfig = StartupTreeConfig;
+        }
+
+        public void LoadSchedule(string schedule = null) {
+            if (schedule == null)
+                schedule = Constants.SCHEDULE_FILE;
+            if (!File.Exists(schedule)) {
+                CurrentSchedule = WeekSchedule.DefaultSchedule();
+            }
+            else {
+                string json = File.ReadAllText(schedule);
+                CurrentSchedule = JsonConvert.DeserializeObject<WeekSchedule>(json);
+            }
+        }
+
         /// <summary>
         /// Saves the current tree configuration to a json file
         /// </summary>
-        public void Save() {
+        public void SaveConfiguration(string configuration = null) {
             Console.WriteLine("Saving configuration");
             try {
+                if (configuration == null)
+                    configuration = Constants.CONFIGURATION_FILE;
                 string json = JsonConvert.SerializeObject(CurrentTreeConfig, Formatting.Indented);
-                if (File.Exists(Constants.CONFIGURATION_FILE))
-                    File.Move(Constants.CONFIGURATION_FILE, Constants.CONFIGURATION_FILE_OLD);
-                File.WriteAllText(Constants.CONFIGURATION_FILE, json);
+                if (File.Exists(configuration))
+                    File.Move(configuration, Constants.CONFIGURATION_FILE_OLD, true);
+                File.WriteAllText(configuration, json);
             }
             catch (Exception e) {
                 Console.WriteLine("LOGTHIS Failed to save tree configuration, an exception occurred");
@@ -54,13 +82,15 @@ namespace ChristmasPi.Data {
         /// <summary>
         /// Saves the current schedule to a json file
         /// </summary>
-        public void SaveSchedule() {
+        public void SaveSchedule(string schedule = null) {
             Console.WriteLine("Saving schedule");
             try {
+                if (schedule == null)
+                    schedule = Constants.SCHEDULE_FILE;
                 string json = JsonConvert.SerializeObject(CurrentSchedule, Formatting.Indented);
-                if (File.Exists(Constants.SCHEDULE_FILE))
-                    File.Move(Constants.SCHEDULE_FILE, Constants.SCHEDULE_FILE_OLD, true);
-                File.WriteAllText(Constants.SCHEDULE_FILE, json);
+                if (File.Exists(schedule))
+                    File.Move(schedule, Constants.SCHEDULE_FILE_OLD, true);
+                File.WriteAllText(schedule, json);
             }
             catch (Exception e) {
                 Console.WriteLine("LOGTHIS Failed to save schedule info, an exception occurred");

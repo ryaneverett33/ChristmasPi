@@ -13,9 +13,7 @@ namespace ChristmasPi.Scheduler {
     class Program {
         static void Main(string[] args) {
             Scheduler scheduler = new Scheduler(args);
-            Thread t = new Thread(() => scheduler.Run());
-            t.Start();
-            t.Join();
+            scheduler.Run();
         }
     }
     public class Scheduler {
@@ -267,12 +265,13 @@ namespace ChristmasPi.Scheduler {
             return -1;
         }
 
-        // Prins help and exits program
+        // Prints help and exits program
         private void printHelp() {
             Console.WriteLine("Usage: Scheduler --config {schedule.json}");
             Console.WriteLine("-----------------------------------------\n");
             Console.WriteLine("-h/--h\t\t\tPrints this help screen");
             Console.WriteLine("-config/--config\tUse this schedule config");
+            Console.WriteLine("-url/--url\tUse this api url");
             Environment.Exit(0);
         }
     }

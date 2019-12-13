@@ -29,7 +29,7 @@ namespace ChristmasPi.Hardware.Factories {
                         }
                     case HardwareType.TEST_RENDER: {
                             if (testRenderer == null)
-                                testRenderer = new TestRenderer();
+                                testRenderer = new TestRenderer(hardware.lightcount);
                             return testRenderer;
                         }
                     case HardwareType.UNKNOWN:
