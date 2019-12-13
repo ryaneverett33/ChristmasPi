@@ -2,6 +2,7 @@
     ViewData["Title"] = "Animation Page";
     ViewData["ActivePage"] = "Animation";
     @model ChristmasPi.Models.AnimationModel;
+    ViewBag.TreeName = Model.TreeName;
 }
 <ul class="list-group">
     @foreach (string animation in Model.Animations) {

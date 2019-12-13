@@ -29,7 +29,12 @@ namespace ChristmasPi.Operations {
                 operatingModes.Add(operationMode.Name, operationMode);
             }
             // Set Current Operating mode
-            setCurrentMode(Constants.DEFAULT_OPERATING_MODE);
+            try {
+                setCurrentMode(ConfigurationManager.Instance.CurrentTreeConfig.tree.defaultmode, true);
+            }
+            catch (Exception) {
+                setCurrentMode(Constants.DEFAULT_OPERATING_MODE, true);
+            }
         }
         public string[] GetModes() {
             ICollection<string> keys = operatingModes.Keys;
@@ -61,7 +66,7 @@ namespace ChristmasPi.Operations {
         /// Deactivates the current operating mode and activates the new mode
         /// </summary>
         /// <param name="newModeName">The mode being switched to</param>
-        private void setCurrentMode(string newModeName) {
+        private void setCurrentMode(string newModeName, bool defaultmode = false) {
             if (!operatingModes.ContainsKey(newModeName))
                 throw new InvalidOperatingModeException($"{newModeName} is not a valid operating mode");
             Task task;
@@ -74,7 +79,7 @@ namespace ChristmasPi.Operations {
                 }
             }
             var newMode = operatingModes[newModeName];
-            task = Task.Run(() => newMode.Activate());
+            task = Task.Run(() => newMode.Activate(defaultmode));
             if (!task.Wait(Constants.ACTIVATION_TIMEOUT)) {
                 Console.WriteLine("LOGHIS Operating Mode activation timed out.");
                 Console.WriteLine($"new mode: {newModeName}");

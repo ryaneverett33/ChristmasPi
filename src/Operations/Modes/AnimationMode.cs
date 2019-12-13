@@ -31,8 +31,15 @@ namespace ChristmasPi.Operations.Modes {
             animator = null;
         }
         #region IOperationMode Methods
-        public void Activate() {
+        public void Activate(bool defaultmode) {
             Console.WriteLine("Activated Animation Mode");
+            if (defaultmode) {
+                // try and play default animation
+                if (StartAnimation(ConfigurationManager.Instance.CurrentTreeConfig.tree.defaultanimation) != 200) {
+                    Console.WriteLine("LOGTHIS Failed to play default animation");
+                    StartAnimation(Constants.DEFAULT_ANIMATION);
+                }
+            }
         }
         public void Deactivate() {
             if (Animating)

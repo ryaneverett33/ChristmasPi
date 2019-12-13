@@ -2,6 +2,7 @@
     ViewData["Title"] = "Solid Page";
     ViewData["ActivePage"] = "Solid";
     @model ChristmasPi.Models.SolidModel;
+    ViewBag.TreeName = Model.TreeName;
 }
 
 <div id="cp2" data-color="rgb(@Model.CurrentColor.R, @Model.CurrentColor.G, @Model.CurrentColor.B)"></div>

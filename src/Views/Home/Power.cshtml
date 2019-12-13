@@ -2,6 +2,7 @@
     ViewData["Title"] = "Power Settings";
     ViewData["ActivePage"] = "Power";
     @model ChristmasPi.Models.PowerModel;
+    ViewBag.TreeName = Model.TreeName;
 }
 <!--@if (Model.PoweredOff) {
     <button class="btn btn-primary" onclick="TurnOn()">Turn On</button>

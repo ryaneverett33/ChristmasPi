@@ -89,8 +89,8 @@ namespace ChristmasPi
                 Console.WriteLine(a);
             }
             Environment.Exit(0);*/
-            OperationManager.Instance.Init();
             AnimationManager.Instance.Init();
+            OperationManager.Instance.Init();
         }
 
         private void loadConfiguration() {

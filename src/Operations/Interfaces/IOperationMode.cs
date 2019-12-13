@@ -8,7 +8,7 @@
         /// <summary>
         /// Performs any needed tasks to start the operation
         /// </summary>
-        void Activate();
+        void Activate(bool defaultmode);
 
         /// <summary>
         /// Stops all operations

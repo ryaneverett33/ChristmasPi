@@ -25,7 +25,7 @@ namespace ChristmasPi.Controllers
                 if (schedule[i] != null) {
                     for (int j = 0; j < schedule[i].Length; j++) {
                         TimeSlot time = schedule[i][j];
-                        dayarray.Add($"{time.StartTime.ToString("HH:MM")} - {time.EndTime.ToString("HH:MM")}");
+                        dayarray.Add($"{time.StartTime.ToString("HH:mm")} - {time.EndTime.ToString("HH:mm")}");
                     }
                 }
                 jarr.Add(dayarray);

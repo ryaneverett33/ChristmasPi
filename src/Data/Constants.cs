@@ -16,6 +16,7 @@ namespace ChristmasPi.Data {
 
         // Operations
         public static readonly string DEFAULT_OPERATING_MODE = "SolidColorMode";
+        public static readonly string DEFAULT_ANIMATION = "Twinkle";
         public static readonly int ACTIVATION_TIMEOUT = 1000;           // in ms
         public static readonly int SCHEDULER_MAX_ATTEMPTS = 5;
         public static readonly TimeSpan SCHEDULER_ERR_SLEEP = new TimeSpan(0, 30, 0);

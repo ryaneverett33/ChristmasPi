@@ -29,7 +29,8 @@
     <!--    navbar come here          -->
     <nav class="navbar navbar-light bg-primary">
         <div class="container">
-            <a class="navbar-brand" href="#">@ViewData["TreeName"]</a>
+            <!--https://stackoverflow.com/a/52657656-->
+            <a class="navbar-brand" href="#">@ViewBag.TreeName</a>
             <a class='navbar-brand nav-link @((string)ViewData["ActivePage"] == "Solid" ? "nav-active" : "")' href="/solid">Solid</a>
             <a class='navbar-brand nav-link @((string)ViewData["ActivePage"] == "Power" ? "nav-active" : "")' href="/power">Power</a>
             <a class='navbar-brand nav-link @((string)ViewData["ActivePage"] == "Schedule" ? "nav-active" : "")' href="/schedule">Schedule</a>

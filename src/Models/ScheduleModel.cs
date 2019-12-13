@@ -6,7 +6,7 @@ using ChristmasPi.Data.Models;
 using ChristmasPi.Data.Models.Scheduler;
 
 namespace ChristmasPi.Models {
-    public class ScheduleModel {
+    public class ScheduleModel : BaseModel {
         public ColoredRule[] Monday { get; set; }
         public ColoredRule[] Tuesday { get; set; }
         public ColoredRule[] Wednesday { get; set; }

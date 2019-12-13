@@ -9,16 +9,6 @@ namespace ChristmasPi.Data.Models {
         public TreeSettings tree { get; set; }
 
         /// <summary>
-        /// The operation mode to run at startup
-        /// </summary>
-        public string defaultmode { get; set; }
-
-        /// <summary>
-        /// The animation to play if the default mode is Animation
-        /// </summary>
-        public string defaultanimation { get; set; }
-
-        /// <summary>
         /// Information for the setup process to operate
         /// </summary>
         public SetupSettings setup { get; set; }
@@ -37,8 +27,6 @@ namespace ChristmasPi.Data.Models {
         public static TreeConfiguration DefaultSettings() {
             TreeConfiguration config = new TreeConfiguration();
             config.tree = TreeSettings.DefaultSettings();
-            config.defaultanimation = "Twinkle";
-            config.defaultmode = "Solid";
             config.setup = SetupSettings.DefaultSettings();
             config.hardware = HardwareSettings.DefaultSettings();
             config.animations = null;

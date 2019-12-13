@@ -23,7 +23,7 @@ namespace ChristmasPi.Operations.Modes {
             _active = false;
         }
         #region IOperationMode Methods
-        public void Activate() {
+        public void Activate(bool defaultmode) {
             renderer.Start();
             TurnOff();
             _active = true;
