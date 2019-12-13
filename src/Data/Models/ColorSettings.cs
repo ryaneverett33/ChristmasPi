@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using Newtonsoft.Json;
 
 namespace ChristmasPi.Data.Models {
     public class ColorSettings {
@@ -18,6 +19,7 @@ namespace ChristmasPi.Data.Models {
         /// Gets the object representation of the default color
         /// </summary>
         /// <see cref="ColorSettings.@default"/>
+        [JsonIgnore]
         public Color DefaultColor {
             get {
                 if (_defaultColor == Color.White)

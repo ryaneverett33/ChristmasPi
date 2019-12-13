@@ -1,0 +1,13 @@
+# ChristmasPi example systemd service
+# /etc/systemd/system/ChristmasPi-Scheduler.service
+[Unit]
+Description=ChristmasPi Scheduler
+
+[Service]
+# Have to run as root because the server is run as root and owns the schedule.json file
+User=root
+WorkingDirectory=/home/pi/ChristmasPi/
+ExecStart=dotnet /home/pi/ChristmasPi/Scheduler.dll --config /home/pi/ChristmasPi/schedule.json --url http://localhost:50808/api
+
+[Install]
+WantedBy=multi-user.target

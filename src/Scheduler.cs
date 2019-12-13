@@ -78,6 +78,7 @@ namespace ChristmasPi.Scheduler {
                     while(Scheduling) {
                         TimeSlot[] currentRules = getCurrentSchedule().GetRules();
                         if (currentRules.Length == 0) {
+                            Console.WriteLine("No rules for the day, sleeping");
                             // long sleep
                             currentSleepToken = ThreadHelpers.RegisterWakeUp();
                             ThreadHelpers.SafeSleep(currentSleepToken, Constants.SCHEDULER_LONG_SLEEP).Wait();            // ignore the result but wakeup if need be
@@ -89,8 +90,10 @@ namespace ChristmasPi.Scheduler {
                             int closestRuleIndex = getClosestRule(currentRules);
                             if (closestRuleIndex == -1) {
                                 if (lastRule != null) {
+                                    Console.WriteLine("Just exited a rule");
                                     TurnOff();
                                 }
+                                Console.WriteLine("No more rules, sleeping");
                                 // no more rules for the current day, go to sleep
                                 currentSleepToken = ThreadHelpers.RegisterWakeUp();
                                 ThreadHelpers.SafeSleep(currentSleepToken, Constants.SCHEDULER_LONG_SLEEP).Wait();            // ignore the result but wakeup if need be
@@ -104,9 +107,11 @@ namespace ChristmasPi.Scheduler {
                                     // check if we just left a rule
                                     if (lastRule != null) {
                                         // turn off
+                                        Console.WriteLine("Just exited a rule");
                                         TurnOff();
                                     }
                                     else {
+                                        Console.WriteLine("Waiting for next rule to start, sleeping");
                                         // wait for rule to start
                                         TimeSpan sleepTime = currentRules[closestRuleIndex].StartTime - current;
                                         currentSleepToken = ThreadHelpers.RegisterWakeUp();
@@ -118,6 +123,7 @@ namespace ChristmasPi.Scheduler {
                                 else {
                                     // check if we've already turned on 
                                     if (lastRule != null && lastRule.Value == currentRules[closestRuleIndex]) {
+                                        Console.WriteLine("Waiting for current rule to end, sleeping");
                                         // wait for the end of the rule
                                         TimeSpan sleepTime = currentRules[closestRuleIndex].EndTime - current;
                                         currentSleepToken = ThreadHelpers.RegisterWakeUp();
@@ -126,6 +132,7 @@ namespace ChristmasPi.Scheduler {
                                         currentSleepToken = null;
                                     }
                                     else {
+                                        Console.WriteLine("Just entered a rule");
                                         // turn on
                                         lastRule = currentRules[closestRuleIndex];
                                         TurnOn();
@@ -187,6 +194,8 @@ namespace ChristmasPi.Scheduler {
         private async Task<bool> TurnOnAsync() {
             try {
                 HttpResponseMessage response = await httpClient.PostAsync($"{apiURL}/power/on", null);
+                // if ((int)response.StatusCode != 200)
+                //    Console.WriteLine($"Failed to turn on, status code: {(int)response.StatusCode}");
                 return response.StatusCode == System.Net.HttpStatusCode.OK;
             }
             catch (HttpRequestException e) {

@@ -2,6 +2,7 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Threading.Tasks;
 using ChristmasPi.Data;
 using ChristmasPi.Hardware.Interfaces;
 using ChristmasPi.Hardware.Factories;
@@ -12,6 +13,7 @@ namespace ChristmasPi.BranchConfigurator {
         static void Main(string[] args) {
             BranchConfigurator b = new BranchConfigurator(args);
             b.Run();
+            Environment.Exit(0);
         }
     }
     public class BranchConfigurator {
@@ -79,8 +81,13 @@ namespace ChristmasPi.BranchConfigurator {
                 drawTree();
             }
             storeData();
+            clearTree();
             Console.WriteLine($"Saving {data.Count} branches");
-            ConfigurationManager.Instance.SaveConfiguration(ConfigurationLoc);
+            Task t = new Task(() => {
+                ConfigurationManager.Instance.SaveConfiguration(ConfigurationLoc);
+            });
+            t.Start();
+            t.Wait(1500);
         }
 
         /// <seealso cref="ChristmasPi.Models.ScheduleModel.getNewColor()"/>
@@ -102,7 +109,7 @@ namespace ChristmasPi.BranchConfigurator {
             bool outOfBranches = false;
             for (int i = 0; i < renderer.LightCount; i++) {
                 if (outOfBranches) {
-                    renderer.SetLEDColor(i, Color.Black);
+                    renderer.SetLEDColor(i, Constants.COLOR_OFF);
                 }
                 else if (currentBranch.Contains(i)) {
                     renderer.SetLEDColor(i, currentBranch.Color);
@@ -121,6 +128,13 @@ namespace ChristmasPi.BranchConfigurator {
                     }
                 }
             }
+            if (!renderer.AutoRender)
+                renderer.Render(renderer);
+        }
+
+        // clear branch info from the tree
+        private void clearTree() {
+            renderer.SetAllLEDColors(Constants.COLOR_OFF);
             if (!renderer.AutoRender)
                 renderer.Render(renderer);
         }
