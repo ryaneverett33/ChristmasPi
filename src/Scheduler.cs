@@ -8,6 +8,7 @@ using ChristmasPi.Data;
 using ChristmasPi.Data.Models.Scheduler;
 using ChristmasPi.Util;
 using ChristmasPi.Data.Extensions;
+using System.Runtime.Loader;
 
 namespace ChristmasPi.Scheduler {
     class Program {
@@ -27,6 +28,7 @@ namespace ChristmasPi.Scheduler {
         private string apiURL;
         private HttpClient httpClient;
         private TimeSlot? lastRule;
+        private bool unloading = false;
 
         public Scheduler(string[] args) {
             for (int i = 0; i < args.Length; i++) {
@@ -65,6 +67,9 @@ namespace ChristmasPi.Scheduler {
             watcher.Changed += FileChanged;
             watcher.Created += FileChanged;
             watcher.Deleted += FileChanged;
+            watcher.EnableRaisingEvents = true;
+            AssemblyLoadContext.Default.Unloading += SigTermEventHandler; //register sigterm event handler. Don't forget to import System.Runtime.Loader!
+            Console.CancelKeyPress += CancelHandler; //register sigint event 
             Running = true;
             Scheduling = false;
             httpClient = new HttpClient();
@@ -78,11 +83,15 @@ namespace ChristmasPi.Scheduler {
                     while(Scheduling) {
                         TimeSlot[] currentRules = getCurrentSchedule().GetRules();
                         if (currentRules.Length == 0) {
+                            if (lastRule != null) {
+                                Console.WriteLine("Just exited a rule");
+                                TurnOff();
+                            }
                             Console.WriteLine("No rules for the day, sleeping");
                             // long sleep
                             currentSleepToken = ThreadHelpers.RegisterWakeUp();
                             ThreadHelpers.SafeSleep(currentSleepToken, Constants.SCHEDULER_LONG_SLEEP).Wait();            // ignore the result but wakeup if need be
-                            // ThreadHelpers.UnSafeSleep(Constants.SCHEDULER_LONG_SLEEP);
+                            //ThreadHelpers.UnSafeSleep(Constants.SCHEDULER_LONG_SLEEP);
                             currentSleepToken = null;
                         }
                         else {
@@ -93,11 +102,11 @@ namespace ChristmasPi.Scheduler {
                                     Console.WriteLine("Just exited a rule");
                                     TurnOff();
                                 }
-                                Console.WriteLine("No more rules, sleeping");
+                                Console.WriteLine("No more rules, sleeping for {0}", Constants.SCHEDULER_LONG_SLEEP.ToString());
                                 // no more rules for the current day, go to sleep
                                 currentSleepToken = ThreadHelpers.RegisterWakeUp();
                                 ThreadHelpers.SafeSleep(currentSleepToken, Constants.SCHEDULER_LONG_SLEEP).Wait();            // ignore the result but wakeup if need be
-                                // ThreadHelpers.UnSafeSleep(Constants.SCHEDULER_LONG_SLEEP);
+                                //ThreadHelpers.UnSafeSleep(Constants.SCHEDULER_LONG_SLEEP);
                                 currentSleepToken = null;
                             }
                             else {
@@ -111,24 +120,24 @@ namespace ChristmasPi.Scheduler {
                                         TurnOff();
                                     }
                                     else {
-                                        Console.WriteLine("Waiting for next rule to start, sleeping");
                                         // wait for rule to start
                                         TimeSpan sleepTime = currentRules[closestRuleIndex].StartTime - current;
+                                        Console.WriteLine("Waiting for next rule to start, sleeping for {0}", sleepTime.ToString());
                                         currentSleepToken = ThreadHelpers.RegisterWakeUp();
                                         ThreadHelpers.SafeSleep(currentSleepToken, sleepTime).Wait();
-                                        // ThreadHelpers.UnSafeSleep(sleepTime);
+                                        //ThreadHelpers.UnSafeSleep(sleepTime);
                                         currentSleepToken = null;
                                     }
                                 }
                                 else {
                                     // check if we've already turned on 
                                     if (lastRule != null && lastRule.Value == currentRules[closestRuleIndex]) {
-                                        Console.WriteLine("Waiting for current rule to end, sleeping");
                                         // wait for the end of the rule
                                         TimeSpan sleepTime = currentRules[closestRuleIndex].EndTime - current;
+                                        Console.WriteLine("Waiting for current rule to end, sleeping for {0}", sleepTime.ToString());
                                         currentSleepToken = ThreadHelpers.RegisterWakeUp();
                                         ThreadHelpers.SafeSleep(currentSleepToken, sleepTime).Wait();
-                                        // ThreadHelpers.UnSafeSleep(sleepTime);
+                                        //ThreadHelpers.UnSafeSleep(sleepTime);
                                         currentSleepToken = null;
                                     }
                                     else {
@@ -146,6 +155,7 @@ namespace ChristmasPi.Scheduler {
                     // sleep for a while and then try again
                     currentSleepToken = ThreadHelpers.RegisterWakeUp();
                     ThreadHelpers.SafeSleep(currentSleepToken, Constants.SCHEDULER_ERR_SLEEP).Wait();            // ignore the result but wakeup if need be
+                    //ThreadHelpers.UnSafeSleep(Constants.SCHEDULER_ERR_SLEEP);
                     currentSleepToken = null;
                 }
             }
@@ -158,7 +168,23 @@ namespace ChristmasPi.Scheduler {
             if (currentSleepToken != null)
                 ThreadHelpers.WakeUpThread(currentSleepToken);
         }
-        
+
+        private void SigTermEventHandler(AssemblyLoadContext obj) {
+            // Per https://logankpaschke.com/linux/systemd/dotnet/systemd-dotnet-1/#
+            // close application
+            if (!unloading) {
+                Console.WriteLine("Recieved SIGTERM, will unload");
+                unload();
+            }
+        }
+
+        private void CancelHandler(object sender, ConsoleCancelEventArgs e) {
+            if (!unloading) {
+                Console.WriteLine("Recieved SIGINT, will unload");
+                unload();
+            }
+        }
+
         private void TurnOff() {
             lastRule = null;
             for (int i = 0; i < Constants.SCHEDULER_MAX_ATTEMPTS; i++) {
@@ -168,7 +194,7 @@ namespace ChristmasPi.Scheduler {
                     break;
                 }
                 else {
-                    Console.WriteLine($"Failed to turnon, {i + 1}/{Constants.SCHEDULER_MAX_ATTEMPTS}");
+                    Console.WriteLine($"Failed to turnoff, {i + 1}/{Constants.SCHEDULER_MAX_ATTEMPTS}");
                 }
             }
         }
@@ -230,6 +256,7 @@ namespace ChristmasPi.Scheduler {
                 try {
                     string json = File.ReadAllText(ScheduleFileLoc);
                     schedule = JsonConvert.DeserializeObject<WeekSchedule>(json);
+                    //Console.WriteLine("Loaded schedule");
                     return true;
                 }
                 catch (Exception) {
@@ -272,6 +299,21 @@ namespace ChristmasPi.Scheduler {
                     return i;
             }
             return -1;
+        }
+
+        // Clean up and exit
+        private void unload() {
+            if (!unloading) {
+                unloading = true;
+                watcher.EnableRaisingEvents = false;
+                watcher.Dispose();
+                Scheduling = false;
+                Running = false;
+                if (currentSleepToken != null)
+                    ThreadHelpers.WakeUpThread(currentSleepToken);
+                httpClient.Dispose();
+                Environment.Exit(0);
+            }
         }
 
         // Prints help and exits program
