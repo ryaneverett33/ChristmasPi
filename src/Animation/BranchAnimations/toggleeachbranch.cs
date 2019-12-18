@@ -9,11 +9,19 @@ namespace ChristmasPi.Animation.BranchAnimations {
     public class toggleeachbranch : BaseBranchAnimation {
         public override string Name => "Toggle Each Branch";
         private Color color;
-        private readonly float SLEEP_TIME = 0.25f;
+        private float SLEEP_TIME = 0.25f;
         private readonly int WAIT_FRAMES = 3;
 
         public toggleeachbranch() : base() {
             color = ConfigurationManager.Instance.CurrentTreeConfig.tree.color.DefaultColor;
+        }
+
+        public override void RegisterProperties() {
+            Ref<object> refone = new Ref<object>(
+                () => SLEEP_TIME,
+                v => { SLEEP_TIME = (float)v; });
+            base.RegisterProperty(refone, "SLEEP_TIME", 0.25f, PrimType.Float);
+            base.ResolveProperties();
         }
 
         public override void constructbranch(int fps, ref BranchData branch) {

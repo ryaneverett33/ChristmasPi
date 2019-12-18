@@ -63,6 +63,12 @@ namespace ChristmasPi.Animation {
                 animationList.Add(key);
             }
             return animationList.ToArray();
-        } 
+        }
+        public ActiveAnimationProperty[] GetAnimationProperties(string animation) {
+            if (!Animations.ContainsKey(animation))
+                return null;
+            IAnimatable animationObj = Animations[animation];
+            return animationObj.GetActiveAnimationProperties();
+        }
     }
 }

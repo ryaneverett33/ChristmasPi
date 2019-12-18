@@ -4,14 +4,14 @@
     @model ChristmasPi.Models.AnimationModel;
     ViewBag.TreeName = Model.TreeName;
 }
-<ul class="list-group">
-    @foreach (string animation in Model.Animations) {
-        @if (animation == Model.CurrentAnimation) {
-            <li class="list-group-item active">
-                @animation
+<ul class="list-group" @(Model.Disabled ? "disabled" : "")>
+    @foreach (AnimationDataModel animation in Model.Animations) {
+        @if (animation.CurrentAnimation) {
+        <li class="list-group-item active">
+            @animation.Name
             @if (Model.CurrentState == ChristmasPi.Data.Models.AnimationState.Paused) {
                 <button class="btn btn-primary btn-just-icon">
-                    <i class="nc-icon nc-button-play" onclick='PlayAnimation("@animation")'></i>
+                    <i class="nc-icon nc-button-play" onclick='PlayAnimation("@animation.Name")'></i>
                 </button>
             }
             else if (Model.CurrentState == ChristmasPi.Data.Models.AnimationState.Stopped) {
@@ -25,21 +25,33 @@
                 </button>
                 <button class="btn btn-primary" onclick="StopAnimation()">Stop</button>
             }
-            </li>
-
+            @if (animation.Properties.Length > 0) {
+                <div style="padding-top: 5px; padding-bottom:10px;">
+                    <h6>Properties</h6>
+                </div>
+                <ul class="list-group">
+                    @foreach (ChristmasPi.Data.Models.ActiveAnimationProperty property in animation.Properties) {
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">@property.Name</span>
+                            </div>
+                            <input type="text" class="form-control" value="@property.CurrentValue" disabled/>
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary" type="button" disabled>Update</button>
+                            </div>
+                        </div>
+                    }
+                </ul>
+            }
+        </li>
         }
         else {
             <li class="list-group-item">
-                @animation
-            <button class="btn btn-primary btn-round btn-just-icon" onclick='PlayAnimation("@animation")'>
-                <i class="nc-icon nc-button-play"></i>
-            </button>
-        </li>
-    }
-        <!--<li class='list-group-item @((animation == Model.CurrentAnimation ? "active" : ""))'>
-            @animation
-        </li>-->
+                @animation.Name
+                <button class="btn btn-primary btn-round btn-just-icon" onclick='PlayAnimation("@animation.Name")'>
+                    <i class="nc-icon nc-button-play"></i>
+                </button>
+            </li>
+        }
     }
 </ul>
-
-

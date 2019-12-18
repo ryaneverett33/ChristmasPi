@@ -8,7 +8,7 @@ using ChristmasPi.Data;
 using System.Linq;
 
 namespace ChristmasPi.Animation.Animations {
-    public class flash : BaseAnimation {
+    public class flash : BasicAnimation {
         private Color color;
         
         public override string Name => "Flash";

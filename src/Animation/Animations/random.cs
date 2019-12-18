@@ -5,7 +5,7 @@ using ChristmasPi.Data;
 using ChristmasPi.Data.Models;
 
 namespace ChristmasPi.Animation.Animations {
-    public class random : BaseAnimation {
+    public class random : BasicAnimation {
         public override string Name => "Random";
 
         private float sleeptime;
@@ -13,8 +13,8 @@ namespace ChristmasPi.Animation.Animations {
         public override void RegisterProperties() {
             Ref<object> reference = new Ref<object>(
                 ()=>sleeptime, 
-                v=>{sleeptime=float.Parse(v.ToString());});
-            base.RegisterProperty(reference, "SLEEP_TIME", 0.2f);
+                v=>{sleeptime=(float)v;});
+            base.RegisterProperty(reference, "SLEEP_TIME", 0.2f, PrimType.Float);
             base.ResolveProperties();
         }
 

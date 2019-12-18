@@ -5,7 +5,7 @@ using ChristmasPi.Data;
 using ChristmasPi.Data.Models;
 
 namespace ChristmasPi.Animation.Animations {
-    public class randomcolor : BaseAnimation {
+    public class randomcolor : BasicAnimation {
 
         public override string Name => "Random Color";
 

@@ -17,7 +17,7 @@ namespace ChristmasPi.Operations {
         private string _currentOperatingMode = null;
         public IOperationMode CurrentOperatingMode => operatingModes[_currentOperatingMode];
         public string CurrentOperatingModeName => _currentOperatingMode;
-        public string DefaultOperatingMode => Constants.DEFAULT_OPERATING_MODE;
+        public string DefaultOperatingMode { get; private set; }
         public object CurrentOperatingInfo => operatingModes[_currentOperatingMode].Info();
 
         public void Init() {
@@ -30,9 +30,11 @@ namespace ChristmasPi.Operations {
             }
             // Set Current Operating mode
             try {
+                DefaultOperatingMode = ConfigurationManager.Instance.CurrentTreeConfig.tree.defaultmode;
                 setCurrentMode(ConfigurationManager.Instance.CurrentTreeConfig.tree.defaultmode, true);
             }
             catch (Exception) {
+                DefaultOperatingMode = Constants.DEFAULT_OPERATING_MODE;
                 setCurrentMode(Constants.DEFAULT_OPERATING_MODE, true);
             }
         }

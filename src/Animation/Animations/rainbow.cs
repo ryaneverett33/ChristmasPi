@@ -9,7 +9,7 @@ using ChristmasPi.Data.Models;
 using ChristmasPi.Util;
 
 namespace ChristmasPi.Animation.Animations {
-    public class rainbow : BaseAnimation {
+    public class rainbow : BasicAnimation {
         public override string Name => "Rainbow";
         //private float SLEEP_TIME = 0.01f;
 

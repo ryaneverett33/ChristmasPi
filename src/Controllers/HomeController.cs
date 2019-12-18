@@ -40,10 +40,19 @@ namespace ChristmasPi.Controllers {
 
         [HttpGet("animation")]
         public IActionResult Animation() {
+            string CurrentAnimation = (string)OperationManager.Instance.GetProperty("AnimationMode", "CurrentAnimation");
+            List<AnimationDataModel> dataModels = new List<AnimationDataModel>();
+            foreach (string animation in AnimationManager.Instance.GetAnimations()) {
+                dataModels.Add(new AnimationDataModel {
+                    Name = animation,
+                    CurrentAnimation = animation.Equals(CurrentAnimation, StringComparison.CurrentCulture),
+                    Properties = AnimationManager.Instance.GetAnimationProperties(animation)
+                });
+            }
             var model = new AnimationModel {
                 Disabled = (OperationManager.Instance.CurrentOperatingMode is IOffMode),
-                Animations = AnimationManager.Instance.GetAnimations(),
-                CurrentAnimation = (string)OperationManager.Instance.GetProperty("AnimationMode", "CurrentAnimation"),
+                Animations = dataModels.ToArray(),
+                //CurrentAnimation = (string)OperationManager.Instance.GetProperty("AnimationMode", "CurrentAnimation"),
                 CurrentState = (AnimationState)OperationManager.Instance.GetProperty("AnimationMode", "CurrentState")
             };
             return View(model);

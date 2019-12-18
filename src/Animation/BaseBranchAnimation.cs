@@ -7,10 +7,8 @@ using ChristmasPi.Data.Models;
 using ChristmasPi.Data.Models.Animation;
 
 namespace ChristmasPi.Animation {
-    public abstract class BaseBranchAnimation : IBranchAnimation {
-        public virtual string Name { get { throw new NotImplementedException(); } }
-        public virtual bool isDebugAnimation { get { return false; } }
-        public bool isBranchAnimation => true;
+    public abstract class BaseBranchAnimation : BaseAnimation, IBranchAnimation {
+        public override bool isBranchAnimation => true;
         public int BranchCount => branchList.Count;
         public int FPS => fps;
 
