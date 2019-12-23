@@ -1,0 +1,97 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+    <title>@ViewData["Title"] - @ViewData["SetupTitle"]</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=3.0, minimum-scale=0.1, user-scalable=1" name="viewport" />
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
+    <!--     Fonts and icons     -->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700,200" rel="stylesheet" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" />
+
+    <!-- CSS Files -->
+    <link href="~/lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
+    <link href="~/lib/paper-kit-2/dist/css/paper-kit.css" rel="stylesheet" />
+    <link href="~/lib/bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="~/css/site.css" />
+    <script type="text/javascript">
+
+    </script>
+
+</head>
+<!--onload="setActivePage('@ViewData["ActivePage"]')"-->
+<body>
+
+    <!--    navbar come here          -->
+    <!--<nav class="navbar navbar-light bg-primary">
+        <div class="container">
+            <!--<a class="navbar-brand" href="#">@ViewBag.TreeName</a>-->
+    <!--<a class='navbar-brand nav-link @((string)ViewData["ActivePage"] == "Solid" ? "nav-active" : "")' href="/solid">Solid</a>
+            <a class='navbar-brand nav-link @((string)ViewData["ActivePage"] == "Power" ? "nav-active" : "")' href="/power">Power</a>
+            <a class='navbar-brand nav-link @((string)ViewData["ActivePage"] == "Schedule" ? "nav-active" : "")' href="/schedule">Schedule</a>
+            <a class='navbar-brand nav-link @((string)ViewData["ActivePage"] == "Animation" ? "nav-active" : "")' href="/animation">Animation</a>
+        </div>
+    </nav>-->
+    <!-- end navbar  -->
+
+    <div class="wrapper">
+        <!-- content come here     -->
+        @RenderBody()
+
+    </div>
+    <footer>
+        @if (ViewBag.ShowProgress) {
+            <div class="progress">
+                <div class="progress-bar progress-bar-striped" role="progressbar" style="width: 10%;" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+        }
+    </footer>
+
+    <!-- Modal Bodies come here -->
+    <div class="modal fade" id="genericErrorModal" tabindex="-1" role="dialog" aria-labelledby="genericErrorModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title" id="genericErrorModalLabel">An error occurred</h6>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p id="genericErrorModalMessage"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--   end modal -->
+</body>
+
+<!-- Core JS Files -->
+<script src="~/lib/jquery/dist/jquery.min.js" type="text/javascript"></script>
+<!--<script src="./js/jquery-ui-1.12.1.custom.min.js" type="text/javascript"></script>-->
+<script src="~/lib/paper-kit-2/dist/js/core/jquery-ui.min.js" type="text/javascript"></script>
+<script src="~/lib/paper-kit-2/dist/js/core/popper.min.js" type="text/javascript"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.min.js" type="text/javascript"></script>
+
+<!-- Switches -->
+<script src="~/lib/paper-kit-2/dist/js/plugins/bootstrap-switch.js" type="text/javascript"></script>
+
+<!--  Plugins for Slider -->
+<script src="~/lib/paper-kit-2/dist/js/plugins/nouislider.min.js" type="text/javascript"></script>
+
+<!--  Plugins for DateTimePicker -->
+<script src="~/lib/paper-kit-2/dist/js/plugins/moment.min.js" type="text/javascript"></script>
+<script src="~/lib/paper-kit-2/dist/js/plugins/bootstrap-datepicker.js" type="text/javascript"></script>
+
+
+<!--  Paper Kit Initialization snd functons -->
+<script src="~/lib/paper-kit-2/dist/js/paper-kit.min.js" type="text/javascript"></script>
+<script src="~/js/site.js" type="text/javascript"></script>
+
+<script src="~/lib/bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js" type="text/javascript"></script>
+@RenderSection("Scripts", required: false)
+</html>

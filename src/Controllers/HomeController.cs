@@ -17,6 +17,8 @@ namespace ChristmasPi.Controllers {
     public class HomeController : Controller {
         [HttpGet]
         public IActionResult Index() {
+            if (requiresSetup())
+                return gotoSetup();
             //return View();
             if (OperationManager.Instance.CurrentOperatingMode is IOffMode)
                 return new RedirectResult("/power");
@@ -31,6 +33,8 @@ namespace ChristmasPi.Controllers {
 
         [HttpGet("solid")]
         public IActionResult Solid() {
+            if (requiresSetup())
+                return gotoSetup();
             var model = new SolidModel {
                 CurrentColor = (Color)OperationManager.Instance.GetProperty("SolidColorMode", "CurrentColor"),
                 DefaultColor = ConfigurationManager.Instance.CurrentTreeConfig.tree.color.DefaultColor
@@ -40,6 +44,8 @@ namespace ChristmasPi.Controllers {
 
         [HttpGet("animation")]
         public IActionResult Animation() {
+            if (requiresSetup())
+                return gotoSetup();
             string CurrentAnimation = (string)OperationManager.Instance.GetProperty("AnimationMode", "CurrentAnimation");
             List<AnimationDataModel> dataModels = new List<AnimationDataModel>();
             foreach (string animation in AnimationManager.Instance.GetAnimations()) {
@@ -59,6 +65,8 @@ namespace ChristmasPi.Controllers {
         }
         [HttpGet("power")]
         public IActionResult Power() {
+            if (requiresSetup())
+                return gotoSetup();
             var model = new PowerModel {
                 PoweredOff = (OperationManager.Instance.CurrentOperatingMode is IOffMode)
             };
@@ -66,6 +74,8 @@ namespace ChristmasPi.Controllers {
         }
         [HttpGet("schedule")]
         public IActionResult Schedule() {
+            if (requiresSetup())
+                return gotoSetup();
             var model = new ScheduleModel(ConfigurationManager.Instance.CurrentSchedule);
             return View(model);
         }
@@ -73,6 +83,13 @@ namespace ChristmasPi.Controllers {
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error() {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        private bool requiresSetup() {
+            return ConfigurationManager.Instance.CurrentTreeConfig.setup.firstrun;
+        }
+        private IActionResult gotoSetup() {
+            return new RedirectResult("/setup/");
         }
     }
 }
