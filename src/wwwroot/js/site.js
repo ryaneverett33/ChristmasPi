@@ -290,6 +290,7 @@ function RemoveRule() {
         day: day
     }));
 }
+
 function AddRule() {
     // /api/schedule/add
     var start = $('#addrule-starttime').data("DateTimePicker").viewDate().format("HH:mm");
@@ -313,4 +314,19 @@ function AddRule() {
         end: end,
         repeat: repeat
     }));
+}
+
+function StartSetup() {
+    var oReq = new XMLHttpRequest();
+    oReq.addEventListener("load", function () {
+        if (this.status !== 200) {
+            showErrorModal("Failed to add rule");
+        }
+        else {
+            location.href="/setup/next"
+        }
+    });
+    oReq.open("POST", "/setup/start");
+    oReq.setRequestHeader("Content-Type", "application/json");
+    oReq.send();
 }
