@@ -52,7 +52,8 @@ namespace ChristmasPi.Operations {
             return new string[] {
                 typeof(SolidColorMode).FullName,
                 typeof(AnimationMode).FullName,
-                typeof(OffMode).FullName
+                typeof(OffMode).FullName,
+                typeof(SetupMode).FullName
             };
         }
 

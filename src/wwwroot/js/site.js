@@ -320,13 +320,19 @@ function StartSetup() {
     var oReq = new XMLHttpRequest();
     oReq.addEventListener("load", function () {
         if (this.status !== 200) {
-            showErrorModal("Failed to add rule");
+            showErrorModal("Failed to start setup");
         }
         else {
-            location.href="/setup/next"
+            location.href='/setup/next?current=start';
         }
     });
     oReq.open("POST", "/setup/start");
     oReq.setRequestHeader("Content-Type", "application/json");
     oReq.send();
+}
+
+function next() {
+    var pathKeys = location.pathname.split('/');
+    var current = pathKeys[pathKeys.length - 1];
+    location.href=`/setup/next?current=${current}`;
 }

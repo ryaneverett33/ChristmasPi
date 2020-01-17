@@ -1,0 +1,23 @@
+@{
+    ViewData["Title"] = "Setup";
+    ViewData["SetupTitle"] = "Hardware";
+    ViewData["SetupStep"] = 1;
+    ViewBag.ShowProgress = true;
+    @model ChristmasPi.Models.SetupHardwareModel;
+}
+@if (Model.HasError) {
+    <div class="alert alert-danger" role="alert">
+        @Model.ErrorMessage
+    </div>
+}
+<form asp-action="SubmitHardware" asp-controller="Setup">
+    <div class="form-group">
+        <label asp-for="datapin">Data Pin</label>
+        <input asp-for="datapin" class="form-control" id="datapininput" placeholder="@Model.Placeholder" />
+        <input type="submit" class="btn btn-primary" value="Submit" />
+    </div>
+</form>
+<div style="height: 400px">
+    <p>&nbsp;</p>
+</div>
+<!--<a class="btn btn-primary btn-lg" onclick="next()" role="button">Next</a>-->

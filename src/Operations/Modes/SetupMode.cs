@@ -14,13 +14,26 @@ namespace ChristmasPi.Operations.Modes {
         public string Name => "SetupMode";
         #endregion
         #region Fields
-        private bool _active;           // Whether or not off mode is currently active
+        private string[] steps;
+        public string CurrentStep { get; private set; }
         #endregion
-        public SetupMode() { }
+        public SetupMode() {
+            steps = new string[] {
+                "start",
+                "hardware",
+                "lights",
+                "branches",
+                "defaults",
+                "finished"
+            };
+            SetCurrentStep(null);
+        }
         #region IOperationMode Methods
         public void Activate(bool defaultmode) {
+            SetCurrentStep("start");
         }
         public void Deactivate() {
+            SetCurrentStep("null");
         }
         public object Info() {
             return new {};
@@ -30,6 +43,19 @@ namespace ChristmasPi.Operations.Modes {
         }
         #endregion
         #region Methods
+        public string GetNext(string currentpage) {
+            for (int i = 0; i < steps.Length; i++) {
+                if (steps[i].Equals(currentpage, StringComparison.CurrentCultureIgnoreCase)) {
+                    if (i + 1 >= steps.Length)
+                        return null;
+                    return steps[i+1];
+                }
+            }
+            return null;
+        }
+        public void SetCurrentStep(string currentstep) {
+            CurrentStep = currentstep;
+        }
         #endregion
     }
 }

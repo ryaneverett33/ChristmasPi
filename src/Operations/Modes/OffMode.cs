@@ -36,7 +36,7 @@ namespace ChristmasPi.Operations.Modes {
         }
         public object Info() {
             return new {
-                TurnedOff = true
+                TurnedOff = _active
             };
         }
         public object GetProperty(string property) {
