@@ -13,11 +13,16 @@
 <form asp-action="SubmitHardware" asp-controller="Setup">
     <div class="form-group">
         <label asp-for="datapin">Data Pin</label>
-        <input asp-for="datapin" class="form-control" id="datapininput" placeholder="@Model.Placeholder" />
-        <input type="submit" class="btn btn-primary" value="Submit" />
+        <input asp-for="datapin" class="form-control" id="datapininput" placeholder="@Model.Placeholder" oninput="ValidateHardware()"/>
+        <input type="submit" class="btn btn-primary" id="submitbtn" value="Submit" disabled="false" />
     </div>
 </form>
-<div style="height: 400px">
+<input type="hidden" id="validationstring" value="@Model.ValidationString" />
+<div style="height: 25px">
+    <p>&nbsp;</p>
+</div>
+<img src="@Model.Image" alt="Hardware Pin Diagram" />
+<div style="height: 25px">
     <p>&nbsp;</p>
 </div>
 <!--<a class="btn btn-primary btn-lg" onclick="next()" role="button">Next</a>-->

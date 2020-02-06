@@ -336,3 +336,24 @@ function next() {
     var current = pathKeys[pathKeys.length - 1];
     location.href=`/setup/next?current=${current}`;
 }
+
+function ValidateHardware() {
+    var validationRaw = $("#validationstring").val();
+    var currentData = $("#datapininput").val();
+    var validationItems = [];
+    validationRaw.split(",").forEach(x => validationItems.push(parseInt(x)));
+    try {
+        var pin = parseInt(currentData);
+        var enabled = false;
+        validationItems.some(x => {
+            if (x === pin) {
+                enabled = true;
+                return true;
+            }
+        });
+        $("#submitbtn").prop("disabled", !enabled);
+    }
+    catch {
+        $("#submitbtn").prop("disabled", true);
+    }
+}

@@ -14,6 +14,7 @@ using ChristmasPi.Data;
 using ChristmasPi.Data.Models;
 using ChristmasPi.Operations;
 using ChristmasPi.Animation;
+using ChristmasPi.Hardware;
 using ChristmasPi.Data.Models.Scheduler;
 using System.IO;
 using Microsoft.Extensions.Hosting;
@@ -91,6 +92,7 @@ namespace ChristmasPi
             Environment.Exit(0);*/
             AnimationManager.Instance.Init();
             OperationManager.Instance.Init();
+            HardwareManager.Instance.Init(true);
         }
     }
 }

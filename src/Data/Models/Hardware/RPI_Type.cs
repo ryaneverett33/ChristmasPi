@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.IO;
+using ChristmasPi.Data.Exceptions;
+using ChristmasPi.Data.Interfaces;
 
 namespace ChristmasPi.Data.Models.Hardware {
     public enum RPI_Type {
@@ -22,8 +22,15 @@ namespace ChristmasPi.Data.Models.Hardware {
     }
     public class RPIType {
         private static Dictionary<int, RPI_Type> typeDict;
+        public static int PlaceHolderPin = 18;
+        private static RPI_Type type;
+        public static bool fallback = false;
 
         public static RPI_Type GetHardwareType() {
+            if (fallback)
+                return RPI_Type.RPI3BPLUS;
+            if (!File.Exists("/proc/cpuinfo"))
+                throw new NonLinuxOSException();
             // check /proc/cpuinfo first then /proc/device-tree/system/linux,revision
             using (StreamReader reader = new StreamReader(File.OpenRead("/proc/cpuinfo"))) {
                 string[] lines = reader.ReadToEnd().Split('\n');
@@ -40,7 +47,8 @@ namespace ChristmasPi.Data.Models.Hardware {
                         }
                         if (!typeDict.ContainsKey((int)revision))
                             throw new Exception("Invalid model revision");
-                        return typeDict[(int)revision];
+                        type = typeDict[(int)revision];
+                        return type;
                     }
                 }
                 throw new Exception("AARCH64 not supported yet");
@@ -110,6 +118,20 @@ namespace ChristmasPi.Data.Models.Hardware {
                 };
             }
             return typeDict;
+        }
+
+        public static string GetValidationString() {
+            if (IsExpandedHeader(type))
+                return "18,21,24";
+            else
+                return "18,24";
+        }
+        
+        public static string GetImageUrl() {
+            if (IsExpandedHeader(type))
+                return "/img/RPI_ExpandedHeader.png";
+            else
+                return "/img/RPI_ShortHeader.png";
         }
     }
 }

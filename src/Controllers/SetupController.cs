@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ChristmasPi.Models;
 using ChristmasPi.Data;
+using ChristmasPi.Hardware;
 using ChristmasPi.Operations;
 using ChristmasPi.Operations.Interfaces;
 
@@ -67,8 +68,8 @@ Defaults
             (OperationManager.Instance.CurrentOperatingMode as ISetupMode).SetCurrentStep("hardware");
             var model = new SetupHardwareModel() {
                 Placeholder = "18",
-                HasError = false,
-                ErrorMessage = null
+                Image = HardwareManager.Instance.GetPinImageUrl(),
+                ValidationString = HardwareManager.Instance.GetValidationOptions()
             };
             return View("hardware", model);
         }
@@ -101,12 +102,13 @@ Defaults
         [HttpPost("/setup/hardware/submit")]
         public IActionResult SubmitHardware() {
             string datapin = this.HttpContext.Request.Form["datapin"].ToString();
-            var resultModel = new SetupHardwareModel() {
+            // save
+            /*var resultModel = new SetupHardwareModel() {
                 Placeholder = "boobs",
                 HasError = true,
                 ErrorMessage = datapin
             };
-            return View("hardware", resultModel);
+            return View("hardware", resultModel);*/
             return new RedirectResult("/setup/next?current=hardware");
         }
     }
