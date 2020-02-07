@@ -22,21 +22,43 @@ namespace ChristmasPi.Hardware.Factories {
             lock (locker) {
                 var hardware = ConfigurationManager.Instance.CurrentTreeConfig.hardware;
                 switch (hardware.type) {
-                    case HardwareType.RPI_WS281x: {
+                    case RendererType.RPI_WS281x: {
                             if (WS281xRenderer == null)
                                 WS281xRenderer = new WS281xRenderer(hardware.lightcount, hardware.datapin, ConfigurationManager.Instance.CurrentTreeConfig.hardware.fps);
                             return WS281xRenderer;
                         }
-                    case HardwareType.TEST_RENDER: {
+                    case RendererType.TEST_RENDER: {
                             if (testRenderer == null)
                                 testRenderer = new TestRenderer(hardware.lightcount);
                             return testRenderer;
                         }
-                    case HardwareType.UNKNOWN:
+                    case RendererType.UNKNOWN:
                         throw new InvalidRendererException();
                 }
             }
             return null;
+        }
+        public static bool TestRender(RendererType rendererType, int datapin) {
+            bool success = false;
+            lock (locker) {
+                try {
+                    switch (rendererType) {
+                        case RendererType.RPI_WS281x: {
+                            var renderer = new WS281xRenderer(1, datapin, 1);
+                            renderer.Dispose();
+                            success = true;
+                            break;
+                        }
+                        default:
+                            success = true;
+                            break;
+                    }
+                }
+                catch (Exception) {
+                    success = false;
+                }
+            }
+            return success;
         }
         public void Dispose() {
             if (!disposed) {

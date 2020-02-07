@@ -124,3 +124,11 @@ body {
     position: relative;
     width: 50px;
 }
+.custom-range {
+    width: 100%;
+    padding-left: 0;
+    background-color: transparent;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}

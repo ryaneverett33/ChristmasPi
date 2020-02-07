@@ -6,6 +6,7 @@ using ChristmasPi.Data;
 using ChristmasPi.Hardware;
 using ChristmasPi.Operations;
 using ChristmasPi.Operations.Interfaces;
+using ChristmasPi.Data.Models;
 
 namespace ChristmasPi.Controllers {
 /*
@@ -66,11 +67,7 @@ Defaults
             if (!(OperationManager.Instance.CurrentOperatingMode is ISetupMode))
                 return new BadRequestObjectResult("Not in setup mode");
             (OperationManager.Instance.CurrentOperatingMode as ISetupMode).SetCurrentStep("hardware");
-            var model = new SetupHardwareModel() {
-                Placeholder = "18",
-                Image = HardwareManager.Instance.GetPinImageUrl(),
-                ValidationString = HardwareManager.Instance.GetValidationOptions()
-            };
+            var model = new SetupHardwareModel();
             return View("hardware", model);
         }
         [HttpGet("/setup/lights")]
@@ -78,7 +75,8 @@ Defaults
             if (!(OperationManager.Instance.CurrentOperatingMode is ISetupMode))
                 return new BadRequestObjectResult("Not in setup mode");
             (OperationManager.Instance.CurrentOperatingMode as ISetupMode).SetCurrentStep("lights");
-            return View("lights");
+            var model = new SetupLightsModel();
+            return View("lights", model);
         }
         [HttpGet("/setup/branches")]
         public IActionResult SetupBranches() {
@@ -101,15 +99,24 @@ Defaults
         }
         [HttpPost("/setup/hardware/submit")]
         public IActionResult SubmitHardware() {
-            string datapin = this.HttpContext.Request.Form["datapin"].ToString();
-            // save
-            /*var resultModel = new SetupHardwareModel() {
-                Placeholder = "boobs",
-                HasError = true,
-                ErrorMessage = datapin
-            };
-            return View("hardware", resultModel);*/
-            return new RedirectResult("/setup/next?current=hardware");
+            string pin = this.HttpContext.Request.Form["datapin"].ToString();
+            string renderer = this.HttpContext.Request.Form["renderer"].ToString();
+            object rendererType;        // This is actually a RendererType enum but TryParse can't out an Enum type (which is real dum)
+            int datapin;
+            if (!Enum.TryParse(typeof(RendererType), renderer, out rendererType)) {
+                return View("hardware", new SetupHardwareModel("Invalid renderer"));
+            }
+            if (!int.TryParse(pin, out datapin)) {
+                return View("hardware", new SetupHardwareModel("Invalid datapin"));
+            }
+            // save data
+            if ((OperationManager.Instance.CurrentOperatingMode as ISetupMode).SetHardware((RendererType)rendererType, datapin)) {
+                return new RedirectResult("/setup/next?current=hardware");
+            }
+            else {
+                //return View("hardware", new SetupHardwareModel("Invalid settings"));
+                return new RedirectResult("/setup/next?current=hardware");
+            }
         }
     }
 }

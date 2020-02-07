@@ -1,4 +1,10 @@
-﻿<!doctype html>
+﻿@{
+    ViewData["SetupStepCount"] = 4;
+    float stepcount = (float)ViewBag.SetupStepCount;
+    float currentstep = (float)ViewBag.SetupStep;
+    ViewBag.StepProgress = String.Format("{0}%", Math.Round((currentstep / stepcount) * 100, 2));
+}
+<!doctype html>
 <html lang="en">
 <head>
     <title>@ViewData["Title"] - @ViewData["SetupTitle"]</title>
@@ -47,7 +53,7 @@
     <footer>
         @if (ViewBag.ShowProgress) {
             <div class="progress">
-                <div class="progress-bar progress-bar-striped" role="progressbar" style='width: @(ViewData["SetupStep"].ToString())%;' aria-valuenow='@ViewData["SetupStep"]' aria-valuemin="0" aria-valuemax="100"></div>
+                <div class="progress-bar progress-bar-striped" role="progressbar" style='width: @(ViewData["StepProgress"].ToString());' aria-valuenow='@ViewData["SetupStep"]' aria-valuemin="0" aria-valuemax="@ViewData["SetupStepCount"]"></div>
             </div>
         }
     </footer>

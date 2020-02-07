@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using ChristmasPi.Data.Models.Hardware;
 using ChristmasPi.Data.Exceptions;
+using ChristmasPi.Data.Models;
 
 namespace ChristmasPi.Hardware {
     public class HardwareManager {
@@ -20,22 +21,51 @@ namespace ChristmasPi.Hardware {
                 RPIType.fallback = true;
         }
 
+        /// <summary>
+        /// Gets the default data pin to act as a placeholder for the Hardware Setup View
+        /// </summary>
+        /// <returns>the default data pin for the current hardware</returns>
         public int GetPlaceHolderPin() {
             if (hardwareType == Hardware_Type.RPI)
                 return RPIType.PlaceHolderPin;
             throw new UnsupportedHardwareException();
         }
 
+        /// <summary>
+        /// Gets the acceptable values for data pin entry
+        /// </summary>
+        /// <returns>A comma seperated string containing acceptable values for the data pin</returns>
         public string GetValidationOptions() {
             if (hardwareType == Hardware_Type.RPI)
                 return RPIType.GetValidationString();
             throw new UnsupportedHardwareException();
         }
 
+        /// <summary>
+        /// Gets the hardware diagram for specifying the hardware pin
+        /// </summary>
+        /// <returns>The image url for the given diagram</returns>
         public string GetPinImageUrl() {
             if (hardwareType == Hardware_Type.RPI)
                 return RPIType.GetImageUrl();
             throw new UnsupportedHardwareException();
+        }
+
+        /// <summary>
+        /// Gets the list of supported renderers
+        /// </summary>
+        /// <returns>An array of renderer names</returns>
+        public string[] GetRenderers() {
+            string[] keys = Enum.GetNames(typeof(RendererType));
+            List<string> renderers = new List<string>(keys.Length - 2);
+            foreach (string key in keys) {
+                if (key == Enum.GetName(typeof(RendererType), RendererType.UNKNOWN))
+                    continue;
+                if (key == Enum.GetName(typeof(RendererType), RendererType.TEST_RENDER))
+                    continue;
+                renderers.Add(key);
+            }
+            return renderers.ToArray();
         }
     }
 }

@@ -12,8 +12,15 @@
 }
 <form asp-action="SubmitHardware" asp-controller="Setup">
     <div class="form-group">
-        <label asp-for="datapin">Data Pin</label>
-        <input asp-for="datapin" class="form-control" id="datapininput" placeholder="@Model.Placeholder" oninput="ValidateHardware()"/>
+        <label>Data Pin</label>
+        <input asp-for="datapin"class="form-control" id="datapininput" placeholder="@Model.Placeholder" oninput="ValidateHardware()"/>
+        <label>Renderer</label>
+        <select asp-for="renderer" id="renderer">
+            @foreach (string renderer in Model.Renderers) {
+                <option>@renderer</option>
+            }
+        </select>
+        <br>
         <input type="submit" class="btn btn-primary" id="submitbtn" value="Submit" disabled="false" />
     </div>
 </form>

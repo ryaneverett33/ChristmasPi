@@ -60,6 +60,11 @@ $(function () {
         else
             TurnOff();
     });
+    $('#brightnessslider').on('input', function (e) {
+        var ammount = e.target.ammount;
+        var percent = Math.round((ammount / 255) * 100);
+        $("brightnessvalue").val(`${percent}%`);
+    });
 });
 function showErrorModal(errorMessage) {
     $("#genericErrorModalMessage").text(errorMessage);

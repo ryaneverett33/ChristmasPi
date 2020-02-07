@@ -24,7 +24,7 @@ namespace ChristmasPi.Data.Models {
         /// <summary>
         /// The type of hardware being used to select a renderer
         /// </summary>
-        public HardwareType type { get; set; }
+        public RendererType type { get; set; }
 
         /// <summary>
         /// The brightness of the lights
@@ -46,7 +46,7 @@ namespace ChristmasPi.Data.Models {
             settings.datapin = 18;      // first PWM pin
             settings.brightness = 255;
             settings.invert = false;
-            settings.type = HardwareType.UNKNOWN;
+            settings.type = RendererType.UNKNOWN;
             return settings;
         }
     }
