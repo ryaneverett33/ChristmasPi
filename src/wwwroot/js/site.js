@@ -60,10 +60,10 @@ $(function () {
         else
             TurnOff();
     });
-    $('#brightnessslider').on('input', function (e) {
-        var ammount = e.target.ammount;
+    $('#brightness-slider').on('input', function (e) {
+        var ammount = e.target.value;
         var percent = Math.round((ammount / 255) * 100);
-        $("brightnessvalue").val(`${percent}%`);
+        $("#brightnessvalue").text(`${percent}%`);
     });
 });
 function showErrorModal(errorMessage) {
@@ -359,6 +359,28 @@ function ValidateHardware() {
         $("#submitbtn").prop("disabled", !enabled);
     }
     catch {
+        $("#submitbtn").prop("disabled", true);
+    }
+}
+
+function ValidateLights() {
+    // light count can't be zero
+    var lightcount = $("#lightcount").val();
+    var maxstr = $("#lightcount").prop("max");
+    try {
+        var count = parseInt(lightcount);
+        var max = parseInt(maxstr);
+        if (count === 0 || count > max) {
+            $("#lightcount").addClass("error");
+            $("#submitbtn").prop("disabled", true);
+        }
+        else {
+            $("#lightcount").removeClass("error");
+            $("#submitbtn").prop("disabled", false);
+        }
+    }
+    catch {
+        $("#lightcount").addClass("error");
         $("#submitbtn").prop("disabled", true);
     }
 }

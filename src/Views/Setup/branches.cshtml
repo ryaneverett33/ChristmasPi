@@ -1,0 +1,25 @@
+@{
+    ViewData["Title"] = "Setup";
+    ViewData["SetupTitle"] = "Branches";
+    ViewData["SetupStep"] = 3;
+    ViewBag.BreadCrumbs = new string[] { "Hardware", "Lights", "Branches" };
+    ViewBag.ShowProgress = true;
+    @model ChristmasPi.Models.SetupBranchesModel;
+}
+@if (Model.HasError) {
+    <div class="alert alert-danger" role="alert">
+        @Model.ErrorMessage
+    </div>
+}
+<form asp-action="SubmitBranches" asp-controller="Setup">
+
+    <div class="form-group">
+        <!--<div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Number of lights</span>
+            </div>
+            <input id="lightcount" asp-for="lightcount" type="number" min="1" max="@ChristmasPi.Data.Constants.LIGHTS_MAX" value="0" />
+        </div>-->
+        <input type="submit" class="btn btn-primary" id="submitbtn" value="Submit" disabled="false" />
+    </div>
+</form>

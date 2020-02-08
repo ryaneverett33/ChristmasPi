@@ -125,10 +125,19 @@ body {
     width: 50px;
 }
 .custom-range {
-    width: 100%;
+    width: 90%;
     padding-left: 0;
     background-color: transparent;
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
+    height: auto;
+    min-width: 60%;
+    max-width: 90%;
+}
+.warning {
+    border-color: yellow;
+}
+.error {
+    border-color: orangered;
 }

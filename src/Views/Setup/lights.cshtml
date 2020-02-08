@@ -3,35 +3,37 @@
     ViewData["SetupTitle"] = "Lights";
     ViewData["SetupStep"] = 2;
     ViewBag.ShowProgress = true;
+    ViewBag.BreadCrumbs = new string[] { "Hardware", "Lights" };
     @model ChristmasPi.Models.SetupLightsModel;
+    ViewBag.StartPercent = String.Format("{0}%", Math.Floor((Model.DefaultBrightness / 255) * (double)100));
 }
 @if (Model.HasError) {
     <div class="alert alert-danger" role="alert">
         @Model.ErrorMessage
     </div>
 }
-<form asp-action="SubmitHardware" asp-controller="Setup" onload="">
+<form asp-action="SubmitLights" asp-controller="Setup" onchange="ValidateLights()" onload="ValidateLights()">
     <div class="form-group">
         <div class="input-group mb-3">
             <div class="input-group-prepend">
                 <span class="input-group-text">Number of lights</span>
             </div>
-            <input asp-for="lightcount" type="number" min="1" max="1000" value="1" />
+            <input id="lightcount" asp-for="lightcount" type="number" min="1" max="@ChristmasPi.Data.Constants.LIGHTS_MAX" value="0" />
         </div>
         <div class="input-group mb-3">
             <div class="input-group-prepend">
                 <span class="input-group-text">FPS</span>
             </div>
-            <input asp-for="fps" type="number" min="1" max="90" value="1" />
+            <input asp-for="fps" type="number" min="1" max="@ChristmasPi.Data.Constants.FPS_MAX" value="@ChristmasPi.Data.Constants.FPS_DEFAULT" />
         </div>
         <div class="input-group mb-3">
             <div class="input-group-prepend">
                 <span class="input-group-text">Brightness</span>
-                <span class="input-group-text" id="brightnessvalue">50</span>
+                <span class="input-group-text" id="brightnessvalue">@ViewBag.StartPercent</span>
             </div>
             <input asp-for="brightness" type="range" class="custom-range" id="brightness-slider" min="0" max="255" step="1" value="@Model.DefaultBrightness">
         </div>
-        <button class="btn btn-primary btn-just-icon" type="button" data-toggle="collapse" data-target="#extra" aria-expanded="false" aria-controls="collapseExample">
+        <!--<button class="btn btn-primary btn-just-icon" type="button" data-toggle="collapse" data-target="#extra" aria-expanded="false" aria-controls="collapseExample">
             <i class="nc-icon nc-simple-add"></i>
         </button>
         <div class="collapse" id="extra">
@@ -39,7 +41,7 @@
                 <label>Invert</label>
                 <input asp-for="invert" type="checkbox" />
             </div>
-        </div>
+        </div>-->
         <br>
         <input type="submit" class="btn btn-primary" id="submitbtn" value="Submit" disabled="false" />
     </div>

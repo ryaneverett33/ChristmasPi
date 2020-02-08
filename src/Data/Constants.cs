@@ -6,6 +6,7 @@ namespace ChristmasPi.Data {
         // Hardware
         public static readonly int FPS_MAX = 100;
         public static readonly int FPS_DEFAULT = 30;
+        public static readonly int LIGHTS_MAX = 1000;
 
         // Regexs
         public static readonly string REGEX_RGB_FORMAT = @"rgb\((\ *[0-9]{1,3}\ *),(\ *[0-9]{1,3}\ *),(\ *[0-9]{1,3}\ *)\)";

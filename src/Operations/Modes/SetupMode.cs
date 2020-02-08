@@ -97,6 +97,27 @@ namespace ChristmasPi.Operations.Modes {
                 return false;
             }
         }
+
+        /// <summary>
+        /// Sets the info for the lights
+        /// </summary>
+        /// <param name="lightcount">How many lights on the tree</param>
+        /// <param name="fps">How quickly animations should be rendered</param>
+        /// <param name="brightness">How bright the tree should be</param>
+        /// <returns>True if the info is valid, false if parameters are incorrect</returns>
+        public bool SetLights(int lightcount, int fps, int brightness) {
+            // limit fps to 1-Constants.FPS_MAX and brightness to 0-255, 1 - lightcount to Constants.LIGHTS_MAX
+            if (lightcount < 1)
+                return false;
+            if (fps < 1 || fps > Constants.FPS_MAX)
+                return false;
+            if (brightness < 0 || brightness > 255)
+                return false;
+            newConfiguration.hardware.brightness = brightness;
+            newConfiguration.hardware.lightcount = lightcount;
+            newConfiguration.hardware.fps = fps;
+            return true;
+        }
         #endregion
     }
 }

@@ -43,6 +43,22 @@
             <a class='navbar-brand nav-link @((string)ViewData["ActivePage"] == "Animation" ? "nav-active" : "")' href="/animation">Animation</a>
         </div>
     </nav>-->
+    @if (ViewBag.BreadCrumbs != null && ViewBag.BreadCrumbs.Length > 0) {
+    <nav aria-label="breadcrumb" role="navigation">
+        <ol class="breadcrumb">
+            <!--<li class="breadcrumb-item"><a>Start</a></li>-->
+            @foreach (var breadcrumb in ViewBag.BreadCrumbs) {
+                if (breadcrumb == ViewBag.SetupTitle) {
+                    <li class="breadcrumb-item"><a href="#">@breadcrumb</a></li>
+                }
+                else {
+                    <li class="breadcrumb-item active" aria-current="page">@breadcrumb</li>
+                }
+            }
+        </ol>
+        
+    </nav>
+    }
     <!-- end navbar  -->
 
     <div class="wrapper">
