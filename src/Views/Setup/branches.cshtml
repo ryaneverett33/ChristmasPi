@@ -6,20 +6,39 @@
     ViewBag.ShowProgress = true;
     @model ChristmasPi.Models.SetupBranchesModel;
 }
+@section Scripts {
+    <script src="/js/branch.js"></script>
+    <script type="text/javascript">
+        $(window).on("load", function () {
+            branchSetupLoad();
+        });
+    </script>
+}
 @if (Model.HasError) {
     <div class="alert alert-danger" role="alert">
         @Model.ErrorMessage
     </div>
 }
-<form asp-action="SubmitBranches" asp-controller="Setup">
+<div>
+    <h3 id="currentbranch">Branch 1</h3>
+    <i class="nc-icon icon-lightbulb"></i>
+    <h4 id="lightcounter">1/@Model.LightCount</h4>
+</div>
+<div>
+    <button id="minusBtn" class="btn btn-info btn-just-icon" onclick="minusLight()">
+        <i class="nc-icon nc-simple-delete"></i></button>
+    <button id="newBtn" class="btn btn-info btn-just-icon" onclick="newBranch()">
+        <i class="nc-icon nc-scissors"></i></button>
+    <button id="resetBtn" class="btn btn-info btn-just-icon" onclick="branchSetupLoad()">
+        <i class="nc-icon nc-refresh-69"></i></button>
+    <button id="addBtn" class="btn btn-info btn-just-icon" onclick="addLight()">
+        <i class="nc-icon nc-simple-add"></i>
+    </button>
+</div>
+<div>
+     <ul id="branchlist">
+     </ul>
+</div>
+<button id="submitBtn" class="btn btn-primary" onclick="submitBranches()">Submit</button>
 
-    <div class="form-group">
-        <!--<div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <span class="input-group-text">Number of lights</span>
-            </div>
-            <input id="lightcount" asp-for="lightcount" type="number" min="1" max="@ChristmasPi.Data.Constants.LIGHTS_MAX" value="0" />
-        </div>-->
-        <input type="submit" class="btn btn-primary" id="submitbtn" value="Submit" disabled="false" />
-    </div>
-</form>
+<input type="hidden" id="lightcount" value="@Model.LightCount" />

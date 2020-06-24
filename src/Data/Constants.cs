@@ -7,6 +7,7 @@ namespace ChristmasPi.Data {
         public static readonly int FPS_MAX = 100;
         public static readonly int FPS_DEFAULT = 30;
         public static readonly int LIGHTS_MAX = 1000;
+        public static readonly Color INDICATION_COLOR = Color.Lime;
 
         // Regexs
         public static readonly string REGEX_RGB_FORMAT = @"rgb\((\ *[0-9]{1,3}\ *),(\ *[0-9]{1,3}\ *),(\ *[0-9]{1,3}\ *)\)";
@@ -37,5 +38,8 @@ namespace ChristmasPi.Data {
 
         // Networking
         public static readonly int PORT = 50808;                        // set in asp.net configuration
+
+        // Misc
+        public static readonly string USAGE_STRING = "Usage: dotnet ChristmasPi.dll [OPTION]";
     }
 }

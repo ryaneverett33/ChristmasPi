@@ -141,3 +141,42 @@ body {
 .error {
     border-color: orangered;
 }
+#branchlist {
+    list-style-type: none;
+}
+.branchitem {
+
+}
+.sm-colorbox {
+    height: 30px;
+    width: 30px;
+    display: inline-block;
+    border: black thin solid;
+    margin-right: 10px;
+}
+.h-no-newline {
+    display: inline-block;
+}
+#currentbranch {
+    display: inline-block;
+    margin-left: 20px;
+}
+#branchlist {
+    max-height: 600px;
+    overflow-y: scroll;
+}
+#lightcounter {
+    display: inline;
+}
+.icon-lightbulb {
+    background-image: url("/img/icons/lightbulb.png");
+    height: 32px;
+    width: 32px;
+    display: inline-block;
+    background-size: 32px;
+    margin-left: 15px;
+}
+#install-steps {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}

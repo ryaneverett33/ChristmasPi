@@ -14,6 +14,7 @@ namespace ChristmasPi.Operations.Modes {
     public class AnimationMode : IOperationMode, IAnimationMode {
         #region Properties
         public string Name => "AnimationMode";
+        public bool CanBeDefault => true;
         public AnimationState CurrentState => animator == null ? AnimationState.Stopped : animator.CurrentState;
         public string CurrentAnimation => animator != null ? animator.CurrentAnimation.Name : "None playing";
         public bool Animating => animator != null ? animator.CurrentState == AnimationState.Animating : false;

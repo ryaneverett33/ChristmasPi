@@ -14,11 +14,15 @@ namespace ChristmasPi.Controllers {
     public class TreeController : ControllerBase {
         [HttpGet("mode")]
         public IActionResult GetTreeMode() {
+            if (RedirectHandler.ShouldRedirect(this.RouteData))
+                return RedirectHandler.Handle();
             // /api/tree/mode
             return new JsonResult(OperationManager.Instance.CurrentOperatingInfo);
         }
         [HttpGet()]
         public IActionResult GetTreeInfo() {
+            if (RedirectHandler.ShouldRedirect(this.RouteData))
+                return RedirectHandler.Handle();
             // /api/tree
             var configuration = new {
                 lightcount = ConfigurationManager.Instance.CurrentTreeConfig.hardware.lightcount,

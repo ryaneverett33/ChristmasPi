@@ -17,6 +17,7 @@
     },
     "src": {
       "commandName": "Project",
+      "commandLineArgs": "--tr --ignorepriv",
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

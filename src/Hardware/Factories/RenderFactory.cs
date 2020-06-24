@@ -18,9 +18,12 @@ namespace ChristmasPi.Hardware.Factories {
         private static TestRenderer testRenderer;
         private static bool disposed = false;
 
-        public static IRenderer GetRenderer() {
+        /// <summary>
+        /// Gets and configures the hardware renderer
+        /// </summary>
+        public static IRenderer GetRenderer(TreeConfiguration tmpConfiguration = null) {
             lock (locker) {
-                var hardware = ConfigurationManager.Instance.CurrentTreeConfig.hardware;
+                var hardware = tmpConfiguration == null ? ConfigurationManager.Instance.CurrentTreeConfig.hardware : tmpConfiguration.hardware;
                 switch (hardware.type) {
                     case RendererType.RPI_WS281x: {
                             if (WS281xRenderer == null)
@@ -38,6 +41,13 @@ namespace ChristmasPi.Hardware.Factories {
             }
             return null;
         }
+
+        /// <summary>
+        /// Tests a given renderer if it'll work on the current hardware
+        /// </summary>
+        /// <param name="rendererType">The renderer to test</param>
+        /// <param name="datapin">Which data pin to initialize the renderer on</param>
+        /// <returns>True if the renderer could be initialized, false if not</returns>
         public static bool TestRender(RendererType rendererType, int datapin) {
             bool success = false;
             lock (locker) {
@@ -59,6 +69,33 @@ namespace ChristmasPi.Hardware.Factories {
                 }
             }
             return success;
+        }
+        
+        /// <summary>
+        /// Cleans up a previously initialized renderer
+        /// </summary>
+        /// <param name="rendererType">The renderer to clean up</param>
+        public static void ReleaseRender(RendererType rendererType) {
+            lock (locker) {
+                switch (rendererType) {
+                    case RendererType.RPI_WS281x: {
+                            if (WS281xRenderer == null)
+                                throw new Exception("Renderer not initialized yet, can't release");
+                            WS281xRenderer.Dispose();
+                            WS281xRenderer = null;
+                            return;
+                        }
+                    case RendererType.TEST_RENDER: {
+                            if (testRenderer == null)
+                                throw new Exception("Renderer not initialized yet, can't release");
+                            testRenderer.Dispose();
+                            testRenderer = null;
+                            return;
+                        }
+                    case RendererType.UNKNOWN:
+                        throw new InvalidRendererException();
+                }
+            } 
         }
         public void Dispose() {
             if (!disposed) {

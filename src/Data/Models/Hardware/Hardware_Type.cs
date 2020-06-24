@@ -11,7 +11,6 @@ namespace ChristmasPi.Data.Models.Hardware {
         UNKNOWN
     }
     public class HardwareType {
-        private static bool defaultToRpi = false;
         /// <summary>
         /// Detects what hardware the system is running on
         /// </summary>

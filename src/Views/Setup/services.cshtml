@@ -1,0 +1,45 @@
+﻿@{
+    ViewData["Title"] = "Setup";
+    ViewData["SetupTitle"] = "Services";
+    ViewData["SetupStep"] = 5;
+    ViewBag.BreadCrumbs = new string[] { "Hardware", "Lights", "Branches", "Defaults", "Services" };
+    ViewBag.ShowProgress = true;
+    @model ChristmasPi.Models.SetupServicesModel;
+}
+@section Scripts {
+    <script src="/js/install.js"></script>
+    <script type="text/javascript">
+        $(window).on("load", function () {
+            $("#continue-btn").hide();
+            @if (Model.InstallSteps != null) {
+                @foreach (string installStep in Model.InstallSteps) {
+                    @:installSteps.push(new install("@installStep", "step-list"));
+                }
+            }
+        });
+    </script>
+}
+@if (Model.InitSystemSupported) {
+    <h4>Would you like to enable the Scheduler service?</h4>
+    <button id="install-btn" class="btn btn-primary" onclick="installService()">Enable service</button>
+    <button id="decline-btn" class="btn btn-secondary" onclick="declineInstall()">Not now</button>
+    <div id="install-steps" class="hide">
+        <ul id="step-list" class="list-group">
+            <li class="list-group-item">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">Do this thing for installing</h5>
+                    <p>Installing</p>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <button id="continue-btn" class="btn btn-info">Continue</button>
+}
+@if (!Model.InitSystemSupported) {
+    <div class="alert alert-danger" role="alert">
+        <p>Your Init System @(Model.InitSystemName) isn't supported yet by the installer.</p>
+        <p>Check the <a href="https://www.github.com/Changer098/ChristmasPi">project page</a> for more information</p>
+    </div>
+    <button class="btn btn-info">Continue</button>
+}

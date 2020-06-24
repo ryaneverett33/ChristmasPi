@@ -1,13 +1,7 @@
-﻿@{
-    ViewData["SetupStepCount"] = 5;
-    float stepcount = (float)ViewBag.SetupStepCount;
-    float currentstep = (float)ViewBag.SetupStep;
-    ViewBag.StepProgress = String.Format("{0}%", Math.Round((currentstep / stepcount) * 100, 2));
-}
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
-    <title>@ViewData["Title"] - @ViewData["SetupTitle"]</title>
+    <title>Error</title>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=3.0, minimum-scale=0.1, user-scalable=1" name="viewport" />
@@ -25,41 +19,17 @@
     <link href="~/lib/bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css" rel="stylesheet" />
 
     <link rel="stylesheet" href="~/css/site.css" />
+    <script type="text/javascript">
+
+    </script>
 
 </head>
 <body>
-    @if (ViewBag.BreadCrumbs != null && ViewBag.BreadCrumbs.Length > 0) {
-    <nav aria-label="breadcrumb" role="navigation">
-        <ol class="breadcrumb">
-            @foreach (var breadcrumb in ViewBag.BreadCrumbs) {
-                if (breadcrumb == ViewBag.SetupTitle) {
-                    <li class="breadcrumb-item"><a href="#">@breadcrumb</a></li>
-                }
-                else {
-                    <li class="breadcrumb-item active" aria-current="page">@breadcrumb</li>
-                }
-            }
-        </ol>
-        
-    </nav>
-    }
-    <!-- end navbar  -->
-
     <div class="wrapper">
         <!-- content come here     -->
         @RenderBody()
 
     </div>
-    <footer>
-        @if (ViewBag.ShowProgress) {
-            <div style="position: absolute; bottom: 25px; width: 100%;">
-                <div class="progress">
-                    <div class="progress-bar progress-bar-striped" role="progressbar" style='width: @(ViewData["StepProgress"].ToString());' aria-valuenow='@ViewData["SetupStep"]' aria-valuemin="0" aria-valuemax="@ViewData["SetupStepCount"]"></div>
-                </div>
-            </div>
-            
-        }
-    </footer>
 
     <!-- Modal Bodies come here -->
     <div class="modal fade" id="genericErrorModal" tabindex="-1" role="dialog" aria-labelledby="genericErrorModalLabel" aria-hidden="true">

@@ -16,6 +16,7 @@ using ChristmasPi.Operations;
 using ChristmasPi.Animation;
 using ChristmasPi.Hardware;
 using ChristmasPi.Data.Models.Scheduler;
+using ChristmasPi.Util;
 using System.IO;
 using Microsoft.Extensions.Hosting;
 
@@ -41,7 +42,9 @@ namespace ChristmasPi
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
-
+            services.Configure<MvcOptions>(options => {
+                options.EnableEndpointRouting = false;
+            });
             services.AddControllersWithViews();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
@@ -58,6 +61,7 @@ namespace ChristmasPi
                 app.UseHsts();
             }
 
+
             // app.UseHttpsRedirection();
             app.UseStaticFiles();
 
@@ -70,7 +74,11 @@ namespace ChristmasPi
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapControllerRoute(
+                    name: "error",
+                    pattern: "{controller=Error}/{action=NotAdmin}/");
             });
+            
         }
 
         /// <summary>
@@ -93,6 +101,7 @@ namespace ChristmasPi
             AnimationManager.Instance.Init();
             OperationManager.Instance.Init();
             HardwareManager.Instance.Init(true);
+            Controllers.RedirectHandler.Init();
         }
     }
 }

@@ -19,6 +19,8 @@ namespace ChristmasPi.Controllers
     {
         [HttpPost("update")]
         public IActionResult Update([FromBody]SolidUpdateArgument argument) {
+            if (RedirectHandler.ShouldRedirect(this.RouteData))
+                return RedirectHandler.Handle();
             // /api/solid/update
             if (argument == null)
                 return new BadRequestObjectResult("Argument is empty");
@@ -26,7 +28,7 @@ namespace ChristmasPi.Controllers
                 return new BadRequestObjectResult("Color argument is empty");
             if (OperationManager.Instance.CurrentOperatingModeName != "SolidColorMode")
                 OperationManager.Instance.SwitchModes("SolidColorMode");
-            Color newColor = ChristmasPi.Util.ColorConverter.Convert(argument.color);
+            Color newColor = Util.ColorConverter.Convert(argument.color);
             int result = (OperationManager.Instance.CurrentOperatingMode as ISolidColorMode).SetColor(newColor);
             return new StatusCodeResult(result);
         }

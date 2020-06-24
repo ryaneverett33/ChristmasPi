@@ -1,3 +1,4 @@
 # Bugs
 
-- [FRONTEND] Resume Animation doesn't work
+- [SETUP] Datapin should have placeholder be renderer specific
+	- Should have a placeholder for each renderer

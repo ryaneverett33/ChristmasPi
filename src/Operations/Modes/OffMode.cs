@@ -12,6 +12,7 @@ namespace ChristmasPi.Operations.Modes {
     public class OffMode : IOperationMode, IOffMode {
         #region Properties
         public string Name => "OffMode";
+        public bool CanBeDefault => false;
         public bool TurnedOff => _active;
         #endregion
         #region Fields
@@ -19,11 +20,11 @@ namespace ChristmasPi.Operations.Modes {
         private bool _active;           // Whether or not off mode is currently active
         #endregion
         public OffMode() {
-            renderer = RenderFactory.GetRenderer();
             _active = false;
         }
         #region IOperationMode Methods
         public void Activate(bool defaultmode) {
+            renderer = RenderFactory.GetRenderer();
             renderer.Start();
             TurnOff();
             _active = true;
@@ -33,6 +34,7 @@ namespace ChristmasPi.Operations.Modes {
             renderer.Stop();
             _active = false;
             Console.WriteLine("Deactivated Off Mode");
+            renderer = null;
         }
         public object Info() {
             return new {

@@ -7,6 +7,7 @@ using ChristmasPi.Hardware;
 using ChristmasPi.Operations;
 using ChristmasPi.Operations.Interfaces;
 using ChristmasPi.Data.Models;
+using System.Drawing;
 
 namespace ChristmasPi.Controllers {
 /*
@@ -26,6 +27,8 @@ Defaults
     public class SetupController : Controller {
         [HttpGet("/setup")]
         public IActionResult Index() {
+            if (RedirectHandler.ShouldRedirect(this.RouteData))
+                return RedirectHandler.Handle();
             // redirect to current page if setup has already started
             if (OperationManager.Instance.CurrentOperatingMode is ISetupMode) {
                 string currentStep = (OperationManager.Instance.CurrentOperatingMode as ISetupMode).CurrentStep;
@@ -36,6 +39,8 @@ Defaults
 
         [HttpPost("/setup/start")]
         public IActionResult Start() {
+            if (RedirectHandler.ShouldRedirect(this.RouteData))
+                return RedirectHandler.Handle();
             // check if we can start the setup process
             if (!ConfigurationManager.Instance.CurrentTreeConfig.setup.firstrun)
                 return new BadRequestObjectResult("Setup already ran");
@@ -49,6 +54,9 @@ Defaults
         }
         [HttpGet("/setup/next")]
         public IActionResult Next(string current) {
+            if (RedirectHandler.ShouldRedirect(this.RouteData))
+                return RedirectHandler.Handle();
+            //return new RedirectResult("/setup/branches");
             if (!(OperationManager.Instance.CurrentOperatingMode is ISetupMode))
                 return new BadRequestObjectResult("Not in setup mode");
             string next = (OperationManager.Instance.CurrentOperatingMode as ISetupMode).GetNext(current);
@@ -61,6 +69,8 @@ Defaults
                     return new RedirectResult("/setup/branches");
                 case "defaults":
                     return new RedirectResult("/setup/defaults");
+                case "services":
+                    return new RedirectResult("/setup/services");
                 case "finished":
                     return Finished();
                 default:
@@ -69,6 +79,8 @@ Defaults
         }
         [HttpGet("/setup/hardware")]
         public IActionResult SetupHardware() {
+            if (RedirectHandler.ShouldRedirect(this.RouteData))
+                return RedirectHandler.Handle();
             if (!(OperationManager.Instance.CurrentOperatingMode is ISetupMode))
                 return new BadRequestObjectResult("Not in setup mode");
             (OperationManager.Instance.CurrentOperatingMode as ISetupMode).SetCurrentStep("hardware");
@@ -77,6 +89,8 @@ Defaults
         }
         [HttpGet("/setup/lights")]
         public IActionResult SetupLights() {
+            if (RedirectHandler.ShouldRedirect(this.RouteData))
+                return RedirectHandler.Handle();
             if (!(OperationManager.Instance.CurrentOperatingMode is ISetupMode))
                 return new BadRequestObjectResult("Not in setup mode");
             (OperationManager.Instance.CurrentOperatingMode as ISetupMode).SetCurrentStep("lights");
@@ -85,67 +99,165 @@ Defaults
         }
         [HttpGet("/setup/branches")]
         public IActionResult SetupBranches() {
+            if (RedirectHandler.ShouldRedirect(this.RouteData))
+                return RedirectHandler.Handle();
             if (!(OperationManager.Instance.CurrentOperatingMode is ISetupMode))
                 return new BadRequestObjectResult("Not in setup mode");
-            (OperationManager.Instance.CurrentOperatingMode as ISetupMode).SetCurrentStep("branches");
-            return View("branches");
+            ISetupMode setupMode = (ISetupMode)OperationManager.Instance.CurrentOperatingMode;
+            setupMode.SetCurrentStep("branches");
+            setupMode.StartSettingUpBranches();
+            var model = new SetupBranchesModel();
+            return View("branches", model);
         }
         [HttpGet("/setup/defaults")]
         public IActionResult SetupDefaults() {
+            if (RedirectHandler.ShouldRedirect(this.RouteData))
+                return RedirectHandler.Handle();
             if (!(OperationManager.Instance.CurrentOperatingMode is ISetupMode))
                 return new BadRequestObjectResult("Not in setup mode");
             (OperationManager.Instance.CurrentOperatingMode as ISetupMode).SetCurrentStep("defaults");
-            return View("defaults");
+            var model = new SetupDefaultsModel();
+            return View("defaults", model);
+        }
+        [HttpGet("/setup/services")]
+        public IActionResult SetupServices() {
+            if (RedirectHandler.ShouldRedirect(this.RouteData))
+                return RedirectHandler.Handle();
+            if (!(OperationManager.Instance.CurrentOperatingMode is ISetupMode))
+                return new BadRequestObjectResult("Not in setup mode");
+            (OperationManager.Instance.CurrentOperatingMode as ISetupMode).SetCurrentStep("services");
+            var model = new SetupServicesModel();
+            return View("services", model);
         }
 
         private IActionResult Finished() {
+            if (RedirectHandler.ShouldRedirect(this.RouteData))
+                return RedirectHandler.Handle();
             // leave setupmode, redirect to home page
             return new RedirectResult("/");
         }
         [HttpPost("/setup/hardware/submit")]
-        public IActionResult SubmitHardware() {
+        public IActionResult SubmitHardware([FromForm]int datapin, [FromForm]string renderer) {
+            if (RedirectHandler.ShouldRedirect(this.RouteData))
+                return RedirectHandler.Handle();
             if (!(OperationManager.Instance.CurrentOperatingMode is ISetupMode))
                 return new BadRequestObjectResult("Not in setup mode");
-            string pin = this.HttpContext.Request.Form["datapin"].ToString();
-            string renderer = this.HttpContext.Request.Form["renderer"].ToString();
-            object rendererType;        // This is actually a RendererType enum but TryParse can't out an Enum type (which is real dum)
-            int datapin;
-            if (!Enum.TryParse(typeof(RendererType), renderer, out rendererType))
-                return View("hardware", new SetupHardwareModel("Invalid renderer format"));
-            if (!int.TryParse(pin, out datapin))
-                return View("hardware", new SetupHardwareModel("Invalid datapin format"));
             // save data
-            if (!(OperationManager.Instance.CurrentOperatingMode as ISetupMode).SetHardware((RendererType)rendererType, datapin)) {
-                // Ignore invalid hardware settings while debugging on non-linux os
-                
-                //return View("hardware", new SetupHardwareModel("Invalid settings"));
-                return new RedirectResult("/setup/next?current=hardware");
-            }
+            RendererType rendererType;
+            if (!Enum.TryParse<RendererType>(renderer, out rendererType))
+                return View("hardware", new SetupHardwareModel("Invalid renderer type"));
+            if (!(OperationManager.Instance.CurrentOperatingMode as ISetupMode).SetHardware(rendererType, datapin))
+                return View("hardware", new SetupHardwareModel("Invalid settings"));
             else
                 return new RedirectResult("/setup/next?current=hardware");
         }
         [HttpPost("/setup/light/submit")]
-        public IActionResult SubmitLights() {
+        public IActionResult SubmitLights([FromForm]int lightcount, [FromForm]int fps, [FromForm]int brightness) {
+            if (RedirectHandler.ShouldRedirect(this.RouteData))
+                return RedirectHandler.Handle();
             if (!(OperationManager.Instance.CurrentOperatingMode is ISetupMode))
                 return new BadRequestObjectResult("Not in setup mode");
-            string lightcountInput = this.HttpContext.Request.Form["lightcount"].ToString();
-            string fpsInput = this.HttpContext.Request.Form["fps"].ToString();
-            string brightnessInput = this.HttpContext.Request.Form["brightness"].ToString();
-            int lightcount, fps, brightness;
-            if (!int.TryParse(lightcountInput, out lightcount))
-                return View("lights", new SetupLightsModel("Invalid lightcount format"));
-            if (!int.TryParse(fpsInput, out fps))
-                return View("lights", new SetupLightsModel("Invalid fps format"));
-            if (!int.TryParse(brightnessInput, out brightness))
-                return View("lights", new SetupLightsModel("Invalid brightness format"));
             if (!(OperationManager.Instance.CurrentOperatingMode as ISetupMode).SetLights(lightcount, fps, brightness))
                 return View("lights", new SetupLightsModel("Invalid settings"));
             else
                 return new RedirectResult("/setup/next?current=lights");
         }
         [HttpPost("/setup/branches/submit")]
-        public IActionResult SubmitBranches() {
-            return View("branches", new SetupBranchesModel("SubmitBranches not implemented yet"));
+        public IActionResult SubmitBranches([FromBody]Branch[] argument) {
+            if (RedirectHandler.ShouldRedirect(this.RouteData))
+                return RedirectHandler.Handle();
+            if (!(OperationManager.Instance.CurrentOperatingMode is ISetupMode))
+                return new BadRequestObjectResult("Not in setup mode");
+            if (!(OperationManager.Instance.CurrentOperatingMode as ISetupMode).IsSettingUpBranches)
+                return new BadRequestObjectResult("Not in branch setup mode");
+            if ((OperationManager.Instance.CurrentOperatingMode as ISetupMode).SetBranches(argument))
+                return Ok();
+            else
+                return new BadRequestObjectResult("Invalid branch setup");
         }
+        [HttpPost("/setup/defaults/submit")]
+        public IActionResult SubmitDefaults([FromForm]string mode, [FromForm]string animation) {
+            if (RedirectHandler.ShouldRedirect(this.RouteData))
+                return RedirectHandler.Handle();
+            if (!(OperationManager.Instance.CurrentOperatingMode is ISetupMode))
+                return new BadRequestObjectResult("Not in setup mode");
+            if ((OperationManager.Instance.CurrentOperatingMode as ISetupMode).SetDefaults(animation, mode))
+                return new RedirectResult("/setup/next?current=defaults");
+            else {
+                var model = new SetupDefaultsModel("Invalid parameters");
+                return View("defaults", model);
+            }
+        }
+
+        [HttpPost("/setup/branches/branch/new")]
+        public IActionResult BranchesNewBranch() {
+            if (RedirectHandler.ShouldRedirect(this.RouteData))
+                return RedirectHandler.Handle();
+            if (!(OperationManager.Instance.CurrentOperatingMode is ISetupMode))
+                return new BadRequestObjectResult("Not in setup mode");
+            if (!(OperationManager.Instance.CurrentOperatingMode as ISetupMode).IsSettingUpBranches)
+                return new BadRequestObjectResult("Not in branch setup mode");
+            Color? color = (OperationManager.Instance.CurrentOperatingMode as ISetupMode).NewBranch();
+            if (color == null)
+                return new BadRequestObjectResult("Reached lightcount");
+            var result = new {
+                color = Util.ColorConverter.ToHex(color.Value)
+            };
+            return new JsonResult(result);
+        }
+        [HttpPost("/setup/branches/branch/remove")]
+        public IActionResult BranchesRemoveBranch() {
+            if (RedirectHandler.ShouldRedirect(this.RouteData))
+                return RedirectHandler.Handle();
+            if (!(OperationManager.Instance.CurrentOperatingMode is ISetupMode))
+                return new BadRequestObjectResult("Not in setup mode");
+            if (!(OperationManager.Instance.CurrentOperatingMode as ISetupMode).IsSettingUpBranches)
+                return new BadRequestObjectResult("Not in branch setup mode");
+            if (!(OperationManager.Instance.CurrentOperatingMode as ISetupMode).RemoveBranch())
+                return new BadRequestObjectResult("Can't remove last branch");
+            else
+                return new OkResult();
+        }
+        [HttpPost("/setup/branches/light/new")]
+        public IActionResult BranchesAddLight() {
+            if (RedirectHandler.ShouldRedirect(this.RouteData))
+                return RedirectHandler.Handle();
+            if (!(OperationManager.Instance.CurrentOperatingMode is ISetupMode))
+                return new BadRequestObjectResult("Not in setup mode");
+            if (!(OperationManager.Instance.CurrentOperatingMode as ISetupMode).IsSettingUpBranches)
+                return new BadRequestObjectResult("Not in branch setup mode");
+            if (!(OperationManager.Instance.CurrentOperatingMode as ISetupMode).NewLight())
+                return new BadRequestObjectResult("Reached lightcount");
+            else
+                return new OkResult();
+        }
+        [HttpPost("/setup/branches/light/remove")]
+        public IActionResult BranchesRemoveLight() {
+            if (RedirectHandler.ShouldRedirect(this.RouteData))
+                return RedirectHandler.Handle();
+            if (!(OperationManager.Instance.CurrentOperatingMode is ISetupMode))
+                return new BadRequestObjectResult("Not in setup mode");
+            if (!(OperationManager.Instance.CurrentOperatingMode as ISetupMode).IsSettingUpBranches)
+                return new BadRequestObjectResult("Not in branch setup mode");
+            if (!(OperationManager.Instance.CurrentOperatingMode as ISetupMode).RemoveLight())
+                return new BadRequestObjectResult("Can't remove last light");
+            else
+                return new OkResult();
+        }
+
+        [HttpPost("/setup/services/install")]
+        public IActionResult ServicesInstallStep(int step) {
+            if (RedirectHandler.ShouldRedirect(this.RouteData))
+                return RedirectHandler.Handle();
+            if (!(OperationManager.Instance.CurrentOperatingMode is ISetupMode))
+                return new BadRequestObjectResult("Not in setup mode");
+            if ((OperationManager.Instance.CurrentOperatingMode as ISetupMode).InstallServiceStep(step))
+                return Ok();
+            else
+                return new StatusCodeResult(500);
+        }
+    }
+    public class BranchesSubmitArgument {
+        public Branch[] branches;
     }
 }

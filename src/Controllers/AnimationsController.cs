@@ -17,6 +17,8 @@ namespace ChristmasPi.Controllers
     {
         [HttpPost("play")]
         public IActionResult PlayAnimation([FromBody]AnimationPlayArgument argument) {
+            if (RedirectHandler.ShouldRedirect(this.RouteData))
+                return RedirectHandler.Handle();
             // /api/animations/play
             if (argument == null) {
                 // allow resume if animation is null
@@ -33,6 +35,8 @@ namespace ChristmasPi.Controllers
         }
         [HttpPost("pause")]
         public IActionResult PauseAnimation() {
+            if (RedirectHandler.ShouldRedirect(this.RouteData))
+                return RedirectHandler.Handle();
             // /api/animations/pause
             if (OperationManager.Instance.CurrentOperatingModeName != "AnimationMode")
                 return new StatusCodeResult(StatusCodes.Status405MethodNotAllowed);
@@ -41,6 +45,8 @@ namespace ChristmasPi.Controllers
         }
         [HttpPost("stop")]
         public IActionResult StopAnimation() {
+            if (RedirectHandler.ShouldRedirect(this.RouteData))
+                return RedirectHandler.Handle();
             // /api/animations/stop
             if (OperationManager.Instance.CurrentOperatingModeName != "AnimationMode")
                 return new StatusCodeResult(StatusCodes.Status405MethodNotAllowed);
@@ -53,6 +59,8 @@ namespace ChristmasPi.Controllers
         }
         [HttpGet()]
         public IActionResult GetAnimations() {
+            if (RedirectHandler.ShouldRedirect(this.RouteData))
+                return RedirectHandler.Handle();
             // /api/animations/
             string[] animations = AnimationManager.Instance.GetAnimations();
             return new JsonResult(animations);

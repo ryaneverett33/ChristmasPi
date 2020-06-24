@@ -7,6 +7,7 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using ChristmasPi.Data;
 
 namespace ChristmasPi
 {
@@ -14,6 +15,10 @@ namespace ChristmasPi
     {
         public static void Main(string[] args)
         {
+            if (!ConfigurationManager.Instance.LoadDebugConfiguration(args)) {
+                Console.WriteLine("Debug Configuration failed to load, exiting");
+                return;
+            }
             CreateWebHostBuilder(args).Build().Run();
         }
 

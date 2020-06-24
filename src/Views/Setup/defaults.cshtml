@@ -1,0 +1,32 @@
+@{
+    ViewData["Title"] = "Setup";
+    ViewData["SetupTitle"] = "Defaults";
+    ViewData["SetupStep"] = 4;
+    ViewBag.BreadCrumbs = new string[] { "Hardware", "Lights", "Branches", "Defaults" };
+    ViewBag.ShowProgress = true;
+    @model ChristmasPi.Models.SetupDefaultsModel;
+}
+@if (Model.HasError) {
+    <div class="alert alert-danger" role="alert">
+        @Model.ErrorMessage
+    </div>
+}
+<form asp-action="SubmitDefaults" asp-controller="Setup">
+    <div class="form-group">
+        <label>Default Mode</label>
+        <select asp-for="mode" id="mode">
+            @foreach (string mode in Model.DefaultModes) {
+                <option>@mode</option>
+            }
+        </select>
+        <br>
+        <label>Default Animation</label>
+        <select asp-for="animation" id="animation">
+            @foreach (string animation in Model.DefaultAnimations) {
+                <option>@animation</option>
+            }
+        </select>
+        <br>
+        <input type="submit" class="btn btn-primary" id="submitbtn" value="Submit"/>
+    </div>
+</form>

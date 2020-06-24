@@ -6,6 +6,11 @@
         string Name { get; }
 
         /// <summary>
+        /// Whether the operation mode can be set as a default
+        /// </summary>
+        bool CanBeDefault { get; }
+
+        /// <summary>
         /// Performs any needed tasks to start the operation
         /// </summary>
         void Activate(bool defaultmode);

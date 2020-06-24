@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using ChristmasPi.Data.Models.Hardware;
 using ChristmasPi.Data.Exceptions;
 using ChristmasPi.Data.Models;
+using ChristmasPi.Data;
 
 namespace ChristmasPi.Hardware {
     public class HardwareManager {
@@ -57,11 +58,12 @@ namespace ChristmasPi.Hardware {
         /// <returns>An array of renderer names</returns>
         public string[] GetRenderers() {
             string[] keys = Enum.GetNames(typeof(RendererType));
-            List<string> renderers = new List<string>(keys.Length - 2);
+            List<string> renderers = new List<string>(keys.Length);
             foreach (string key in keys) {
                 if (key == Enum.GetName(typeof(RendererType), RendererType.UNKNOWN))
                     continue;
-                if (key == Enum.GetName(typeof(RendererType), RendererType.TEST_RENDER))
+                if (key == Enum.GetName(typeof(RendererType), RendererType.TEST_RENDER) &&
+                    !ConfigurationManager.Instance.DebugConfiguration.AllowTestRenderer)
                     continue;
                 renderers.Add(key);
             }

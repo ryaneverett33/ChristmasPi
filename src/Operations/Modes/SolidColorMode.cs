@@ -14,6 +14,7 @@ namespace ChristmasPi.Operations.Modes {
     public class SolidColorMode : IOperationMode, ISolidColorMode {
         #region Properties
         public string Name => "SolidColorMode";
+        public bool CanBeDefault => true;
         public Color CurrentColor => _currentColor;
         #endregion
         #region Fields
@@ -21,11 +22,11 @@ namespace ChristmasPi.Operations.Modes {
         private IRenderer renderer;
         #endregion
         public SolidColorMode() {
-            renderer = RenderFactory.GetRenderer();
             _currentColor = ConfigurationManager.Instance.CurrentTreeConfig.tree.color.DefaultColor;
         }
         #region IOperationMode Methods
         public void Activate(bool defaultmode) {
+            renderer = RenderFactory.GetRenderer();
             renderer.Start();
             SetColor(_currentColor);
             Console.WriteLine("Activated Solid Color Mode");
@@ -33,6 +34,7 @@ namespace ChristmasPi.Operations.Modes {
         public void Deactivate() {
             renderer.Stop();
             Console.WriteLine("Deactivated Solid Color Mode");
+            renderer = null;
         }
         public object Info() {
             return new {

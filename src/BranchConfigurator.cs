@@ -21,7 +21,6 @@ namespace ChristmasPi.BranchConfigurator {
         private IRenderer renderer;
         private List<Color> usedColors;
         private List<ActiveBranchData> data;
-        private Color indicationColor = Color.Lime;
 
         public BranchConfigurator(string[] args) {
             for (int i = 0; i < args.Length; i++) {
@@ -124,7 +123,7 @@ namespace ChristmasPi.BranchConfigurator {
                     else {
                         outOfBranches = true;
                         // indicate the current led
-                        renderer.SetLEDColor(i, indicationColor);
+                        renderer.SetLEDColor(i, Constants.INDICATION_COLOR);
                     }
                 }
             }

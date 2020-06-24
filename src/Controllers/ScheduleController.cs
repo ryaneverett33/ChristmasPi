@@ -18,6 +18,8 @@ namespace ChristmasPi.Controllers
     public class ScheduleController : ControllerBase {
         [HttpGet]
         public IActionResult Get() {
+            if (RedirectHandler.ShouldRedirect(this.RouteData))
+                return RedirectHandler.Handle();
             TimeSlot[][] schedule = ConfigurationManager.Instance.CurrentSchedule.GetSimpleSchedule();
             JArray jarr = new JArray();
             for (int i = 0; i < schedule.Length; i++) {
@@ -34,6 +36,8 @@ namespace ChristmasPi.Controllers
         }
         [HttpPost("add")]
         public IActionResult AddRule([FromBody]ScheduleAddRuleArgument argument) {
+            if (RedirectHandler.ShouldRedirect(this.RouteData))
+                return RedirectHandler.Handle();
             try {
                 if (argument == null)
                     return new BadRequestObjectResult("No arguments supplied");
@@ -56,6 +60,8 @@ namespace ChristmasPi.Controllers
         }
         [HttpPost("remove")]
         public IActionResult RemoveRule([FromBody]ScheduleRemoveRuleArgument argument) {
+            if (RedirectHandler.ShouldRedirect(this.RouteData))
+                return RedirectHandler.Handle();
             try {
                 if (argument == null)
                     return new BadRequestObjectResult("No arguments supplied");

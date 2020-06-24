@@ -4,6 +4,7 @@ using System.IO;
 using Microsoft.Extensions.Configuration;
 using ChristmasPi.Data.Models;
 using ChristmasPi.Data.Models.Scheduler;
+using ChristmasPi.Util.Arguments;
 using Newtonsoft.Json;
 
 namespace ChristmasPi.Data {
@@ -17,6 +18,11 @@ namespace ChristmasPi.Data {
         /// ASP.NET Configuration data
         /// </summary>
         public IConfiguration Configuration;
+
+        /// <summary>
+        /// Debug configuration specified at runtime
+        /// </summary>
+        public DebugConfiguration DebugConfiguration;
 
         /// <summary>
         /// Tree Configuration loaded at startup
@@ -97,6 +103,17 @@ namespace ChristmasPi.Data {
                 Console.WriteLine(e.Message);
                 Console.WriteLine(e.StackTrace);
             }
+        }
+
+        /// <summary>
+        /// Loads the runtime command line arguments
+        /// </summary>
+        /// <param name="args">the Arguments passed to the main entry point</param>
+        /// <returns>Whether or not parsing was successful (and the program should continue)</returns>
+        public bool LoadDebugConfiguration(string[] args) {
+            DebugConfiguration = new DebugConfiguration();
+            ArgumentHelper helper = new ArgumentHelper(DebugConfiguration);
+            return helper.Parse(args);
         }
     }
 }

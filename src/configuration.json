@@ -31,14 +31,14 @@
     ]
   },
   "setup": {
-    "firstrun": false
+    "firstrun": true
   },
   "hardware": {
-    "lightcount": 1,
+    "lightcount": 5,
     "fps": 30,
     "datapin": 18,
-    "brightness" : 100,
-    "invert" : false,
+    "brightness": 100,
+    "invert": false,
     "type": "TEST_RENDER"
   },
   "animations" : [

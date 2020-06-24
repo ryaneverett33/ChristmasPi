@@ -30,17 +30,29 @@ namespace ChristmasPi.Operations {
             }
             // Set Current Operating mode
             try {
-                DefaultOperatingMode = ConfigurationManager.Instance.CurrentTreeConfig.tree.defaultmode;
-                setCurrentMode(ConfigurationManager.Instance.CurrentTreeConfig.tree.defaultmode, true);
+                if (ConfigurationManager.Instance.CurrentTreeConfig.setup.firstrun)
+                    setCurrentMode("NothingMode", true);
+                else {
+                    DefaultOperatingMode = ConfigurationManager.Instance.CurrentTreeConfig.tree.defaultmode;
+                    setCurrentMode(ConfigurationManager.Instance.CurrentTreeConfig.tree.defaultmode, true);
+                }
             }
             catch (Exception) {
                 DefaultOperatingMode = Constants.DEFAULT_OPERATING_MODE;
                 setCurrentMode(Constants.DEFAULT_OPERATING_MODE, true);
             }
         }
-        public string[] GetModes() {
-            ICollection<string> keys = operatingModes.Keys;
-            return keys.ToArray<string>();
+        public string[] GetModes(bool includeNonDefault = true) {
+            List<string> modes = new List<string>();
+            foreach (string key in operatingModes.Keys) {
+                IOperationMode mode = operatingModes[key];
+                if (!mode.CanBeDefault && includeNonDefault)
+                    modes.Add(key);
+                else if (mode.CanBeDefault)
+                    modes.Add(key);
+            }
+
+            return modes.ToArray<string>();
         }
 
         /// <summary>
@@ -53,7 +65,8 @@ namespace ChristmasPi.Operations {
                 typeof(SolidColorMode).FullName,
                 typeof(AnimationMode).FullName,
                 typeof(OffMode).FullName,
-                typeof(SetupMode).FullName
+                typeof(SetupMode).FullName,
+                typeof(NothingMode).FullName
             };
         }
 
@@ -103,6 +116,15 @@ namespace ChristmasPi.Operations {
                 IOperationMode modeObj = operatingModes[mode];
                 return modeObj.GetProperty(property);
             }
+        }
+
+        /// <summary>
+        /// Gets the list of operating modes that can be defaulted to
+        /// </summary>
+        /// <returns>Array of operation mode names</returns>
+        public string[] GetDefaultableModes() {
+            IEnumerable<KeyValuePair<string, IOperationMode>> pairs =  operatingModes.Where(nameModePair => nameModePair.Value.CanBeDefault);
+            return pairs.Select(pair => pair.Key).ToArray();
         }
     }
 }
