@@ -1,4 +1,5 @@
 ﻿using ChristmasPi.Data.Models;
+using ChristmasPi.Util;
 using System.Drawing;
 
 namespace ChristmasPi.Operations.Interfaces {
@@ -6,6 +7,7 @@ namespace ChristmasPi.Operations.Interfaces {
         string CurrentStep { get; }
         TreeConfiguration Configuration { get; }
         bool IsSettingUpBranches { get; }
+        bool IsInstallingAService { get; }
         string GetNext(string current);
         void SetCurrentStep(string currentstep);
         bool SetHardware(RendererType rendererType, int datapin);
@@ -17,6 +19,7 @@ namespace ChristmasPi.Operations.Interfaces {
         bool RemoveBranch();
         bool NewLight();
         bool RemoveLight();
-        bool InstallServiceStep(int step);
+        bool StartServicesInstall();
+        InstallationProgress GetServicesInstallProgress();
     }
 }

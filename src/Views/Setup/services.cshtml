@@ -11,35 +11,52 @@
     <script type="text/javascript">
         $(window).on("load", function () {
             $("#continue-btn").hide();
-            @if (Model.InstallSteps != null) {
-                @foreach (string installStep in Model.InstallSteps) {
-                    @:installSteps.push(new install("@installStep", "step-list"));
-                }
-            }
+            $("#installprogress").hide();
         });
+        var buttonActive = $("#toggle-icon").hasClass("nc-minimal-down");
+        function toggleOutput() {
+            if (buttonActive) {
+                $("#toggle-icon").removeClass("nc-minimal-up");
+                $("#toggle-icon").addClass("nc-minimal-down");
+                $("#console-output").collapse('hide');
+                buttonActive = false;
+            }
+            else {
+                $("#toggle-icon").removeClass("nc-minimal-down");
+                $("#toggle-icon").addClass("nc-minimal-up");
+                $("#console-output").collapse('show');
+                buttonActive = true;
+            }
+        }
+        function continueBtn() {
+            location.href='/setup/next?current=services';
+        }
     </script>
 }
-@if (Model.InitSystemSupported) {
-    <h4>Would you like to enable the Scheduler service?</h4>
-    <button id="install-btn" class="btn btn-primary" onclick="installService()">Enable service</button>
-    <button id="decline-btn" class="btn btn-secondary" onclick="declineInstall()">Not now</button>
-    <div id="install-steps" class="hide">
-        <ul id="step-list" class="list-group">
+<h4>Would you like to enable the Scheduler service?</h4>
+<button id="install-btn" class="btn btn-primary" onclick="installService()">Enable service</button>
+<button id="decline-btn" class="btn btn-secondary" onclick="declineInstall()">Not now</button>
+<div id="installprogress" class="hide">
+    <div class="card card-static" style="width: 95%;">
+        <ul class="list-group list-group-flush">
             <li class="list-group-item">
-                <div class="d-flex w-100 justify-content-between">
-                    <h5 class="mb-1">Do this thing for installing</h5>
-                    <p>Installing</p>
+                <div>
+                    <h4 class="h-no-newline">Installing</h4>
+                    <img class="float-right" src="/img/icons/reindeer.gif" width="57.6" height="41.4" />
+                </div>
+            </li>
+            <li class="list-group-item">
+                <div>
+                    <h5 class="h-no-newline">Console Output</h5>
+                    <button class="float-right btn btn-link" onclick="toggleOutput()">
+                        <h5><i id="toggle-icon" class="nc-icon nc-minimal-down"></i></h5></button>
+                    <div class="collapse" id="console-output">
+                        <pre id="programoutput"></pre>
+                    </div>
                 </div>
             </li>
         </ul>
     </div>
+</div>
 
-    <button id="continue-btn" class="btn btn-info">Continue</button>
-}
-@if (!Model.InitSystemSupported) {
-    <div class="alert alert-danger" role="alert">
-        <p>Your Init System @(Model.InitSystemName) isn't supported yet by the installer.</p>
-        <p>Check the <a href="https://www.github.com/Changer098/ChristmasPi">project page</a> for more information</p>
-    </div>
-    <button class="btn btn-info">Continue</button>
-}
+<button id="continue-btn" class="btn btn-info" onclick="continueBtn()">Continue</button>

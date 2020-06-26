@@ -71,7 +71,7 @@ namespace ChristmasPi.Util.Arguments {
         private List<Section> sortSections(List<Section> sections) {
             List<Section> sorted = new List<Section>(sections.Count);
             Section reservedSection = sections.Where(s => s.Name == "Reserved").SingleOrDefault();
-            Section emptySection = sections.Where(s => s.Name == "").SingleOrDefault();
+            Section emptySection = sections.Where(s => s.Name == "").First();
             List<Section> rest = sections.Where(s => s != reservedSection && s != emptySection).ToList();
             if (rest != null)
                 rest.Sort(delegate(Section a, Section b) {

@@ -180,3 +180,6 @@ body {
     margin-top: 20px;
     margin-bottom: 20px;
 }
+#programoutput {
+    max-height: 50%;
+}

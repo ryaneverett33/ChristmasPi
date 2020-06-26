@@ -1,67 +1,112 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System;
+using System.Diagnostics;
+using System.Threading;
 
 namespace ChristmasPi.Util {
     public class ServiceInstaller {
-        #region Singleton Methods
-        private static readonly ServiceInstaller _instance = new ServiceInstaller();
-        private static ServiceInstaller Instance { get { return _instance; } }
-        #endregion
-        private InitSystem? initSystem;
-        private SystemDInstaller systemDInstaller;
 
-        private ServiceInstaller() {
-            systemDInstaller = new SystemDInstaller();
+        /*
+            Installation Process
+                1. Check if requested service is already installed
+                    Yes: Uninstall service
+                2. Copy service file to systemd directory
+                3. Systemd enable service
+                4. Systemd start service
+        */
+        private InstallationProgress Progress;
+        private object locker;
+        private Thread installerThread;
+        private string serviceName;
+        private string servicePath;
+        public ServiceInstaller(string name, string path) {
+            Progress = new InstallationProgress();
+            locker = new object();
         }
-        
-        public static bool CanInstallService() {
-            if (Instance.initSystem == null)
-                Instance.initSystem = OSUtils.GetInitSystemType();
-            switch (Instance.initSystem) {
-                case InitSystem.systemd:
-                    return true;
-                default:
-                    return false;
+
+        // Starts the installation process with progress reported to Progress
+        public void StartInstall() {
+            installerThread = new Thread(installerMonitor);
+            installerThread.Start();
+        }
+
+        // Safely gets the progress object
+        public InstallationProgress GetProgress() {
+            InstallationProgress progressHolder;
+            lock (locker) {
+                progressHolder = Progress;
+            }
+            return progressHolder;
+        }
+
+        private void writeline(string format, params object[] args) {
+            lock (locker) {
+                Progress.WriteLine(format, args);
+            }
+        }
+        private void writeline(string line) {
+            lock (locker) {
+                Progress.WriteLine(line);
             }
         }
 
-        public static bool Install(int step) {
-            switch (Instance.initSystem) {
-                case InitSystem.systemd:
-                    if (step >= Instance.systemDInstaller.Steps.Length)
-                        return false;
-                    return Instance.systemDInstaller.Steps[step].Item2();
-                default:
-                    return false;
+        private void installerMonitor() {
+            try {
+                lock (locker) {
+                    Progress.StartInstall();
+                }
+                installer();
+                lock (locker) {
+                    Progress.FinishInstall();
+                }
+            }
+            catch (Exception e) {
+                writeline("Installer failed with exception {0}", e.Message);
+                writeline(e.StackTrace);
+                lock (locker) {
+                    Progress.FailedInstall();
+                }
             }
         }
 
-        public static string[] GetSteps() {
-            return Instance.systemDInstaller.Steps.Select(tup => tup.Item1).ToArray();
-            switch (Instance.initSystem) {
-                case InitSystem.systemd:
-                    return Instance.systemDInstaller.Steps.Select(tup => tup.Item1).ToArray();
-                default:
-                    return null;
+        private void installer() {
+            writeline("Starting installation process");
+            writeline("Info\t\tname: {0}, path: {1}", serviceName, servicePath);
+            Thread.Sleep(1500);
+            for (int i = 0; i < 10; i++) {
+                writeline("Step {0}", i);
+                Thread.Sleep(750);
             }
-        }
-    }
-    class SystemDInstaller {
-        public Tuple<string, Func<bool>>[] Steps { get; private set; }
-
-        public SystemDInstaller() {
-            Steps = new Tuple<string, Func<bool>>[] {
-                new Tuple<string, Func<bool>>("Copy Service Files", copyFiles),
-                new Tuple<string, Func<bool>>("Example step 1", () => {return true; }),
-                new Tuple<string, Func<bool>>("Example step 2", () => {return true; }),
-                new Tuple<string, Func<bool>>("Example step 3", () => {return true; }),
-            };
+            writeline("Finised installation process");
         }
 
-        private bool copyFiles() {
-            return true;
+        private bool isServiceInstalled() {
+            // systemctl list-units --full -all | grep "cron.service"
+            return false;
+        }
+        private bool uninstallService() {
+            // systemctl show -p FragmentPath cron.service
+            // FragmentPath=/lib/systemd/system/cron.service
+            // find servicefile
+            // rm servicefile
+            // disable service
+            // daemon reload
+            return false;
+        }
+        private bool copyServiceFile() {
+            // copy service file to /etc/systemd/system/
+            return false;
+        }
+        private bool enableService() {
+            // systemctl enable service.service
+            return false;
+        }
+        private bool startService() {
+            // systemctl start service.service
+            return false;
+        }
+        private bool daemonReload() {
+            // systemctl daemon-reload
+            return false;
         }
     }
 }

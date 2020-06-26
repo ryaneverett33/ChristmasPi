@@ -6,6 +6,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using ChristmasPi.Data;
 using ChristmasPi.Util;
+using ChristmasPi.Operations;
+using ChristmasPi.Operations.Interfaces;
 
 namespace ChristmasPi.Controllers {
     public class RedirectHandler {
@@ -36,13 +38,15 @@ namespace ChristmasPi.Controllers {
         public static bool ShouldRedirect(RouteData routeData) {
             string controller = (string)routeData.Values["controller"];
             string action = (string)routeData.Values["action"];
+            Console.WriteLine("Controller: {0}, Action: {1}, isSetupMode: {2}", controller, action, OperationManager.Instance.CurrentOperatingMode is ISetupMode);
             
             // never redirect on the error controller
             if (controller.Equals("Error"))
                 return false;
+            //if (controller.Equals("Setup") && !action.Equals("Index") && !(OperationManager.Instance.CurrentOperatingMode is ISetupMode))
+            //    return true;
             if (controller.Equals("Setup") && !Instance.hasError)
                 return false;
-
             return Instance.hasError | Instance.hasRedirect;
         }
 
@@ -55,8 +59,12 @@ namespace ChristmasPi.Controllers {
             else {
                 if (Instance.DoSetup)
                     return new RedirectResult("/setup/");
-                return null;
+                return new RedirectResult("/");
             }
+        }
+
+        public static void SetupComplete() {
+            Instance.DoSetup = false;
         }
 
         private static IActionResult handleNoAdmins() {

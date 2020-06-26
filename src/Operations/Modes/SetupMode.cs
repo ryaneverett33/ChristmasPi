@@ -8,6 +8,7 @@ using ChristmasPi.Hardware.Factories;
 using ChristmasPi.Data.Exceptions;
 using ChristmasPi.Data;
 using ChristmasPi.Data.Models;
+using ChristmasPi.Util;
 using System.Drawing;
 
 namespace ChristmasPi.Operations.Modes {
@@ -15,6 +16,7 @@ namespace ChristmasPi.Operations.Modes {
         #region Properties
         public string Name => "SetupMode";
         public bool CanBeDefault => false;
+        public bool IsInstallingAService => currentServiceInstaller != null;
         #endregion
         #region Fields
         private string[] steps;
@@ -25,6 +27,7 @@ namespace ChristmasPi.Operations.Modes {
         private List<Color> usedColors;
         private List<Tuple<Branch, Color>> branches;
         private int lightCount;
+        private ServiceInstaller currentServiceInstaller;
         #endregion
         public SetupMode() {
             steps = new string[] {
@@ -40,10 +43,12 @@ namespace ChristmasPi.Operations.Modes {
         }
         #region IOperationMode Methods
         public void Activate(bool defaultmode) {
+            Console.WriteLine("Activated Setup Mode");
             Configuration = ConfigurationManager.Instance.CurrentTreeConfig;
             SetCurrentStep("start");
         }
         public void Deactivate() {
+            Console.WriteLine("Deactivated Setup Mode");
             SetCurrentStep("null");
         }
         public object Info() {
@@ -232,8 +237,18 @@ namespace ChristmasPi.Operations.Modes {
             return true;
         }
 
-        public bool InstallServiceStep(int step) {
+        public bool StartServicesInstall() {
+            if (currentServiceInstaller != null)
+                return false;
+            currentServiceInstaller = new ServiceInstaller("some name", "some path");
+            currentServiceInstaller.StartInstall();
             return true;
+        }
+
+        public InstallationProgress GetServicesInstallProgress() {
+            if (currentServiceInstaller == null)
+                return null;
+            return currentServiceInstaller.GetProgress();
         }
 
         private void renderLight(Color color, bool increment) {

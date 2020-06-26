@@ -571,4 +571,61 @@ function submitBranches() {
     oReq.send(json);
 }
 
-installSteps = [];
+servicePoller = null;
+
+function installService() {
+    var oReq = new XMLHttpRequest();
+    oReq.addEventListener("load", function () {
+        if (this.status !== 200) {
+            showErrorModal("Failed to start installation process");
+        }
+        else {
+            $("#installprogress").show();
+            servicePoller = setInterval(servicesInstallPoller, 500);
+        }
+    });
+    oReq.open("POST", "/setup/services/install");
+    oReq.setRequestHeader("Content-Type", "application/json");
+    oReq.send();
+}
+
+function servicesInstallPoller() {
+    console.log("polling for data");
+    var oReq = new XMLHttpRequest();
+    oReq.addEventListener("load", function () {
+        if (this.status !== 200) {
+            showErrorModal("Failed to get installation progress");
+            clearInterval(servicePoller);
+        }
+        else {
+            var json = this.responseText;
+            var obj = JSON.parse(json);
+            console.log(obj);
+            if (obj["status"] == "Success") {
+                clearInterval(servicePoller);
+                $("#continue-btn").show();
+            }
+            else {
+                $("#programoutput").text(obj["lines"]);
+            }
+        }
+    });
+    oReq.open("GET", "/setup/services/progress");
+    oReq.send();
+    // clearInterval(servicePoller);
+}
+
+function declineInstall() {
+    var oReq = new XMLHttpRequest();
+    oReq.addEventListener("load", function () {
+        if (this.status !== 200) {
+            showErrorModal("Failed to update services");
+        }
+        else {
+            location.href='/setup/next?current=services';
+        }
+    });
+    oReq.open("POST", "/setup/services/decline");
+    oReq.setRequestHeader("Content-Type", "application/json");
+    oReq.send();
+}
