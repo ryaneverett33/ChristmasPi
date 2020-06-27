@@ -1,10 +1,11 @@
 ﻿using ChristmasPi.Data.Models;
 using ChristmasPi.Util;
+using ChristmasPi.Models;
 using System.Drawing;
 
 namespace ChristmasPi.Operations.Interfaces {
     public interface ISetupMode {
-        string CurrentStep { get; }
+        string CurrentStepName { get; }
         TreeConfiguration Configuration { get; }
         bool IsSettingUpBranches { get; }
         bool IsInstallingAService { get; }
@@ -19,7 +20,7 @@ namespace ChristmasPi.Operations.Interfaces {
         bool RemoveBranch();
         bool NewLight();
         bool RemoveLight();
-        bool StartServicesInstall();
-        InstallationProgress GetServicesInstallProgress();
+        bool StartServicesInstall(bool installSchedulerService);
+        ServiceStatusModel GetServicesInstallProgress();
     }
 }

@@ -8,3 +8,9 @@
 - [FRONTEND] Add animation parameters
 - Allow reconfiguring animations
 - Add support for smart outlets
+- Test if ArrayExtensions.Subset() works
+- SetupController install both ChristmasPi.service and Scheduler.service
+- Implement ServiceInstaller::Dispose()
+- Services start reindeer when installing
+- Services reindeer gif transition to checkmark
+- Redo and reenable redirect handler

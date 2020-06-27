@@ -45,7 +45,9 @@ namespace ChristmasPi
             services.Configure<MvcOptions>(options => {
                 options.EnableEndpointRouting = false;
             });
-            services.AddControllersWithViews();
+            // Use JSON.Net from https://thecodebuzz.com/add-newtonsoft-json-support-net-core/
+            services.AddControllersWithViews().AddNewtonsoftJson(options =>
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
         }

@@ -1,9 +1,10 @@
 using System;
 using System.Diagnostics;
 using System.Threading;
+using System.Collections.Generic;
 
 namespace ChristmasPi.Util {
-    public class ServiceInstaller {
+    public class ServiceInstaller : IDisposable {
 
         /*
             Installation Process
@@ -13,14 +14,33 @@ namespace ChristmasPi.Util {
                 3. Systemd enable service
                 4. Systemd start service
         */
-        private InstallationProgress Progress;
+        
+        public delegate void InstallSuccessHandler(ServiceInstallState state);
+        public delegate void InstallFailureHandler(ServiceInstallState state);
+        public delegate void InstallProgressHandler(ServiceInstallState state);
+
+        // Executed after install succeeded
+        public InstallSuccessHandler OnInstallSuccess;
+        // Executed after install failed
+        public InstallFailureHandler OnInstallFailure;
+        // Executed after installation has made progress
+        public InstallProgressHandler OnInstallProgress;
+
+        private InstallationStatus status;
+        private OutputWriter output;
+        
         private object locker;
         private Thread installerThread;
         private string serviceName;
         private string servicePath;
+        private bool isDisposed;
         public ServiceInstaller(string name, string path) {
-            Progress = new InstallationProgress();
+            status = InstallationStatus.Waiting;
             locker = new object();
+            output = new OutputWriter();
+            serviceName = name;
+            servicePath = path;
+            isDisposed = false;
         }
 
         // Starts the installation process with progress reported to Progress
@@ -30,53 +50,54 @@ namespace ChristmasPi.Util {
         }
 
         // Safely gets the progress object
-        public InstallationProgress GetProgress() {
-            InstallationProgress progressHolder;
+        public InstallationStatus GetStatus() {
             lock (locker) {
-                progressHolder = Progress;
+                return status;
             }
-            return progressHolder;
         }
 
-        private void writeline(string format, params object[] args) {
+        public OutputWriter GetWriter() {
             lock (locker) {
-                Progress.WriteLine(format, args);
+                return output;
             }
         }
-        private void writeline(string line) {
-            lock (locker) {
-                Progress.WriteLine(line);
-            }
-        }
+
+        protected ServiceInstallState getState() => new ServiceInstallState() { ServiceName = serviceName, Status = status };
 
         private void installerMonitor() {
             try {
-                lock (locker) {
-                    Progress.StartInstall();
+                startInstall();
+                if (installer()) {
+                    Console.WriteLine("Success");
+                    finishInstall();
+                    OnInstallSuccess.Invoke(getState());
                 }
-                installer();
-                lock (locker) {
-                    Progress.FinishInstall();
+                else {
+                    failedInstall();
+                    OnInstallFailure.Invoke(getState());
                 }
             }
             catch (Exception e) {
                 writeline("Installer failed with exception {0}", e.Message);
                 writeline(e.StackTrace);
-                lock (locker) {
-                    Progress.FailedInstall();
-                }
+                failedInstall();
+                OnInstallFailure.Invoke(getState());
             }
         }
 
-        private void installer() {
+        private bool installer() {
             writeline("Starting installation process");
-            writeline("Info\t\tname: {0}, path: {1}", serviceName, servicePath);
+            writeline("Info\t\tname: {0}, path: {1}", this.serviceName, this.servicePath);
+            OnInstallProgress.Invoke(getState());
             Thread.Sleep(1500);
             for (int i = 0; i < 10; i++) {
                 writeline("Step {0}", i);
+                OnInstallProgress.Invoke(getState());
                 Thread.Sleep(750);
             }
             writeline("Finised installation process");
+            OnInstallProgress.Invoke(getState());
+            return true;
         }
 
         private bool isServiceInstalled() {
@@ -107,6 +128,49 @@ namespace ChristmasPi.Util {
         private bool daemonReload() {
             // systemctl daemon-reload
             return false;
+        }
+
+        private void startInstall() {
+            lock (locker) {
+                status = InstallationStatus.Installing;
+            }
+        }
+        private void failedInstall() {
+            lock (locker) {
+                status = InstallationStatus.Failed;
+            }
+        }
+        private void finishInstall() {
+            lock(locker) {
+                status = InstallationStatus.Success;
+            }
+        }        
+        private void writeline(string format, params object[] args) {
+            lock (locker) {
+                output.WriteLine(format, args);
+            }
+        }
+        private void writeline(string line) {
+            lock (locker) {
+                output.WriteLine(line);
+            }
+        }
+        private void write(string format, params object[] args) {
+            lock (locker) {
+                output.Write(format, args);
+            }
+        }
+        private void write(string line) {
+            lock (locker) {
+                output.Write(line);
+            }
+        }
+
+        /// TODO
+        public void Dispose() {
+            if (!isDisposed) {
+                isDisposed = true;
+            }
         }
     }
 }

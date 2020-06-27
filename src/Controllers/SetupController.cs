@@ -32,7 +32,7 @@ Defaults
                 return RedirectHandler.Handle();
             // redirect to current page if setup has already started
             if (OperationManager.Instance.CurrentOperatingMode is ISetupMode) {
-                string currentStep = (OperationManager.Instance.CurrentOperatingMode as ISetupMode).CurrentStep;
+                string currentStep = (OperationManager.Instance.CurrentOperatingMode as ISetupMode).CurrentStepName;
                 return new RedirectResult($"/setup/{currentStep}");
             }
             return View();
@@ -219,20 +219,13 @@ Defaults
         }
 
         [HttpPost("/setup/services/install")]
-        public IActionResult ServicesStartInstall() {
+        public IActionResult ServicesStartInstall([FromBody]ServicesInstallArgument installScheduler) {
             if (RedirectHandler.ShouldRedirect(this.RouteData))
                 return RedirectHandler.Handle();
-            if ((OperationManager.Instance.CurrentOperatingMode as ISetupMode).StartServicesInstall())
+            if ((OperationManager.Instance.CurrentOperatingMode as ISetupMode).StartServicesInstall(installScheduler.installScheduler))
                 return Ok();
             else
                 return new StatusCodeResult(500);
-        }
-
-        [HttpPost("/setup/services/decline")]
-        public IActionResult ServicesDeclineInstall() {
-            if (RedirectHandler.ShouldRedirect(this.RouteData))
-                return RedirectHandler.Handle();
-            return Ok();
         }
 
         [HttpGet("/setup/services/progress")]
@@ -241,17 +234,20 @@ Defaults
                 return RedirectHandler.Handle();
             if (!(OperationManager.Instance.CurrentOperatingMode as ISetupMode).IsInstallingAService)
                 return new BadRequestObjectResult("No services are being installed");
-            InstallationProgress progress = (OperationManager.Instance.CurrentOperatingMode as ISetupMode).GetServicesInstallProgress();
-            if (progress == null)
+            ServiceStatusModel status = (OperationManager.Instance.CurrentOperatingMode as ISetupMode).GetServicesInstallProgress();
+            if (status == null)
                 return new BadRequestObjectResult("Unable to get progress");
-            var result = new {
-                status = Enum.GetName(typeof(InstallationStatus), progress.Status),
-                lines = progress.Lines
+            var model = new {
+                Status = status.Status,
+                Output = status.Output
             };
-            return new JsonResult(result);
+            return new JsonResult(model);
         }
     }
     public class BranchesSubmitArgument {
         public Branch[] branches;
+    }
+    public class ServicesInstallArgument {
+        public bool installScheduler;
     }
 }

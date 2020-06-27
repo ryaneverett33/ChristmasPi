@@ -42,5 +42,19 @@ namespace ChristmasPi.Data.Extensions {
             }
             return true;
         }
+        public static IEnumerable<T> Subset<T>(this IEnumerable<T> arr, int start, int end) {
+            if (start == end)
+                return Array.Empty<T>();
+            if (end < start)
+                throw new ArgumentException("The end index cannot be less than the start index");
+            if (end < 0)
+                throw new ArgumentException("The end index must be non-negative");
+            if (start < 0)
+                throw new ArgumentException("The start index must be non-negative");
+            int length = end - start;
+            Array newArr = Array.CreateInstance(typeof(T), length);
+            Array.Copy(arr.ToArray(), start, newArr, end, length);
+            return newArr.Cast<T>();
+        }
     }
 }

@@ -573,24 +573,58 @@ function submitBranches() {
 
 servicePoller = null;
 
-function installService() {
+function setServiceTitle(isMainService, status) {
+    if (isMainService) {
+        var title = `ChristmasPi Service - ${status}`
+        $("#main-service-status").text(title);
+    }
+    else {
+        var title = `Scheduler Service - ${status}`
+        $("#scheduler-service-status").text(title);
+    }
+}
+
+var savedText = null;
+var successInstall = false;
+var doInstallScheduler = false;
+
+// set current text
+function updateText(text) {
+    newText = text;
+    if (savedText != null)
+        newText = savedText + '\n' + text;
+    $("#programoutput").text(newText);
+}
+
+// save text from previous installation
+function saveText(text) {
+    savedText = text;
+}
+
+function installService(installScheduler) {
+    doInstallScheduler = installScheduler;
     var oReq = new XMLHttpRequest();
     oReq.addEventListener("load", function () {
         if (this.status !== 200) {
             showErrorModal("Failed to start installation process");
         }
         else {
+            if (!installScheduler)
+                setServiceTitle(false, "Not Installing");
             $("#installprogress").show();
             servicePoller = setInterval(servicesInstallPoller, 500);
         }
     });
     oReq.open("POST", "/setup/services/install");
     oReq.setRequestHeader("Content-Type", "application/json");
-    oReq.send();
+    var data = {
+        installScheduler : installScheduler
+    };
+    var json = JSON.stringify(data);
+    oReq.send(json);
 }
 
 function servicesInstallPoller() {
-    console.log("polling for data");
     var oReq = new XMLHttpRequest();
     oReq.addEventListener("load", function () {
         if (this.status !== 200) {
@@ -598,34 +632,36 @@ function servicesInstallPoller() {
             clearInterval(servicePoller);
         }
         else {
-            var json = this.responseText;
-            var obj = JSON.parse(json);
-            console.log(obj);
-            if (obj["status"] == "Success") {
-                clearInterval(servicePoller);
-                $("#continue-btn").show();
-            }
-            else {
-                $("#programoutput").text(obj["lines"]);
+            var obj = JSON.parse(this.responseText);
+            switch (obj["status"]) {
+                case "Stale":
+                    break;
+                case "Installing":
+                    updateText(obj["output"]);
+                    break;
+                case "Success":
+                    saveText(obj["output"]);
+                    updateText(obj["output"]);
+                    successInstall = true;
+                    setServiceTitle(true, "Installed");
+                    if (doInstallScheduler)
+                        setServiceTitle(false, "Installing");
+                    break;
+                case "Failure":
+                    clearInterval(servicePoller);
+                    $("#continue-btn").show();
+                    updateText(obj["output"]);
+                    setServiceTitle(!successInstall, "Failed");
+                    break;
+                case "AllDone":
+                    clearInterval(servicePoller);
+                    setServiceTitle(false, "Installed");
+                    $("#continue-btn").show();
+                    break;
             }
         }
     });
     oReq.open("GET", "/setup/services/progress");
     oReq.send();
     // clearInterval(servicePoller);
-}
-
-function declineInstall() {
-    var oReq = new XMLHttpRequest();
-    oReq.addEventListener("load", function () {
-        if (this.status !== 200) {
-            showErrorModal("Failed to update services");
-        }
-        else {
-            location.href='/setup/next?current=services';
-        }
-    });
-    oReq.open("POST", "/setup/services/decline");
-    oReq.setRequestHeader("Content-Type", "application/json");
-    oReq.send();
 }

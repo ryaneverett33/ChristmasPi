@@ -34,15 +34,21 @@
     </script>
 }
 <h4>Would you like to enable the Scheduler service?</h4>
-<button id="install-btn" class="btn btn-primary" onclick="installService()">Enable service</button>
-<button id="decline-btn" class="btn btn-secondary" onclick="declineInstall()">Not now</button>
+<button id="install-btn" class="btn btn-primary" onclick="installService(true)">Enable service</button>
+<button id="decline-btn" class="btn btn-secondary" onclick="installService(false)">Not now</button>
 <div id="installprogress" class="hide">
     <div class="card card-static" style="width: 95%;">
         <ul class="list-group list-group-flush">
-            <li class="list-group-item">
+            <li class="list-group-item" id="main-service-item">
                 <div>
-                    <h4 class="h-no-newline">Installing</h4>
-                    <img class="float-right" src="/img/icons/reindeer.gif" width="57.6" height="41.4" />
+                    <h4 class="h-no-newline" id="main-service-status">ChristmasPi Service - Installing</h4>
+                    <img class="float-right" id="main-service-icon" src="/img/icons/reindeer.gif" width="57.6" height="41.4" />
+                </div>
+            </li>
+            <li class="list-group-item" id="scheduler-service-item">
+                <div>
+                    <h4 class="h-no-newline" id="scheduler-service-status">Scheduler Service - Waiting</h4>
+                    <img class="float-right hidden" id="scheduler-service-icon" src="/img/icons/reindeer.gif" width="57.6" height="41.4" />
                 </div>
             </li>
             <li class="list-group-item">

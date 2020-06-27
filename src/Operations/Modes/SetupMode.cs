@@ -9,6 +9,7 @@ using ChristmasPi.Data.Exceptions;
 using ChristmasPi.Data;
 using ChristmasPi.Data.Models;
 using ChristmasPi.Util;
+using ChristmasPi.Models;
 using System.Drawing;
 
 namespace ChristmasPi.Operations.Modes {
@@ -19,8 +20,8 @@ namespace ChristmasPi.Operations.Modes {
         public bool IsInstallingAService => currentServiceInstaller != null;
         #endregion
         #region Fields
-        private string[] steps;
-        public string CurrentStep { get; private set; }
+        private SetupStep[] steps;
+        public string CurrentStepName { get; private set; }
         public TreeConfiguration Configuration { get; private set; } 
         public bool IsSettingUpBranches { get; private set; }
         private IRenderer renderer;
@@ -28,16 +29,19 @@ namespace ChristmasPi.Operations.Modes {
         private List<Tuple<Branch, Color>> branches;
         private int lightCount;
         private ServiceInstaller currentServiceInstaller;
+        private bool installSchedulerService;
+        private bool serviceHasUpdate;
+        private ServiceStatusModel lastStatusUpdate;
         #endregion
         public SetupMode() {
-            steps = new string[] {
-                "start",
-                "hardware",
-                "lights",
-                "branches",
-                "defaults",
-                "services",
-                "finished"
+            steps = new SetupStep[] {
+                new SetupStep("start"),
+                new SetupStep("hardware"),
+                new SetupStep("lights"),
+                new SetupStep("branches"),
+                new SetupStep("defaults"),
+                new SetupStep("services"),
+                new SetupStep("finished")
             };
             SetCurrentStep(null);
         }
@@ -66,10 +70,10 @@ namespace ChristmasPi.Operations.Modes {
         /// <returns>The name of the next setup step</returns>
         public string GetNext(string currentpage) {
             for (int i = 0; i < steps.Length; i++) {
-                if (steps[i].Equals(currentpage, StringComparison.CurrentCultureIgnoreCase)) {
+                if (steps[i].Name.Equals(currentpage, StringComparison.CurrentCultureIgnoreCase)) {
                     if (i + 1 >= steps.Length)
                         return null;
-                    return steps[i+1];
+                    return steps[i+1].Name;
                 }
             }
             return null;
@@ -81,7 +85,11 @@ namespace ChristmasPi.Operations.Modes {
         /// <param name="newstep">The new setup step</param>
         /// <remarks>This should only be called by the SetupController</remarks>
         public void SetCurrentStep(string newstep) {
-            CurrentStep = newstep;
+            Console.WriteLine("Setting current step: {0}", newstep);
+            if (newstep == null || newstep.Length == 0)
+                return;
+            SetupStep step = steps.Where(step => step.Name.Equals(newstep)).Single();
+            CurrentStepName = step.Name;
         }
 
         /// <summary>
@@ -237,18 +245,73 @@ namespace ChristmasPi.Operations.Modes {
             return true;
         }
 
-        public bool StartServicesInstall() {
+        public bool StartServicesInstall(bool installSchedulerService) {
             if (currentServiceInstaller != null)
                 return false;
-            currentServiceInstaller = new ServiceInstaller("some name", "some path");
+            this.installSchedulerService = installSchedulerService;
+            Console.WriteLine("Install Scheduler Service? {0}", installSchedulerService);
+            currentServiceInstaller = new ServiceInstaller("ChristmasPi.service", "some path");
+            currentServiceInstaller.OnInstallFailure = serviceInstallHandler;
+            currentServiceInstaller.OnInstallProgress = serviceInstallHandler;
+            currentServiceInstaller.OnInstallSuccess = serviceInstallHandler;
             currentServiceInstaller.StartInstall();
             return true;
         }
+        private void serviceInstallHandler(ServiceInstallState state) {
+            switch (state.Status) {
+                case InstallationStatus.Success:
+                    // Wait until serviceHasUpdate has been toggled before installing next service
+                    if (installSchedulerService) {
+                        lastStatusUpdate = new ServiceStatusModel(currentServiceInstaller.GetWriter(), currentServiceInstaller.GetStatus());
+                        serviceHasUpdate = true;
+                        Task t = new Task(() => {
+                            installSchedulerService = false;
+                            while (serviceHasUpdate) {
+                                // Slow Spin Lock
+                                Task.Delay(25);
+                            }
+                            // Start install for Scheduler.service
+                            currentServiceInstaller.Dispose();
+                            currentServiceInstaller = new ServiceInstaller("Scheduler.service", "some path");
+                            currentServiceInstaller.OnInstallFailure = serviceInstallHandler;
+                            currentServiceInstaller.OnInstallProgress = serviceInstallHandler;
+                            currentServiceInstaller.OnInstallSuccess = serviceInstallHandler;
+                            currentServiceInstaller.StartInstall();
+                        });
+                        t.Start();
+                    }
+                    else {
+                        lastStatusUpdate = lastStatusUpdate.AllDone();
+                        serviceHasUpdate = true;
+                    }
+                    break;
+                case InstallationStatus.Failed:
+                    // Clean up installer
+                    lastStatusUpdate = new ServiceStatusModel(currentServiceInstaller.GetWriter(), currentServiceInstaller.GetStatus());
+                    serviceHasUpdate = true;
+                    currentServiceInstaller.Dispose();
+                    currentServiceInstaller = null;
+                    break;
+                case InstallationStatus.Installing:
+                    // Set service update info
+                    lastStatusUpdate = new ServiceStatusModel(currentServiceInstaller.GetWriter(), currentServiceInstaller.GetStatus());
+                    serviceHasUpdate = true;
+                    break;
+                default:
+                    break;
+            }
+        }
 
-        public InstallationProgress GetServicesInstallProgress() {
+        public ServiceStatusModel GetServicesInstallProgress() {
             if (currentServiceInstaller == null)
                 return null;
-            return currentServiceInstaller.GetProgress();
+            if (serviceHasUpdate) {
+                serviceHasUpdate = false;
+                return lastStatusUpdate;
+            }
+            else {
+                return ServiceStatusModel.Stale();
+            }
         }
 
         private void renderLight(Color color, bool increment) {
@@ -279,5 +342,12 @@ namespace ChristmasPi.Operations.Modes {
                 renderer.Render(renderer);
         }
         #endregion
+    }
+    public class SetupStep {
+        public string Name;
+        public bool Completed;
+        public SetupStep(string name) {
+            Name = name;
+        }
     }
 }
