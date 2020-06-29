@@ -15,8 +15,8 @@ namespace ChristmasPi.Controllers
     public class PowerController : ControllerBase {
         [HttpPost("off")]
         public IActionResult Off() {
-            if (RedirectHandler.ShouldRedirect(this.RouteData))
-                return RedirectHandler.Handle();
+            if (RedirectHandler.ShouldRedirect(this.RouteData, "post") is IActionResult redirect)
+                return redirect;
             // /api/power/off
             if (OperationManager.Instance.CurrentOperatingMode is IOffMode) {
                 (OperationManager.Instance.CurrentOperatingMode as IOffMode).TurnOff();
@@ -29,8 +29,8 @@ namespace ChristmasPi.Controllers
         }
         [HttpPost("on")]
         public IActionResult On() {
-            if (RedirectHandler.ShouldRedirect(this.RouteData))
-                return RedirectHandler.Handle();
+            if (RedirectHandler.ShouldRedirect(this.RouteData, "post") is IActionResult redirect)
+                return redirect;
             // /api/power/on
             if (OperationManager.Instance.CurrentOperatingMode is IOffMode) {
                 // Switch to Default Operating Mode
@@ -44,8 +44,8 @@ namespace ChristmasPi.Controllers
         }
         [HttpGet]
         public IActionResult Get() {
-            if (RedirectHandler.ShouldRedirect(this.RouteData))
-                return RedirectHandler.Handle();
+            if (RedirectHandler.ShouldRedirect(this.RouteData, "get") is IActionResult redirect)
+                return redirect;
             // /api/power/
             if (OperationManager.Instance.CurrentOperatingMode is IOffMode)
                 return new JsonResult(new { on = true });

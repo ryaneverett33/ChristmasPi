@@ -19,8 +19,8 @@ namespace ChristmasPi.Controllers
     {
         [HttpPost("update")]
         public IActionResult Update([FromBody]SolidUpdateArgument argument) {
-            if (RedirectHandler.ShouldRedirect(this.RouteData))
-                return RedirectHandler.Handle();
+            if (RedirectHandler.ShouldRedirect(this.RouteData, "post") is IActionResult redirect)
+                return redirect;
             // /api/solid/update
             if (argument == null)
                 return new BadRequestObjectResult("Argument is empty");

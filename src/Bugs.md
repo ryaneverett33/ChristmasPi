@@ -7,3 +7,4 @@
 - [HELPFORMATTER] Argument messages should all be aligned in same column
 	- Should handle overflow
 - [SETUP] firstrun doesn't get set to false after completing setup
+- Redirect on SetupController: action is SetupHardware and not hardware

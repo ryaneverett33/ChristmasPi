@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ using ChristmasPi.Data;
 using ChristmasPi.Util;
 using ChristmasPi.Operations;
 using ChristmasPi.Operations.Interfaces;
+using ChristmasPi.Data.Interfaces;
 
 namespace ChristmasPi.Controllers {
     public class RedirectHandler {
@@ -15,6 +17,8 @@ namespace ChristmasPi.Controllers {
         private static readonly RedirectHandler _instance = new RedirectHandler();
         private static RedirectHandler Instance { get { return _instance; } }
         #endregion
+        public delegate void RegisterLookupHandler();
+        private RegisterLookupHandler onRegisteringLookups;
 
         // Errors
         public bool NotAdminError = false;
@@ -28,47 +32,93 @@ namespace ChristmasPi.Controllers {
         private bool hasRedirect { get {
                 return Instance.DoSetup;
             } }
+        // Map actual action to friendly name
+        // Ex: Actual action "SetupHardware" -> "hardware"
+        private Dictionary<string, Dictionary<string, string>> actionLookupTable;
 
         public static void Init() {
             Instance.DoSetup = ConfigurationManager.Instance.CurrentTreeConfig.setup.firstrun;
             if (!ConfigurationManager.Instance.DebugConfiguration.IgnorePrivileges)
                 Instance.NotAdminError = !OSUtils.IsAdmin();
+            if (Instance.actionLookupTable == null)
+                Instance.actionLookupTable = new Dictionary<string, Dictionary<string, string>>();
+            Instance.onRegisteringLookups.Invoke();
+        }
+        public static bool IsActionLookupRegistered(string controller) {
+            if (controller == null || controller.Length == 0)
+                throw new ArgumentNullException("controller");
+            if (Instance.actionLookupTable != null)
+                return Instance.actionLookupTable.ContainsKey(controller);
+            return false;
         }
 
-        public static bool ShouldRedirect(RouteData routeData) {
+        public static void AddOnRegisteringLookupHandler(RegisterLookupHandler handler) {
+            if (handler == null)
+                throw new ArgumentNullException("handler");
+            Instance.onRegisteringLookups += handler;
+        }
+
+        public static void RegisterActionLookup(string controller, Dictionary<string, string> lookupTable) {
+            Console.WriteLine($"Registering lookup for {controller}");
+            if (controller == null || controller.Length == 0)
+                throw new ArgumentNullException("controller");
+            if (lookupTable == null || lookupTable.Count == 0)
+                throw new ArgumentNullException("Lookup Table");
+            if (Instance.actionLookupTable == null)
+                throw new ApplicationException("RedirectHandler has not been initialized yet");
+            if (Instance.actionLookupTable.ContainsKey(controller))
+                throw new ArgumentException("Controller already registered a lookup table");
+            Instance.actionLookupTable[controller] = lookupTable;
+        }
+
+        public static IActionResult ShouldRedirect(RouteData routeData, string method) {
             string controller = (string)routeData.Values["controller"];
             string action = (string)routeData.Values["action"];
-            Console.WriteLine("Controller: {0}, Action: {1}, isSetupMode: {2}", controller, action, OperationManager.Instance.CurrentOperatingMode is ISetupMode);
-            
-            // never redirect on the error controller
-            if (controller.Equals("Error"))
-                return false;
-            //if (controller.Equals("Setup") && !action.Equals("Index") && !(OperationManager.Instance.CurrentOperatingMode is ISetupMode))
-            //    return true;
-            if (controller.Equals("Setup") && !Instance.hasError)
-                return false;
-            return Instance.hasError | Instance.hasRedirect;
+            if (Instance.shouldRedirectBuiltin(controller, action, method) is string url)
+                return new RedirectResult(url);
+            if (Instance.shouldRedirectControllers(controller, action, method) is string urlControllers)
+                return new RedirectResult(urlControllers);
+            return null;
         }
 
-        public static IActionResult Handle() {
-            if (Instance.hasError) {
-                if (Instance.NotAdminError)
-                    return new RedirectResult("/error/notadmin");
-                return null;
-            }
-            else {
-                if (Instance.DoSetup)
-                    return new RedirectResult("/setup/");
-                return new RedirectResult("/");
+        private string shouldRedirectBuiltin(string controller, string action, string method) {
+            // check if not admin
+            if (controller != "Error" &&  NotAdminError)
+                return "/error/notadmin";
+            if (controller != "Setup" && DoSetup)
+                return "/setup/";
+            // TODO other checks
+            return null;
+        }
+
+        private string shouldRedirectControllers(string controller, string action, string method) {
+            switch (controller) {
+                case "Setup":
+                    if (!(OperationManager.Instance.CurrentOperatingMode is ISetupMode)) {
+                        return null;
+                    }
+                    if (actionLookupTable.ContainsKey(controller)) {
+                        Console.WriteLine($"Looking up action for controller: {controller}, action: {action}");
+                        Dictionary<string, string> lookupTable = actionLookupTable[controller];
+                        if (!lookupTable.ContainsKey(action)) {
+                            Console.WriteLine("LOGTHIS - RedirectHandler::shouldRedirectControllers() Lookup table failed");
+                            Console.WriteLine("\tLookup table for controller {0} does not have a mapping for action {1}", controller, action);
+                            return (OperationManager.Instance.CurrentOperatingMode as IRedirectable).ShouldRedirect(controller, action, method);
+                        }
+                        else
+                            return (OperationManager.Instance.CurrentOperatingMode as IRedirectable).ShouldRedirect(controller, lookupTable[action], method);
+                    }
+                    else {
+                        Console.WriteLine($"Does not have a lookup table for controller: {controller}");
+                        return (OperationManager.Instance.CurrentOperatingMode as IRedirectable).ShouldRedirect(controller, action, method);
+                    }
+                default:
+                    return null;
             }
         }
 
         public static void SetupComplete() {
             Instance.DoSetup = false;
-        }
-
-        private static IActionResult handleNoAdmins() {
-            return new RedirectResult("/error/notadmin");
         }
     }
 }

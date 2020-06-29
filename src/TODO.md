@@ -13,4 +13,4 @@
 - Implement ServiceInstaller::Dispose()
 - Services start reindeer when installing
 - Services reindeer gif transition to checkmark
-- Redo and reenable redirect handler
+- Redo project structure !!!

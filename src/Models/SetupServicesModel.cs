@@ -5,6 +5,7 @@ using ChristmasPi.Util;
 
 namespace ChristmasPi.Models {
     public class SetupServicesModel : SetupBase {
+        public bool alreadyInstalled;
 
         public SetupServicesModel(string ErrorMessage) : this() {
             this.ErrorMessage = ErrorMessage;

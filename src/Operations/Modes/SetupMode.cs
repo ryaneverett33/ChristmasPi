@@ -31,6 +31,7 @@ namespace ChristmasPi.Operations.Modes {
         private ServiceInstaller currentServiceInstaller;
         private bool installSchedulerService;
         private bool serviceHasUpdate;
+        private bool servicesInstalled;
         private ServiceStatusModel lastStatusUpdate;
         #endregion
         public SetupMode() {
@@ -44,6 +45,32 @@ namespace ChristmasPi.Operations.Modes {
                 new SetupStep("finished")
             };
             SetCurrentStep(null);
+            Controllers.RedirectHandler.AddOnRegisteringLookupHandler(() => {
+                if (!Controllers.RedirectHandler.IsActionLookupRegistered("Setup")) {
+                    Controllers.RedirectHandler.RegisterActionLookup("Setup", new Dictionary<string, string>() {
+                        {"Index","index"},
+                        {"Start","start"},
+                        {"Next","next"},
+                        {"SetupHardware","hardware"},
+                        {"SetupLights","lights"},
+                        {"SetupBranches","branches"},
+                        {"SetupDefaults","defaults"},
+                        {"SetupServices","services"},
+                        {"Finished","finished"},
+                        {"SubmitHardware","hardware/submit"},
+                        {"SubmitLights","light/submit"},
+                        {"SubmitBranches","branches/submit"},
+                        {"SubmitDefaults","defaults/submit"},
+                        {"BranchesNewBranch","branch/new"},
+                        {"BranchesRemoveBranch","branch/remove"},
+                        {"BranchesAddLight","light/new"},
+                        {"BranchesRemoveLight","light/remove"},
+                        {"ServicesStartInstall","services/install"},
+                        {"ServicesGetProgress","services/progress"},
+                        {"ServicesFinish","services/finish"}
+                    });
+                }
+            });
         }
         #region IOperationMode Methods
         public void Activate(bool defaultmode) {
@@ -90,6 +117,31 @@ namespace ChristmasPi.Operations.Modes {
                 return;
             SetupStep step = steps.Where(step => step.Name.Equals(newstep)).Single();
             CurrentStepName = step.Name;
+        }
+        public void CompleteStep() {
+            // completes the current step in a linear fashion
+            if (CurrentStepName == null || CurrentStepName.Length == 0) {
+                Console.WriteLine("CompleteStep() CurrentStepName is null");
+                return;
+            }
+            int currentStepIndex = -1;
+            // get index of current step and check if previous steps are completed
+            for (int i = 0; i < steps.Length; i++) {
+                if (steps[i].Name == CurrentStepName) {
+                    currentStepIndex = i;
+                    break;
+                }
+                else {
+                    if (!steps[i].Completed)
+                        throw new ApplicationException("Setup not completed in linear order");
+                }
+            }
+            if (currentStepIndex == -1)
+                throw new ApplicationException("Unable to find index for the current setup step");
+            steps[currentStepIndex].Completed = true;
+        }
+        public bool IsStepFinished(string step) {
+            return steps.Where(s => s.Name == step).Single().Completed;
         }
 
         /// <summary>
@@ -283,6 +335,7 @@ namespace ChristmasPi.Operations.Modes {
                     else {
                         lastStatusUpdate = lastStatusUpdate.AllDone();
                         serviceHasUpdate = true;
+                        servicesInstalled = true;
                     }
                     break;
                 case InstallationStatus.Failed:
@@ -342,6 +395,37 @@ namespace ChristmasPi.Operations.Modes {
                 renderer.Render(renderer);
         }
         #endregion
+        public string ShouldRedirect(string controller, string action, string method) {
+            Console.WriteLine("Called SetupMode ShouldRedirect");
+            // redirect to current page if setup has begun
+            // redirect to setup start if setup hasn't begun
+            bool activated = OperationManager.Instance.CurrentOperatingMode is ISetupMode;
+            Console.WriteLine($"Activated: {activated}, controller: {controller}, action: {action}");
+            if (!activated) {
+                if (action != "Index") // if not actively running setup, only allow the index page to be viewed
+                    return "/setup/";
+                else
+                    return null;
+            }
+            else {
+                // ignore these actions
+                if (action.ToLower() == "start" || action.ToLower() == "next" || action.ToLower() == "finished")
+                    return null;
+                // redirect to current page
+                // NOTE: SetCurrentPage is called after navigating to page, so redirect should account for going to the next page
+                string nextPage = GetNext(CurrentStepName);
+                Console.WriteLine($"nextPage: {nextPage}, currentStepName: {CurrentStepName}");
+                if (method.ToUpper() == "POST") // don't redirect on POST requests
+                    return null;
+                if (action.ToUpper() == CurrentStepName.ToUpper())  // don't redirect on the current step
+                    return null;
+                if (action.ToUpper() == nextPage.ToUpper() && IsStepFinished(CurrentStepName)) // don't redirect when navigating to the next step
+                    return null;
+                if (action.ToLower() == "services/progress" && CurrentStepName.ToLower() == "services") // don't redirect when trying to get service installation progress
+                    return null;
+                return $"/setup/{CurrentStepName}";
+            }
+        }
     }
     public class SetupStep {
         public string Name;
