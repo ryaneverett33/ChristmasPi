@@ -72,7 +72,7 @@ Defaults
                 case "services":
                     return new RedirectResult("/setup/services");
                 case "finished":
-                    return Finished();
+                    return new RedirectResult("/setup/finished");
                 default:
                     return new BadRequestObjectResult($"Unable to find next step for {current}");
             }
@@ -119,20 +119,34 @@ Defaults
             var model = new SetupServicesModel();
             return View("services", model);
         }
+        [HttpGet("/setup/services/progress")]
+        public IActionResult ServicesGetProgress() {
+            if (RedirectHandler.ShouldRedirect(this.RouteData, "get") is IActionResult redirect)
+                return redirect;
+            if (!(OperationManager.Instance.CurrentOperatingMode as ISetupMode).IsInstallingAService)
+                return new BadRequestObjectResult("No services are being installed");
+            ServiceStatusModel status = (OperationManager.Instance.CurrentOperatingMode as ISetupMode).GetServicesInstallProgress();
+            if (status == null)
+                return new BadRequestObjectResult("Unable to get progress");
+            var model = new {
+                Status = status.Status,
+                Output = status.Output
+            };
+            return new JsonResult(model);
+        }
+        [HttpGet("/setup/finished")]
+        public IActionResult Finished() {
+            if (RedirectHandler.ShouldRedirect(this.RouteData, "get") is IActionResult redirect)
+                return redirect;
+            (OperationManager.Instance.CurrentOperatingMode as ISetupMode).SetCurrentStep("finished");
+            return View();
+        }
         [HttpPost("/setup/services/finish")]
         public IActionResult ServicesFinish() {
             if (RedirectHandler.ShouldRedirect(this.RouteData, "post") is IActionResult redirect)
                 return redirect;
             (OperationManager.Instance.CurrentOperatingMode as ISetupMode).CompleteStep();
             return new RedirectResult("/setup/next?current=services");
-        }
-
-        private IActionResult Finished() {
-            if (RedirectHandler.ShouldRedirect(this.RouteData, "get") is IActionResult redirect)
-                return redirect;
-            // leave setupmode, redirect to home page
-            RedirectHandler.SetupComplete();
-            return new RedirectResult("/");
         }
         [HttpPost("/setup/hardware/submit")]
         public IActionResult SubmitHardware([FromForm]int datapin, [FromForm]string renderer) {
@@ -244,21 +258,12 @@ Defaults
             else
                 return new StatusCodeResult(500);
         }
-
-        [HttpGet("/setup/services/progress")]
-        public IActionResult ServicesGetProgress() {
-            if (RedirectHandler.ShouldRedirect(this.RouteData, "get") is IActionResult redirect)
+        [HttpPost("/setup/complete")]
+        public IActionResult SetupComplete() {
+            if (RedirectHandler.ShouldRedirect(this.RouteData, "post") is IActionResult redirect)
                 return redirect;
-            if (!(OperationManager.Instance.CurrentOperatingMode as ISetupMode).IsInstallingAService)
-                return new BadRequestObjectResult("No services are being installed");
-            ServiceStatusModel status = (OperationManager.Instance.CurrentOperatingMode as ISetupMode).GetServicesInstallProgress();
-            if (status == null)
-                return new BadRequestObjectResult("Unable to get progress");
-            var model = new {
-                Status = status.Status,
-                Output = status.Output
-            };
-            return new JsonResult(model);
+            (OperationManager.Instance.CurrentOperatingMode as ISetupMode).Finish();
+            return Ok();
         }
     }
     public class BranchesSubmitArgument {

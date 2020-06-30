@@ -14,6 +14,7 @@ namespace ChristmasPi.Operations.Interfaces {
         void SetCurrentStep(string currentstep);
         void CompleteStep();
         bool IsStepFinished(string step);
+        void Finish();
         bool SetHardware(RendererType rendererType, int datapin);
         bool SetLights(int lightcount, int fps, int brightness);
         bool SetBranches(Branch[] branches);

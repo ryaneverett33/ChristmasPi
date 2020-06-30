@@ -1,0 +1,30 @@
+@{
+    ViewData["Title"] = "Setup";
+    ViewData["SetupTitle"] = "Finished";
+    ViewData["SetupStep"] = 5;
+    ViewBag.BreadCrumbs = new string[] {  };
+    ViewBag.ShowProgress = false;
+}
+@section Scripts {
+    <script src="/js/install.js"></script>
+    <script type="text/javascript">
+        var sentRequest = false;
+        $(window).on("load", function () {
+            if (!sentRequest) {
+                sentRequest = true;
+                var oReq = new XMLHttpRequest();
+                oReq.addEventListener("load", function () {
+                    if (this.status !== 200) {
+                        showErrorModal("Failed to finish install process");
+                    }
+                    else {
+                        window.location.href = "/";
+                    }
+                });
+                oReq.open("POST", "/setup/complete");
+                oReq.send();
+            }
+        });
+    </script>
+}
+<h5>Redirecting</h5>

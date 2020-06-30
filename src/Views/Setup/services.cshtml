@@ -29,7 +29,17 @@
             }
         }
         function continueBtn() {
-            location.href='/setup/next?current=services';
+            var oReq = new XMLHttpRequest();
+            oReq.addEventListener("load", function () {
+                if (this.status !== 200) {
+                    showErrorModal("Failed to finish service install process");
+                }
+                else {
+                    window.location.href = this.responseURL;
+                }
+            });
+            oReq.open("POST", "/setup/services/finish");
+            oReq.send();
         }
     </script>
 }

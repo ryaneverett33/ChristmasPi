@@ -13,4 +13,5 @@
 - Implement ServiceInstaller::Dispose()
 - Services start reindeer when installing
 - Services reindeer gif transition to checkmark
+- defaults choose default color
 - Redo project structure !!!

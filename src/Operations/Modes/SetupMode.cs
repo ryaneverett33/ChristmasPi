@@ -67,7 +67,8 @@ namespace ChristmasPi.Operations.Modes {
                         {"BranchesRemoveLight","light/remove"},
                         {"ServicesStartInstall","services/install"},
                         {"ServicesGetProgress","services/progress"},
-                        {"ServicesFinish","services/finish"}
+                        {"ServicesFinish","services/finish"},
+                        {"SetupComplete","setup/complete"}
                     });
                 }
             });
@@ -151,6 +152,10 @@ namespace ChristmasPi.Operations.Modes {
             // set firstrun to false
             // set current configuration
             // save configuration
+            Controllers.RedirectHandler.SetupComplete();
+            Configuration.setup.firstrun = false;
+            ConfigurationManager.Instance.CurrentTreeConfig = Configuration;
+            ConfigurationManager.Instance.SaveConfiguration();
         }
 
         /// <summary>
@@ -298,6 +303,17 @@ namespace ChristmasPi.Operations.Modes {
         }
 
         public bool StartServicesInstall(bool installSchedulerService) {
+            // If the user hits reload instead of hitting continue
+            if (servicesInstalled) {
+                lastStatusUpdate = new ServiceStatusModel().AllDone();
+                lastStatusUpdate.Output = "ChristmasPi.service already installed";
+                if (installSchedulerService)
+                    lastStatusUpdate.Output += "\nScheduler.service already installed";
+                serviceHasUpdate = true;
+                servicesInstalled = true;
+                return true;
+            }
+            // If two different browsers attempt to install at the same time
             if (currentServiceInstaller != null)
                 return false;
             this.installSchedulerService = installSchedulerService;
