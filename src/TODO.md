@@ -12,8 +12,7 @@
 - [BACKEND] Implement ServiceInstaller::Dispose()
 - [FRONTEND] Services start reindeer when installing
 - [FRONTEND] Services reindeer gif transition to checkmark
-- [FRONTEND] Add choose default color to setup::defaults
 - [FRONTEND] Add Checkmark icon and transition gif
 - [BACKEND] Refactor other controllers to use RedirectHandler
-- [FRONTEND] Make renderer verification string dependenant upon selected renderer
+- [FRONTEND] Make renderer verification string dependant upon selected renderer
 - [BACKEND] Redo project structure !!!

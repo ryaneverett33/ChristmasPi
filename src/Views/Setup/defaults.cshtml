@@ -6,6 +6,34 @@
     ViewBag.ShowProgress = true;
     @model ChristmasPi.Models.SetupDefaultsModel;
 }
+@section Scripts {
+<script>
+    $(function () {
+    $('#setup-colorpicker').colorpicker({
+        inline: true,
+        container: false,
+        format: "rgb",
+        useAlpha: false,
+        customClass: 'colorpicker-2x',
+        sliders: {
+            saturation: {
+                maxLeft: 200,
+                maxTop: 200
+            },
+            hue: {
+                maxTop: 200
+            },
+            alpha: {
+                maxTop: 200
+            }
+        }
+    });
+    $('#setup-colorpicker').on('colorpickerChange colorpickerCreate', function (event) {
+        $("#color").val(event.color.toString());
+    });
+});
+</script>
+}
 @if (Model.HasError) {
     <div class="alert alert-danger" role="alert">
         @Model.ErrorMessage
@@ -27,6 +55,8 @@
             }
         </select>
         <br>
+        <div id="setup-colorpicker" data-color="rgb(@Model.DefaultColor.R, @Model.DefaultColor.G, @Model.DefaultColor.B)"></div>
+        <input asp-for="color" type="hidden" id="color" value="" />
         <input type="submit" class="btn btn-primary" id="submitbtn" value="Submit"/>
     </div>
 </form>

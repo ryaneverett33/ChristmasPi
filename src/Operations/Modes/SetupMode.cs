@@ -214,7 +214,7 @@ namespace ChristmasPi.Operations.Modes {
             return true;
         }
 
-        public bool SetDefaults(string animation, string mode) {
+        public bool SetDefaults(string animation, string mode, string color) {
             if (animation == null || mode == null)
                 return false;
             if (!Animation.AnimationManager.Instance.Animations.ContainsKey(animation))
@@ -222,8 +222,18 @@ namespace ChristmasPi.Operations.Modes {
             string[] modes = OperationManager.Instance.GetDefaultableModes();
             if (!modes.Contains(mode))
                 return false;
+            Color defaultColor;
+            try {
+                defaultColor = Util.ColorConverter.Convert(color);
+            }
+            catch (Exception) {
+                Console.WriteLine("LOGTHIS -- SetupMode::SetDefaults() could not convert color");
+                return false;
+            }
+            Configuration.tree.color.DefaultColor = defaultColor;
             Configuration.tree.defaultanimation = animation;
             Configuration.tree.defaultmode = mode;
+            
             return true;
         }
 

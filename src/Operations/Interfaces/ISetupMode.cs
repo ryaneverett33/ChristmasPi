@@ -18,7 +18,7 @@ namespace ChristmasPi.Operations.Interfaces {
         bool SetHardware(RendererType rendererType, int datapin);
         bool SetLights(int lightcount, int fps, int brightness);
         bool SetBranches(Branch[] branches);
-        bool SetDefaults(string animation, string mode);
+        bool SetDefaults(string animation, string mode, string color);
         void StartSettingUpBranches();
         Color? NewBranch();
         bool RemoveBranch();

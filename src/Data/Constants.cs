@@ -29,6 +29,7 @@ namespace ChristmasPi.Data {
         public static readonly int RANDOM_MAX = 255;                    // exclusive range
         public static readonly int RANDOM_MIN = 0;
         public static readonly Color COLOR_OFF = Color.Black;
+        public static readonly Color DEFAULT_COLOR = Util.ColorConverter.Convert("#db7b26");
 
         // Files
         public static readonly string CONFIGURATION_FILE = "configuration.json";

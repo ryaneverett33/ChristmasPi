@@ -188,10 +188,11 @@ Defaults
                 return new BadRequestObjectResult("Invalid branch setup");
         }
         [HttpPost("/setup/defaults/submit")]
-        public IActionResult SubmitDefaults([FromForm]string mode, [FromForm]string animation) {
+        public IActionResult SubmitDefaults([FromForm]string mode, [FromForm]string animation, [FromForm]string color) {
+            Console.WriteLine($"Submitting new default color: {color}");
             if (RedirectHandler.ShouldRedirect(this.RouteData, "post") is IActionResult redirect)
                 return redirect;
-            if ((OperationManager.Instance.CurrentOperatingMode as ISetupMode).SetDefaults(animation, mode)) {
+            if ((OperationManager.Instance.CurrentOperatingMode as ISetupMode).SetDefaults(animation, mode, color)) {
                 (OperationManager.Instance.CurrentOperatingMode as ISetupMode).CompleteStep();
                 return new RedirectResult("/setup/next?current=defaults");
             }
