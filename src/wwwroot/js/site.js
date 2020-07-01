@@ -655,7 +655,10 @@ function servicesInstallPoller() {
                     break;
                 case "AllDone":
                     clearInterval(servicePoller);
-                    setServiceTitle(false, "Installed");
+                    if (doInstallScheduler)
+                        setServiceTitle(false, "Installed");
+                    else
+                        setServiceTitle(true, "Installed");
                     $("#continue-btn").show();
                     break;
             }
