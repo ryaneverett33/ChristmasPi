@@ -1,11 +1,10 @@
 ﻿using ChristmasPi.Data.Models;
 using ChristmasPi.Util;
 using ChristmasPi.Models;
-using ChristmasPi.Data.Interfaces;
 using System.Drawing;
 
 namespace ChristmasPi.Operations.Interfaces {
-    public interface ISetupMode : IRedirectable {
+    public interface ISetupMode {
         string CurrentStepName { get; }
         TreeConfiguration Configuration { get; }
         bool IsSettingUpBranches { get; }

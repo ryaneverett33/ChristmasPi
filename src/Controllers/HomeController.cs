@@ -15,6 +15,17 @@ using System.Drawing;
 namespace ChristmasPi.Controllers {
     [Route("/")]
     public class HomeController : Controller {
+        public HomeController() {
+            RedirectHandler.AddOnRegisteringLookupHandler(() => {
+                RedirectHandler.RegisterActionLookup("Home", new Dictionary<string, string>() {
+                    {"Index", "index"},
+                    {"Solid", "solid"},
+                    {"Animation", "animation"},
+                    {"Power", "power"},
+                    {"Schedule", "schedule"}
+                });
+            });
+        }
         [HttpGet]
         public IActionResult Index() {
             if (RedirectHandler.ShouldRedirect(this.RouteData, "get") is IActionResult redirect)

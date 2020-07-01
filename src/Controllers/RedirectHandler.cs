@@ -35,6 +35,7 @@ namespace ChristmasPi.Controllers {
         // Map actual action to friendly name
         // Ex: Actual action "SetupHardware" -> "hardware"
         private Dictionary<string, Dictionary<string, string>> actionLookupTable;
+        private Dictionary<string, Func<string, string, string, string>> functionRuleTable;
 
         public static void Init() {
             Instance.DoSetup = ConfigurationManager.Instance.CurrentTreeConfig.setup.firstrun;
@@ -42,6 +43,8 @@ namespace ChristmasPi.Controllers {
                 Instance.NotAdminError = !OSUtils.IsAdmin();
             if (Instance.actionLookupTable == null)
                 Instance.actionLookupTable = new Dictionary<string, Dictionary<string, string>>();
+            if (Instance.functionRuleTable == null)
+                Instance.functionRuleTable = new Dictionary<string, Func<string, string, string, string>>();
             Instance.onRegisteringLookups.Invoke();
         }
         public static bool IsActionLookupRegistered(string controller) {
@@ -49,6 +52,13 @@ namespace ChristmasPi.Controllers {
                 throw new ArgumentNullException("controller");
             if (Instance.actionLookupTable != null)
                 return Instance.actionLookupTable.ContainsKey(controller);
+            return false;
+        }
+        public static bool IsRuleFunctionRegistered(string controller) {
+            if (controller == null || controller.Length == 0)
+                throw new ArgumentNullException("controller");
+            if (Instance.functionRuleTable != null)
+                return Instance.functionRuleTable.ContainsKey(controller);
             return false;
         }
 
@@ -64,11 +74,24 @@ namespace ChristmasPi.Controllers {
                 throw new ArgumentNullException("controller");
             if (lookupTable == null || lookupTable.Count == 0)
                 throw new ArgumentNullException("Lookup Table");
-            if (Instance.actionLookupTable == null)
+            if (Instance.functionRuleTable == null)
                 throw new ApplicationException("RedirectHandler has not been initialized yet");
             if (Instance.actionLookupTable.ContainsKey(controller))
                 throw new ArgumentException("Controller already registered a lookup table");
             Instance.actionLookupTable[controller] = lookupTable;
+        }
+        
+        public static void RegisterLookupRules(string controller, Func<string, string, string, string> ruleFunc) {
+            Console.WriteLine($"Registering rules for {controller}");
+            if (controller == null || controller.Length == 0)
+                throw new ArgumentNullException("controller");
+            if (ruleFunc == null)
+                throw new ArgumentNullException("Lookup Function");
+            if (Instance.functionRuleTable == null)
+                throw new ApplicationException("RedirectHandler has not been initialized yet");
+            if (Instance.functionRuleTable.ContainsKey(controller))
+                throw new ArgumentException("Controller already registered a rule function");
+            Instance.functionRuleTable[controller] = ruleFunc;
         }
 
         public static IActionResult ShouldRedirect(RouteData routeData, string method) {
@@ -92,28 +115,28 @@ namespace ChristmasPi.Controllers {
         }
 
         private string shouldRedirectControllers(string controller, string action, string method) {
-            switch (controller) {
-                case "Setup":
-                    if (!(OperationManager.Instance.CurrentOperatingMode is ISetupMode)) {
-                        return null;
-                    }
-                    if (actionLookupTable.ContainsKey(controller)) {
-                        Console.WriteLine($"Looking up action for controller: {controller}, action: {action}");
-                        Dictionary<string, string> lookupTable = actionLookupTable[controller];
-                        if (!lookupTable.ContainsKey(action)) {
-                            Console.WriteLine("LOGTHIS - RedirectHandler::shouldRedirectControllers() Lookup table failed");
-                            Console.WriteLine("\tLookup table for controller {0} does not have a mapping for action {1}", controller, action);
-                            return (OperationManager.Instance.CurrentOperatingMode as IRedirectable).ShouldRedirect(controller, action, method);
-                        }
-                        else
-                            return (OperationManager.Instance.CurrentOperatingMode as IRedirectable).ShouldRedirect(controller, lookupTable[action], method);
-                    }
-                    else {
-                        Console.WriteLine($"Does not have a lookup table for controller: {controller}");
-                        return (OperationManager.Instance.CurrentOperatingMode as IRedirectable).ShouldRedirect(controller, action, method);
-                    }
-                default:
-                    return null;
+            if (!functionRuleTable.ContainsKey(controller)) {
+                Console.WriteLine($"Function rule doesn't contain a function for {controller}");
+                return null;
+            }
+            if (actionLookupTable.ContainsKey(controller)) {
+                Console.WriteLine($"Looking up action for controller: {controller}, action: {action}, method: {method}");
+                Dictionary<string, string> lookupTable = actionLookupTable[controller];
+                string useAction;
+                if (!lookupTable.ContainsKey(action)) {
+                    Console.WriteLine("LOGTHIS - RedirectHandler::shouldRedirectControllers() Lookup table failed");
+                    Console.WriteLine("\tLookup table for controller {0} does not have a mapping for action {1}", controller, action);
+                    useAction = action;
+                }
+                else
+                    useAction = lookupTable[action];
+                Func<string, string, string, string> ruleFunc = functionRuleTable[controller];
+                return ruleFunc(controller, useAction, method);
+            }
+            else {
+                Console.WriteLine($"Does not have a lookup table for controller: {controller}");
+                Func<string, string, string, string> ruleFunc = functionRuleTable[controller];
+                return ruleFunc(controller, action, method);
             }
         }
 

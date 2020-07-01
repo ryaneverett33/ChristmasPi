@@ -21,6 +21,7 @@ namespace ChristmasPi.Operations.Modes {
         #endregion
         #region Fields
         private SetupStep[] steps;
+        private Dictionary<string, string> validActions;
         public string CurrentStepName { get; private set; }
         public TreeConfiguration Configuration { get; private set; } 
         public bool IsSettingUpBranches { get; private set; }
@@ -44,32 +45,36 @@ namespace ChristmasPi.Operations.Modes {
                 new SetupStep("services"),
                 new SetupStep("finished")
             };
+            validActions = new Dictionary<string, string>() {
+                {"Index","index"},
+                {"Start","start"},
+                {"Next","next"},
+                {"SetupHardware","hardware"},
+                {"SetupLights","lights"},
+                {"SetupBranches","branches"},
+                {"SetupDefaults","defaults"},
+                {"SetupServices","services"},
+                {"Finished","finished"},
+                {"SubmitHardware","hardware/submit"},
+                {"SubmitLights","light/submit"},
+                {"SubmitBranches","branches/submit"},
+                {"SubmitDefaults","defaults/submit"},
+                {"BranchesNewBranch","branch/new"},
+                {"BranchesRemoveBranch","branch/remove"},
+                {"BranchesAddLight","light/new"},
+                {"BranchesRemoveLight","light/remove"},
+                {"ServicesStartInstall","services/install"},
+                {"ServicesGetProgress","services/progress"},
+                {"ServicesFinish","services/finish"},
+                {"SetupComplete","setup/complete"}
+            };
             SetCurrentStep(null);
             Controllers.RedirectHandler.AddOnRegisteringLookupHandler(() => {
                 if (!Controllers.RedirectHandler.IsActionLookupRegistered("Setup")) {
-                    Controllers.RedirectHandler.RegisterActionLookup("Setup", new Dictionary<string, string>() {
-                        {"Index","index"},
-                        {"Start","start"},
-                        {"Next","next"},
-                        {"SetupHardware","hardware"},
-                        {"SetupLights","lights"},
-                        {"SetupBranches","branches"},
-                        {"SetupDefaults","defaults"},
-                        {"SetupServices","services"},
-                        {"Finished","finished"},
-                        {"SubmitHardware","hardware/submit"},
-                        {"SubmitLights","light/submit"},
-                        {"SubmitBranches","branches/submit"},
-                        {"SubmitDefaults","defaults/submit"},
-                        {"BranchesNewBranch","branch/new"},
-                        {"BranchesRemoveBranch","branch/remove"},
-                        {"BranchesAddLight","light/new"},
-                        {"BranchesRemoveLight","light/remove"},
-                        {"ServicesStartInstall","services/install"},
-                        {"ServicesGetProgress","services/progress"},
-                        {"ServicesFinish","services/finish"},
-                        {"SetupComplete","setup/complete"}
-                    });
+                    Controllers.RedirectHandler.RegisterActionLookup("Setup", validActions);
+                }
+                if (!Controllers.RedirectHandler.IsRuleFunctionRegistered("Setup")) {
+                    Controllers.RedirectHandler.RegisterLookupRules("Setup", ShouldRedirect);
                 }
             });
         }
@@ -423,10 +428,18 @@ namespace ChristmasPi.Operations.Modes {
         #endregion
         public string ShouldRedirect(string controller, string action, string method) {
             Console.WriteLine("Called SetupMode ShouldRedirect");
+            if (!(OperationManager.Instance.CurrentOperatingMode is ISetupMode)) {
+                // If on the index page, don't redirect
+                // ignore these actions to allow the ability to start setupmode
+                if (action.ToLower() == "index" || action.ToLower() == "start" || action.ToLower() == "next")
+                    return null;
+                // Disallow access else
+                return "/setup/";
+            }
+                
             // redirect to current page if setup has begun
             // redirect to setup start if setup hasn't begun
             bool activated = OperationManager.Instance.CurrentOperatingMode is ISetupMode;
-            Console.WriteLine($"Activated: {activated}, controller: {controller}, action: {action}");
             if (!activated) {
                 if (action != "Index") // if not actively running setup, only allow the index page to be viewed
                     return "/setup/";
