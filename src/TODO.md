@@ -14,5 +14,6 @@
 - [FRONTEND] Services reindeer gif transition to checkmark
 - [FRONTEND] Add Checkmark icon and transition gif
 - [BACKEND] Refactor other controllers to use RedirectHandler
+- [BACKEND] RedirectHandler should try and catch 404 errors
 - [FRONTEND] Make renderer verification string dependant upon selected renderer
 - [BACKEND] Redo project structure !!!
