@@ -8,7 +8,6 @@
 - [FRONTEND] Add animation parameters
 - [BOTH] Allow reconfiguring animations
 - [BACKEND] Add support for smart outlets
-- [TEST] Test if ArrayExtensions.Subset() works
 - [BACKEND] Implement ServiceInstaller::Dispose()
 - [FRONTEND] Services start reindeer when installing
 - [FRONTEND] Services reindeer gif transition to checkmark

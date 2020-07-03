@@ -42,7 +42,7 @@ namespace ChristmasPi.Data.Extensions {
             }
             return true;
         }
-        public static IEnumerable<T> Subset<T>(this IEnumerable<T> arr, int start, int end) {
+        public static T[] Subset<T>(this T[] array, int start, int end) {
             if (start == end)
                 return Array.Empty<T>();
             if (end < start)
@@ -52,9 +52,14 @@ namespace ChristmasPi.Data.Extensions {
             if (start < 0)
                 throw new ArgumentException("The start index must be non-negative");
             int length = end - start;
-            Array newArr = Array.CreateInstance(typeof(T), length);
-            Array.Copy(arr.ToArray(), start, newArr, end, length);
-            return newArr.Cast<T>();
+            T[] newArray = (T[])Array.CreateInstance(typeof(T), length);
+            Array.Copy(array.ToArray(), start, newArray, 0, length);
+            return newArray;
+        }
+        public static void Print<T>(this T[] array) {
+            for (int i = 0; i < array.Length; i++) {
+                Console.WriteLine("{0}: {1}", i, array[i].ToString());
+            }
         }
     }
 }
