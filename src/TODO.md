@@ -12,6 +12,7 @@
 - [FRONTEND] Services start reindeer when installing
 - [FRONTEND] Services reindeer gif transition to checkmark
 - [FRONTEND] Add Checkmark icon and transition gif
+- [BACKEND] Implement services installation
 - [BACKEND] Refactor other controllers to use RedirectHandler
 - [BACKEND] RedirectHandler should try and catch 404 errors
 - [BACKEND] Refactor Hardware_Type to use RPI_Type::GetHardwareType instead of isRpi
@@ -19,3 +20,10 @@
 - [FRONTEND] Replace hardware/unknown.png or give proper credit
 - [BACKEND] Redo project structure !!!
 - [BACKEND] Implement logging
+- [FRONTEND] Add Settings tab
+- [FRONTEND] Implement main settings page
+- [BACKEND] Create a settings controller
+- [BACKEND] Allow updating various settings of the tree
+- [BACKEND] Allow monitoring of services
+	- Check if they're alive
+	- Maybe start them if they're not alive?
