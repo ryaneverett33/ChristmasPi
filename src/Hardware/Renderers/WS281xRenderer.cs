@@ -7,6 +7,7 @@ using System.Drawing;
 using ChristmasPi.Hardware.Interfaces;
 using ChristmasPi.Data;
 using ChristmasPi.Data.Models;
+using ChristmasPi.Data.Models.Hardware;
 using ChristmasPi.Data.Extensions;
 using rpi_ws281x;
 
@@ -15,7 +16,7 @@ namespace ChristmasPi.Hardware.Renderers {
     /// A WS281x renderer based on the raspberry pi
     /// </summary>
     public class WS281xRenderer : BaseRenderer, IRenderer {
-        public new bool AutoRender => true;
+        public override bool AutoRender => true;
         private WS281x rpi;                             // WS281x object used for hardware access
         private RenderThread renderThread;              // thread used for rendering
         private object locker;
@@ -111,5 +112,9 @@ namespace ChristmasPi.Hardware.Renderers {
                     return StripType.WS2811_STRIP_RGB;
             }
         }
+
+        private static RendererHardwareInfo _hardwareInfo = new RendererHardwareInfo(RPIType.PWMImageUrl, RPIType.PWMValidationString, RPIType.PWMPlaceholder);
+        public static new RendererHardwareInfo GetHardwareInfo() => _hardwareInfo;
+        public static new Hardware_Type GetSupportedHardware() => Hardware_Type.RPI;
     }
 }

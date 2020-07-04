@@ -247,7 +247,7 @@ namespace ChristmasPi.Operations.Modes {
                 if (renderer != null)
                     renderer.Stop();
             }
-            renderer = RenderFactory.GetRenderer(Configuration);
+            renderer = RenderFactory.GetRenderer(Configuration.hardware.type, Configuration);
             usedColors = new List<Color>();
             branches = new List<Tuple<Branch, Color>>();
             lightCount = 0;

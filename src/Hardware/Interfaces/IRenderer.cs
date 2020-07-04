@@ -1,5 +1,6 @@
 ﻿using System;
 using ChristmasPi.Data.Models;
+using ChristmasPi.Data.Models.Hardware;
 
 namespace ChristmasPi.Hardware.Interfaces {
     public interface IRenderer : IDisposable {

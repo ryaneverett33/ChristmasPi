@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using ChristmasPi.Data.Models.Hardware;
 using ChristmasPi.Data.Exceptions;
 using ChristmasPi.Data.Models;
 using ChristmasPi.Data;
+using ChristmasPi.Hardware.Factories;
 
 namespace ChristmasPi.Hardware {
     public class HardwareManager {
@@ -23,51 +25,49 @@ namespace ChristmasPi.Hardware {
         }
 
         /// <summary>
-        /// Gets the default data pin to act as a placeholder for the Hardware Setup View
+        /// Gets list of renderers and necessary info about the renderer for setup
         /// </summary>
-        /// <returns>the default data pin for the current hardware</returns>
-        public int GetPlaceHolderPin() {
-            if (hardwareType == Hardware_Type.RPI)
-                return RPIType.PlaceHolderPin;
-            throw new UnsupportedHardwareException();
-        }
-
-        /// <summary>
-        /// Gets the acceptable values for data pin entry
-        /// </summary>
-        /// <returns>A comma seperated string containing acceptable values for the data pin</returns>
-        public string GetValidationOptions() {
-            if (hardwareType == Hardware_Type.RPI)
-                return RPIType.GetValidationString();
-            throw new UnsupportedHardwareException();
-        }
-
-        /// <summary>
-        /// Gets the hardware diagram for specifying the hardware pin
-        /// </summary>
-        /// <returns>The image url for the given diagram</returns>
-        public string GetPinImageUrl() {
-            if (hardwareType == Hardware_Type.RPI)
-                return RPIType.GetImageUrl();
-            throw new UnsupportedHardwareException();
-        }
-
-        /// <summary>
-        /// Gets the list of supported renderers
-        /// </summary>
-        /// <returns>An array of renderer names</returns>
-        public string[] GetRenderers() {
-            string[] keys = Enum.GetNames(typeof(RendererType));
-            List<string> renderers = new List<string>(keys.Length);
-            foreach (string key in keys) {
-                if (key == Enum.GetName(typeof(RendererType), RendererType.UNKNOWN))
-                    continue;
-                if (key == Enum.GetName(typeof(RendererType), RendererType.TEST_RENDER) &&
-                    !ConfigurationManager.Instance.DebugConfiguration.AllowTestRenderer)
-                    continue;
-                renderers.Add(key);
+        /// <returns>An array of HardwareInfoResult's</returns>
+        public HardwareInfoResult[] GetRendererInfo() {
+            RendererType[] rendererTypes = (RendererType[])Enum.GetValues(typeof(RendererType));
+            // filter out unknown
+            rendererTypes = rendererTypes.Where(rt => rt != RendererType.UNKNOWN).ToArray();
+            List<RendererType> supportedRendererTypes = new List<RendererType>();
+            foreach (RendererType type in rendererTypes) {
+                if (RenderFactory.GetSupportedHardwareForRenderer(type).HasFlag(hardwareType))
+                    supportedRendererTypes.Add(type);
             }
-            return renderers.ToArray();
+            List<HardwareInfoResult> results = new List<HardwareInfoResult>();
+            foreach (RendererType type in supportedRendererTypes) {
+                RendererHardwareInfo info = RenderFactory.GetRendererHardwareInfoForRenderer(type);
+                results.Add(new HardwareInfoResult() {
+                    Name = Enum.GetName(typeof(RendererType), type),
+                    Placeholder = info.GetPlaceholderValue(),
+                    Image = info.GetImageUrl(),
+                    ValidationString = info.GetValidationString()
+                });
+            }
+            return results.ToArray();
         }
+    }
+    public class HardwareInfoResult {
+        /// <summary>
+        /// The name of the renderer
+        /// </summary>
+        public string Name;
+        /// <summary>
+        /// The default pin or port needed to setup the renderer
+        /// </summary>
+        public string Placeholder;
+        /// <summary>
+        /// Image URL for any hardware diagrams
+        /// </summary>
+        public string Image;
+        /// <summary>
+        /// The validation string
+        /// </summary>
+        /// <notes>This is either a csv or an empty string. 
+        /// The csv denotes acceptable values while an empty string allows all values</notes>
+        public string ValidationString;
     }
 }

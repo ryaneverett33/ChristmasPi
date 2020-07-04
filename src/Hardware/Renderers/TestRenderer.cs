@@ -2,11 +2,12 @@
 using System.Drawing;
 using System.IO;
 using ChristmasPi.Data.Models;
+using ChristmasPi.Data.Models.Hardware;
 using ChristmasPi.Hardware.Interfaces;
 
 namespace ChristmasPi.Hardware.Renderers {
     public class TestRenderer : BaseRenderer, IRenderer {
-        public new bool AutoRender => false;
+        public override bool AutoRender => false;
         public override event BeforeRenderHandler BeforeRenderEvent;
         public override event AfterRenderHandler AfterRenderEvent;
         private TextWriter writer;

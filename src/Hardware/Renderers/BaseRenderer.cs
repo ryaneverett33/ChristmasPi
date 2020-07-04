@@ -6,6 +6,7 @@ using ChristmasPi.Hardware.Interfaces;
 using ChristmasPi.Data;
 using ChristmasPi.Data.Models;
 using ChristmasPi.Data.Extensions;
+using ChristmasPi.Data.Models.Hardware;
 
 namespace ChristmasPi.Hardware.Renderers {
     public abstract class BaseRenderer : IRenderer {
@@ -13,8 +14,8 @@ namespace ChristmasPi.Hardware.Renderers {
         protected bool colorsChanged = false;
 
         public int LightCount { get; protected set; }
-        public bool AutoRender => false;
-        public bool is2D => false;
+        public virtual bool AutoRender => false;
+        public virtual bool is2D => false;
         protected bool stopped = true;
         public abstract event BeforeRenderHandler BeforeRenderEvent;
         public abstract event AfterRenderHandler AfterRenderEvent;
@@ -51,7 +52,20 @@ namespace ChristmasPi.Hardware.Renderers {
         public abstract void Stop();
 
         public virtual void Dispose() {
-            
+            // nothing to do
         }
+
+        private static RendererHardwareInfo _hardwareInfo = new RendererHardwareInfo();
+
+        /// <summary>
+        /// Which hardware this renderer can be executed on
+        /// </summary>
+        public static RendererHardwareInfo GetHardwareInfo() => _hardwareInfo;
+
+        /// <summary>
+        /// Necessary hardware information
+        /// <notes>Used by the setup process for helping the user setup the renderer</notes>
+        /// </summary>
+        public static Hardware_Type GetSupportedHardware() => Hardware_Type.All;
     }
 }

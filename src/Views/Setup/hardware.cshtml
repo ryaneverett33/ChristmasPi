@@ -4,7 +4,57 @@
     ViewData["SetupStep"] = 1;
     ViewBag.BreadCrumbs = new string[] { "Hardware" };
     ViewBag.ShowProgress = true;
+    int counter = 0;
     @model ChristmasPi.Models.SetupHardwareModel;
+}
+@section Scripts {
+    <script type="text/javascript">
+        $(window).on("load", function () {
+            // set validation string, placeholder, and image
+            var placeholder = $("#placeholder-0").val();
+            var image = $("#image-0").val();
+            $("#datapininput").attr("placeholder", placeholder);
+            $("#hardware-img").attr("src", image);
+        });
+        $("#renderer").on("change", function() {
+            var index = $("#renderer").prop("selectedIndex");
+            var placeholder = $(`#placeholder-${index}`).val();
+            var image = $(`#image-${index}`).val();
+            $(`#datapininput`).attr("placeholder", placeholder);
+            $(`#hardware-img`).attr("src", image);
+            ValidateHardware()
+        });
+        function ValidateHardware() {
+            var index = $("#renderer").prop("selectedIndex");
+            var validationRaw = $(`#validationstring-${index}`).val();
+            var currentData = $("#datapininput").val();
+            var validationItems = [];
+            if (validationRaw !== "")
+                validationRaw.split(",").forEach(x => validationItems.push(parseInt(x)));
+            try {
+                var pin = parseInt(currentData);
+                var enabled = false;
+                if (validationItems.length == 0) {
+                    if (currentData.length > 0)
+                        enabled = true;
+                    else
+                        enabled = false;
+                }
+                else {
+                    validationItems.some(x => {
+                        if (x === pin) {
+                            enabled = true;
+                            return true;
+                        }
+                    });
+                }
+                $("#submitbtn").prop("disabled", !enabled);
+            }
+            catch {
+                $("#submitbtn").prop("disabled", true);
+            }
+        }
+    </script>
 }
 @if (Model.HasError) {
     <div class="alert alert-danger" role="alert">
@@ -14,7 +64,7 @@
 <form asp-action="SubmitHardware" asp-controller="Setup">
     <div class="form-group">
         <label>Data Pin</label>
-        <input asp-for="datapin"class="form-control" id="datapininput" placeholder="@Model.Placeholder" oninput="ValidateHardware()"/>
+        <input asp-for="datapin" class="form-control" id="datapininput" placeholder="" oninput="ValidateHardware()"/>
         <label>Renderer</label>
         <select asp-for="renderer" id="renderer">
             @foreach (string renderer in Model.Renderers) {
@@ -25,11 +75,25 @@
         <input type="submit" class="btn btn-primary" id="submitbtn" value="Submit" disabled="false" />
     </div>
 </form>
-<input type="hidden" id="validationstring" value="@Model.ValidationString" />
+@{counter = 0;}
+@foreach (string validationstring in Model.ValidationStrings) {
+    <input type="hidden" id="@String.Format("validationstring-{0}", counter)" value="@validationstring" />
+    {counter++;}
+}
+@{counter = 0;}
+@foreach (string placeholder in Model.Placeholders) {
+    <input type="hidden" id="@String.Format("placeholder-{0}", counter)" value="@placeholder" />
+    {counter++;}
+}
+@{counter = 0;}
+@foreach (string image in Model.Images) {
+    <input type="hidden" id="@String.Format("image-{0}", counter)" value="@image" />
+    {counter++;}
+}
 <div style="height: 25px">
     <p>&nbsp;</p>
 </div>
-<img src="@Model.Image" alt="Hardware Pin Diagram" />
+<img id="hardware-img" src="" alt="Hardware Pin Diagram" />
 <div style="height: 25px">
     <p>&nbsp;</p>
 </div>

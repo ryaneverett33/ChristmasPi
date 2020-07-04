@@ -120,18 +120,22 @@ namespace ChristmasPi.Data.Models.Hardware {
             return typeDict;
         }
 
-        public static string GetValidationString() {
+        public static string PWMValidationString() {
             if (IsExpandedHeader(type))
                 return "18,21,24";
             else
                 return "18,24";
         }
-        
-        public static string GetImageUrl() {
+
+        public static string PWMImageUrl() {
             if (IsExpandedHeader(type))
-                return "/img/RPI_ExpandedHeader.png";
+                return "/img/hardware/RPI_ExpandedHeader.png";
             else
-                return "/img/RPI_ShortHeader.png";
+                return "/img/hardware/RPI_ShortHeader.png";
+        }
+
+        public static string PWMPlaceholder() {
+            return "18";
         }
     }
 }

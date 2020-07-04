@@ -4,11 +4,13 @@ using ChristmasPi.Data.Exceptions;
 
 namespace ChristmasPi.Data.Models.Hardware {
     /// <summary>
-    /// Which hardware the software is currently running on
+    /// The types of hardware/systems recognized by ChristmasPi
     /// </summary>
+    [Flags]
     public enum Hardware_Type {
-        RPI,
-        UNKNOWN
+        All = 0 | 1 | 2,        // Referring to all hardware (even unkown) in this enumeration
+        RPI = 1,                // A Raspberry Pi
+        UNKNOWN = 2             // Unknown hardware, could be a PC or a new board
     }
     public class HardwareType {
         /// <summary>

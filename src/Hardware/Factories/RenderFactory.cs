@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ChristmasPi.Data;
 using ChristmasPi.Data.Models;
+using ChristmasPi.Data.Models.Hardware;
 using ChristmasPi.Data.Exceptions;
 using ChristmasPi.Hardware.Interfaces;
 using ChristmasPi.Hardware.Renderers;
@@ -21,10 +22,13 @@ namespace ChristmasPi.Hardware.Factories {
         /// <summary>
         /// Gets and configures the hardware renderer
         /// </summary>
-        public static IRenderer GetRenderer(TreeConfiguration tmpConfiguration = null) {
+        public static IRenderer GetRenderer(RendererType? rendererType = null, TreeConfiguration configuration = null) {
+            if (rendererType.HasValue && configuration == null || configuration == null && !rendererType.HasValue)
+                throw new InvalidOperationException("Either both params are null or filled, null arguments can not be mismatched");
             lock (locker) {
-                var hardware = tmpConfiguration == null ? ConfigurationManager.Instance.CurrentTreeConfig.hardware : tmpConfiguration.hardware;
-                switch (hardware.type) {
+                RendererType type = rendererType.HasValue ? rendererType.Value : ConfigurationManager.Instance.CurrentTreeConfig.hardware.type;
+                var hardware = configuration == null ? ConfigurationManager.Instance.CurrentTreeConfig.hardware : configuration.hardware;
+                switch (type) {
                     case RendererType.RPI_WS281x: {
                             if (WS281xRenderer == null)
                                 WS281xRenderer = new WS281xRenderer(hardware.lightcount, hardware.datapin, ConfigurationManager.Instance.CurrentTreeConfig.hardware.fps);
@@ -97,6 +101,38 @@ namespace ChristmasPi.Hardware.Factories {
                 }
             } 
         }
+        /// <summary>
+        /// Gets the hardware supported for a given renderer
+        /// </summary>
+        /// <param name="type">The renderer to look up info for</param>
+        /// <returns>The hardware type supported</returns>
+        /// <notes>Hardware_Type is a Flags enumeration and can represent multiple hardware types</notes>
+        public static Hardware_Type GetSupportedHardwareForRenderer(RendererType type) {
+            switch (type) {
+                case RendererType.RPI_WS281x:
+                    return WS281xRenderer.GetSupportedHardware();
+                case RendererType.TEST_RENDER:
+                    return TestRenderer.GetSupportedHardware();
+                default:
+                    throw new InvalidRendererException();
+            }
+        }
+        /// <summary>
+        /// Gets necessary setup information for a given renderer
+        /// </summary>
+        /// <param name="type">The renderer to look up info for</param>
+        /// <returns>A RendererHardwareInfo object containing the placeholder, validation, and image strings</returns>
+        public static RendererHardwareInfo GetRendererHardwareInfoForRenderer(RendererType type) {
+            switch (type) {
+                case RendererType.RPI_WS281x:
+                    return WS281xRenderer.GetHardwareInfo();
+                case RendererType.TEST_RENDER:
+                    return TestRenderer.GetHardwareInfo();
+                default:
+                    throw new InvalidRendererException();
+            }
+        }
+
         public void Dispose() {
             if (!disposed) {
                 if (WS281xRenderer != null)
@@ -105,5 +141,6 @@ namespace ChristmasPi.Hardware.Factories {
                     testRenderer.Dispose();
             }
         }
+
     }
 }

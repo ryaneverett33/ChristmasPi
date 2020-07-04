@@ -14,5 +14,8 @@
 - [FRONTEND] Add Checkmark icon and transition gif
 - [BACKEND] Refactor other controllers to use RedirectHandler
 - [BACKEND] RedirectHandler should try and catch 404 errors
-- [FRONTEND] Make renderer verification string dependant upon selected renderer
+- [BACKEND] Refactor Hardware_Type to use RPI_Type::GetHardwareType instead of isRpi
+- [BACKEND] Refactor Hardware_Type::GetHardwareType()
+- [FRONTEND] Replace hardware/unknown.png or give proper credit
 - [BACKEND] Redo project structure !!!
+- [BACKEND] Implement logging
