@@ -23,14 +23,17 @@ namespace ChristmasPi.Data.Models.Hardware {
     public class RPIType {
         private static Dictionary<int, RPI_Type> typeDict;
         public static int PlaceHolderPin = 18;
-        private static RPI_Type type;
-        public static bool fallback = false;
+        private static RPI_Type? type;
+        public static readonly RPI_Type FALLBACK_TYPE = RPI_Type.RPI3BPLUS;
 
-        public static RPI_Type GetHardwareType() {
-            if (fallback)
-                return RPI_Type.RPI3BPLUS;
-            if (!File.Exists("/proc/cpuinfo"))
+        public static RPI_Type GetHardwareType(bool defaultToRpi = false) {
+            if (type != null)
+                return type.Value;
+            if (!File.Exists("/proc/cpuinfo")) {
+                if (defaultToRpi)
+                    return RPIType.FALLBACK_TYPE;
                 throw new NonLinuxOSException();
+            }    
             // check /proc/cpuinfo first then /proc/device-tree/system/linux,revision
             using (StreamReader reader = new StreamReader(File.OpenRead("/proc/cpuinfo"))) {
                 string[] lines = reader.ReadToEnd().Split('\n');
@@ -43,14 +46,21 @@ namespace ChristmasPi.Data.Models.Hardware {
                             revision = Convert.ToUInt32(revisionRaw, 16);
                         }
                         catch (FormatException) {
+                            if (defaultToRpi)
+                                return RPIType.FALLBACK_TYPE;
                             throw new Exception("Unable to parse revision number");
                         }
-                        if (!typeDict.ContainsKey((int)revision))
+                        if (!typeDict.ContainsKey((int)revision)) {
+                            if (defaultToRpi)
+                                return RPIType.FALLBACK_TYPE;
                             throw new Exception("Invalid model revision");
+                        }
                         type = typeDict[(int)revision];
-                        return type;
+                        return type.Value;
                     }
                 }
+                if (defaultToRpi)
+                    return RPIType.FALLBACK_TYPE;
                 throw new Exception("AARCH64 not supported yet");
             }
         }
@@ -121,14 +131,14 @@ namespace ChristmasPi.Data.Models.Hardware {
         }
 
         public static string PWMValidationString() {
-            if (IsExpandedHeader(type))
+            if (IsExpandedHeader(type.Value))
                 return "18,21,24";
             else
                 return "18,24";
         }
 
         public static string PWMImageUrl() {
-            if (IsExpandedHeader(type))
+            if (IsExpandedHeader(type.Value))
                 return "/img/hardware/RPI_ExpandedHeader.png";
             else
                 return "/img/hardware/RPI_ShortHeader.png";

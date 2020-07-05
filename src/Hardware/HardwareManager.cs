@@ -20,8 +20,6 @@ namespace ChristmasPi.Hardware {
         public void Init(bool defaultToRpi = false) {
             RPITypeDict = RPIType.GetTypeDictionary();
             hardwareType = HardwareType.GetHardwareType(defaultToRpi);
-            if (defaultToRpi)
-                RPIType.fallback = true;
         }
 
         /// <summary>

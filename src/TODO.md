@@ -15,8 +15,6 @@
 - [BACKEND] Implement services installation
 - [BACKEND] Refactor other controllers to use RedirectHandler
 - [BACKEND] RedirectHandler should try and catch 404 errors
-- [BACKEND] Refactor Hardware_Type to use RPI_Type::GetHardwareType instead of isRpi
-- [BACKEND] Refactor Hardware_Type::GetHardwareType()
 - [FRONTEND] Replace hardware/unknown.png or give proper credit
 - [BACKEND] Redo project structure !!!
 - [BACKEND] Implement logging
