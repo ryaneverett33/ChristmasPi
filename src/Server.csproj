@@ -5,19 +5,13 @@
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
     <AssemblyName>ChristmasPi</AssemblyName>
     <RootNamespace>ChristmasPi</RootNamespace>
-    <OutputType>Library</OutputType>
+    <StartupObject>ChristmasPi.Server</StartupObject>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="lib\**" />
-    <Content Remove="lib\**" />
-    <EmbeddedResource Remove="lib\**" />
-    <None Remove="lib\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="Server.cs" />
-    <Compile Remove="Startup.cs" />
+    <Compile Include="Server.cs" />
+    <Compile Include="Startup.cs" />
   </ItemGroup>
 
 
@@ -39,6 +33,11 @@
     <Reference Include="rpi-ws281x">
       <HintPath>lib\netcoreapp3.0\rpi-ws281x.dll</HintPath>
     </Reference>
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <ProjectReference Include="ChristmasPi.csproj" />
   </ItemGroup>
 
 </Project>
