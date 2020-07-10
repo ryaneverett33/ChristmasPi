@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+<!--Properties: https://docs.microsoft.com/en-us/visualstudio/msbuild/common-msbuild-project-properties?view=vs-2019-->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <StartupObject>ChristmasPi.Scheduler.Program</StartupObject>
+    <RootNamespace>ChristmasPi.Scheduler</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <BaseOutputPath>src/bin/$(Configuration)/$(TargetFrameworkVersion)/</BaseOutputPath>
+    <BaseIntermediateOutputPath>src/obj-Scheduler/$(Configuration)/$(TargetFrameworkVersion)/</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>src/obj-Scheduler/$(Configuration)/$(TargetFrameworkVersion)/</IntermediateOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="src/Scheduler.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="src/src.csproj" />
+  </ItemGroup>
+
+</Project>

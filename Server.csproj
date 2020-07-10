@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+<!--Properties: https://docs.microsoft.com/en-us/visualstudio/msbuild/common-msbuild-project-properties?view=vs-2019-->
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
+    <AssemblyName>ChristmasPi.Server</AssemblyName>
+    <RootNamespace>ChristmasPi</RootNamespace>
+    <StartupObject>ChristmasPi.Server</StartupObject>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <RazorCompileOnBuild>false</RazorCompileOnBuild>
+    <RazorCompileOnPublish>false</RazorCompileOnPublish>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="src/Startup.cs" />
+    <Compile Include="src/Server.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="src/src.csproj" />
+  </ItemGroup>
+
+</Project>
