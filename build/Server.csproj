@@ -12,12 +12,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="src/Startup.cs" />
-    <Compile Include="src/Server.cs" />
+    <Compile Include="../src/Startup.cs" />
+    <Compile Include="../src/Server.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="src/src.csproj" />
+    <ProjectReference Include="../src/src.csproj" />
   </ItemGroup>
 
 </Project>

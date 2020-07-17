@@ -1,4 +1,5 @@
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.11.1
+#load build/tools.cake
 
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS
@@ -18,45 +19,52 @@ Task("Clean")
     CleanDirectory(buildDir);
 });
 
-Task("Restore-Packages-src")
-    .IsDependentOn("Clean")
+Task("BuildSrc")
     .Does(() =>
 {
-    NuGetRestore("src/src.csproj");
+    Information("Building source");
+    DotNetCoreBuild("src/src.csproj");
+    if (DirectoryExists("build/bin/Debug/netcoreapp3.0/wwwroot")) {
+        DeleteDirectory("build/bin/Debug/netcoreapp3.0/wwwroot", new DeleteDirectorySettings {
+            Recursive = true
+        });
+    }
+    CopyDirectory("src/wwwroot/", "build/bin/Debug/netcoreapp3.0/wwwroot/");
 });
-
-Task("Restore-Packages-Scheduler")
-    .IsDependentOn("Clean")
+Task("BuildServer")
+    .IsDependentOn("BuildSrc")
     .Does(() =>
 {
-    NuGetRestore("Scheduler.csproj");
+    Information("Building Server");
+    DotNetCoreBuild("build/Server.csproj");
 });
-
-Task("Restore-Packages-BranchConfigurator")
-    .IsDependentOn("Clean")
+Task("BuildScheduler")
+    .IsDependentOn("BuildSrc")
     .Does(() =>
 {
-    NuGetRestore("BranchConfigurator.csproj");
+    Information("Building Scheduler");
+    DotNetCoreBuild("build/Scheduler.csproj");
 });
-
-Task("RestoreAll")
-    .IsDependentOn("Clean")
-    .IsDependentOn("Restore-Packages-src")
-    .IsDependentOn("Restore-Packages-Scheduler")
-    .IsDependentOn("Restore-Packages-BranchConfigurator");
+Task("BuildBranchConfigurator")
+    .IsDependentOn("BuildSrc")
+    .Does(() =>
+{
+    Information("Building Branch Configurator");
+    DotNetCoreBuild("build/BranchConfigurator.csproj");
+});
 
 Task("BuildAll")
-    .IsDependentOn("RestoreAll")
+    .IsDependentOn("BuildSrc")
     .Does(() =>
 {
-    DotNetCoreBuild("src/src.csproj");
-    DotNetCoreBuild("Server.csproj");
-    DotNetCoreBuild("Scheduler.csproj");
-    DotNetCoreBuild("BranchConfigurator.csproj")
+    Information("Building all targets");
+    RunTarget("BuildServer");
+    RunTarget("BuildScheduler");
+    RunTarget("BuildBranchConfigurator");
 });
 
-Task("Run-UnitTests")
-    .IsDependentOn("Build")
+Task("TestSrc")
+    .IsDependentOn("BuildSrc")
     .Does(() =>
 {
     NUnit3(
@@ -72,10 +80,11 @@ Task("Run-UnitTests")
 //////////////////////////////////////////////////////////////////////
 
 Task("Default")
-    .IsDependentOn("Run-UnitTests");
+    .IsDependentOn("BuildAll");
 
 //////////////////////////////////////////////////////////////////////
 // EXECUTION
 //////////////////////////////////////////////////////////////////////
-
+Information("Running target");
+init();
 RunTarget(target);

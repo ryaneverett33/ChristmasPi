@@ -17,6 +17,7 @@
 - [BACKEND] RedirectHandler should try and catch 404 errors
 - [FRONTEND] Replace hardware/unknown.png or give proper credit
 - [BACKEND] Redo project structure !!!
+- [BACKEND] Refactor AnimationParameters to use Attributes
 - [BACKEND] Implement logging
 - [FRONTEND] Add Settings tab
 - [FRONTEND] Implement main settings page

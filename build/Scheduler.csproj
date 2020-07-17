@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="src/Scheduler.cs" />
+    <Compile Include="../src/Scheduler.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="src/src.csproj" />
+    <ProjectReference Include="../src/src.csproj" />
   </ItemGroup>
 
 </Project>

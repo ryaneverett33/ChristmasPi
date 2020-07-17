@@ -13,15 +13,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="src/BranchConfigurator.cs" />
+    <Compile Include="../src/BranchConfigurator.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="src/src.csproj" />
+    <ProjectReference Include="../src/src.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="src/src.csproj" />
+    <ProjectReference Include="../src/src.csproj" />
   </ItemGroup>
 
 </Project>
