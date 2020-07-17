@@ -353,3 +353,6 @@ MigrationBackup/
 
 # macOS
 .DS_Store
+
+# Dotnet tools
+tools/

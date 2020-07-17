@@ -38,6 +38,8 @@ namespace ChristmasPi.Data.Models {
         /// </summary>
         /// <returns>An AnimationInfo object if the animation exists, else null</returns>
         public AnimationInfo GetAnimation(string name) {
+            if (animations == null)
+                return null;
             foreach (AnimationInfo info in animations) {
                 if (info.Name == name)
                     return info;
