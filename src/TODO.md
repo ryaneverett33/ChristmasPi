@@ -16,7 +16,6 @@
 - [BACKEND] Refactor other controllers to use RedirectHandler
 - [BACKEND] RedirectHandler should try and catch 404 errors
 - [FRONTEND] Replace hardware/unknown.png or give proper credit
-- [BACKEND] Redo project structure !!!
 - [BACKEND] Refactor AnimationParameters to use Attributes
 - [BACKEND] Implement logging
 - [FRONTEND] Add Settings tab
