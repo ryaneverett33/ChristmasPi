@@ -8,6 +8,7 @@ namespace ChristmasPi.Util.Arguments {
     public class HelpFormatter {
         private ArgParser parser;
         private string dashstring;
+        private readonly int argumentColumnWidth = 30;
 
         public HelpFormatter() {
             this.dashstring = new string('-', 15);
@@ -34,12 +35,7 @@ namespace ChristmasPi.Util.Arguments {
                 if (section.Name != "Reserved" && section.Name != "")
                     lines.Add($" {section.Name}");
                 lines.Add(dashstring);
-                lines.Add("");
-                foreach (RuntimeArgument arg in section.args) {
-                    string message = arg.HasMessage ? arg.Message : "";
-                    lines.Add($"-{arg.ArgKey}/--{arg.ArgKey} \t\t\t {message}");
-                }
-                lines.Add("");
+                lines.AddRange(formatSection(section));
             }
 
             return lines.ToArray();
@@ -85,6 +81,51 @@ namespace ChristmasPi.Util.Arguments {
             if (rest != null)
                 sorted.AddRange(rest);
             return sorted;
+        }
+        private string[] formatSection(Section section) {
+            List<string> lines = new List<string>();
+            foreach (RuntimeArgument arg in section.args) {
+                string message = arg.HasMessage ? arg.Message : "";
+                // Format argument column first
+                string argument = $"-{arg.ArgKey}/--{arg.ArgKey}";
+                int argColumnPaddingCount = argumentColumnWidth - argument.Length;
+                if (argColumnPaddingCount > 0)
+                    argument += new string(' ', argColumnPaddingCount);
+                // Format Message column
+                // " | " between columns
+                string[] messageLines = fitMessageToLines(message);
+                lines.Add($"{argument} | {messageLines[0]}");
+                if (messageLines.Length > 1) {
+                    for (int i = 1; i < messageLines.Length; i++) {
+                        string line = messageLines[i];
+                        lines.Add(String.Format("{0}| {1}", 
+                                                new string(' ', argumentColumnWidth + 1), 
+                                                line));
+                    }
+                }
+            }
+            return lines.ToArray();
+        }
+        private string[] fitMessageToLines(string message) {
+            List<string> lines = new List<string>(10);      // Max lines is 10
+            int maxWidth = (argumentColumnWidth + 3) - Console.WindowWidth;
+            string[] wordStack = message.Split(' ');
+            int stackPosition = 0;
+            for (int i = 0; i < 10; i++) {
+                string line = "";
+                // go through wordStack until more words can't be fit into maxWidth
+                for (; stackPosition < wordStack.Length; stackPosition++) {
+                    string nextWord = wordStack[stackPosition];
+                    if ((line + nextWord + 1).Length > maxWidth)
+                        break;
+                    line += nextWord + ' ';
+                }
+                if (line.Length != 0)
+                    lines.Add(line);
+                if (stackPosition == wordStack.Length - 1)
+                    break;
+            }
+            return lines.ToArray();
         }
     }
     class Section {
