@@ -11,7 +11,7 @@ using ChristmasPi.Data;
 
 namespace ChristmasPi
 {
-    public class Program
+    public class Server
     {
         public static void Main(string[] args)
         {

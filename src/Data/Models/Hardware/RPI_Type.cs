@@ -30,8 +30,10 @@ namespace ChristmasPi.Data.Models.Hardware {
             if (type != null)
                 return type.Value;
             if (!File.Exists("/proc/cpuinfo")) {
-                if (defaultToRpi)
-                    return RPIType.FALLBACK_TYPE;
+                if (defaultToRpi) {
+                    type = RPIType.FALLBACK_TYPE;
+                    return type.Value;
+                }
                 throw new NonLinuxOSException();
             }    
             // check /proc/cpuinfo first then /proc/device-tree/system/linux,revision
@@ -46,26 +48,32 @@ namespace ChristmasPi.Data.Models.Hardware {
                             revision = Convert.ToUInt32(revisionRaw, 16);
                         }
                         catch (FormatException) {
-                            if (defaultToRpi)
-                                return RPIType.FALLBACK_TYPE;
+                            if (defaultToRpi) {
+                                type = RPIType.FALLBACK_TYPE;
+                                return type.Value;
+                            }
                             throw new Exception("Unable to parse revision number");
                         }
                         if (!typeDict.ContainsKey((int)revision)) {
-                            if (defaultToRpi)
-                                return RPIType.FALLBACK_TYPE;
+                            if (defaultToRpi) {
+                                type = RPIType.FALLBACK_TYPE;
+                                return type.Value;
+                            }
                             throw new Exception("Invalid model revision");
                         }
                         type = typeDict[(int)revision];
                         return type.Value;
                     }
                 }
-                if (defaultToRpi)
-                    return RPIType.FALLBACK_TYPE;
+                if (defaultToRpi) {
+                    type = RPIType.FALLBACK_TYPE;
+                    return type.Value;
+                }
                 throw new Exception("AARCH64 not supported yet");
             }
         }
-        public static bool IsExpandedHeader(RPI_Type type) {
-            switch (type) {
+        public static bool IsExpandedHeader(RPI_Type rpiType) {
+            switch (rpiType) {
                 case RPI_Type.RPI2B:
                     return false;
                 case RPI_Type.RPI3B:
