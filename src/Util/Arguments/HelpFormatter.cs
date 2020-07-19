@@ -31,11 +31,14 @@ namespace ChristmasPi.Util.Arguments {
             }
             sections = sortSections(sections);
             lines.Add(Constants.USAGE_STRING);
-            foreach (Section section in sections) {
+            for (int i = 0; i < sections.Count; i++) {
+                Section section = sections[i];
                 if (section.Name != "Reserved" && section.Name != "")
                     lines.Add($" {section.Name}");
                 lines.Add(dashstring);
                 lines.AddRange(formatSection(section));
+                if (i != sections.Count - 1)
+                    lines.Add(String.Empty);     // Add new line at the end of the section
             }
 
             return lines.ToArray();
@@ -58,16 +61,17 @@ namespace ChristmasPi.Util.Arguments {
                 section = sections.Where(s => s.Name == "").SingleOrDefault();
             else
                 section = sections.Where(s => s.Name == argument.Section).SingleOrDefault();
-            if (section == null)
+            if (section == null) {
                 section = new Section(argument.Section == null ? "" : argument.Section);
-            sections.Add(section);
+                sections.Add(section);
+            }          
             return section;
         }
 
         private List<Section> sortSections(List<Section> sections) {
             List<Section> sorted = new List<Section>(sections.Count);
             Section reservedSection = sections.Where(s => s.Name == "Reserved").SingleOrDefault();
-            Section emptySection = sections.Where(s => s.Name == "").First();
+            Section emptySection = sections.Where(s => s.Name == "").FirstOrDefault();
             List<Section> rest = sections.Where(s => s != reservedSection && s != emptySection).ToList();
             if (rest != null)
                 rest.Sort(delegate(Section a, Section b) {
@@ -107,6 +111,8 @@ namespace ChristmasPi.Util.Arguments {
             return lines.ToArray();
         }
         private string[] fitMessageToLines(string message) {
+            if (Console.WindowWidth < argumentColumnWidth + 10)
+                return new string[] { message };
             List<string> lines = new List<string>(10);      // Max lines is 10
             int maxWidth = (argumentColumnWidth + 3) - Console.WindowWidth;
             string[] wordStack = message.Split(' ');
