@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using ChristmasPi.Data;
+using Serilog;
 
 namespace ChristmasPi
 {
@@ -25,6 +26,7 @@ namespace ChristmasPi
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
+                .UseSerilog()
                 .ConfigureKestrel(options => {
                     options.ListenAnyIP(50808);
                 })

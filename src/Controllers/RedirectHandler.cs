@@ -10,6 +10,7 @@ using ChristmasPi.Util;
 using ChristmasPi.Operations;
 using ChristmasPi.Operations.Interfaces;
 using ChristmasPi.Data.Interfaces;
+using Serilog;
 
 namespace ChristmasPi.Controllers {
     public class RedirectHandler {
@@ -124,8 +125,9 @@ namespace ChristmasPi.Controllers {
                 Dictionary<string, string> lookupTable = actionLookupTable[controller];
                 string useAction;
                 if (!lookupTable.ContainsKey(action)) {
-                    Console.WriteLine("LOGTHIS - RedirectHandler::shouldRedirectControllers() Lookup table failed");
-                    Console.WriteLine("\tLookup table for controller {0} does not have a mapping for action {1}", controller, action);
+                    Log.ForContext("ClassName", "RedirectHandler").Debug("Lookup table failed");
+                    Log.ForContext("ClassName", "RedirectHandler").Debug("Lookup table for controller {controller} does not have a mapping for action {action}",
+                                                                        controller, action);
                     useAction = action;
                 }
                 else

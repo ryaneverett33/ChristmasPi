@@ -19,6 +19,7 @@ using ChristmasPi.Data.Models.Scheduler;
 using ChristmasPi.Util;
 using System.IO;
 using Microsoft.Extensions.Hosting;
+using Serilog;
 
 namespace ChristmasPi
 {
@@ -28,6 +29,8 @@ namespace ChristmasPi
         {
             Configuration = configuration;
             ConfigureTree();
+            ConfigurationManager.Instance.InitializeShutdown();
+            ConfigurationManager.Instance.InitializeLogger();
             StartTree();
         }
 
@@ -71,6 +74,8 @@ namespace ChristmasPi
 
             app.UseAuthorization();
 
+            app.UseSerilogRequestLogging();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
@@ -101,6 +106,7 @@ namespace ChristmasPi
             OperationManager.Instance.Init();
             HardwareManager.Instance.Init(true);
             Controllers.RedirectHandler.Init();
+            Log.Debug("Starting tree");
         }
     }
 }

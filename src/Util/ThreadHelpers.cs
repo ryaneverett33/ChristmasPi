@@ -2,6 +2,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace ChristmasPi.Util {
     public class ThreadHelpers {
@@ -80,7 +81,7 @@ namespace ChristmasPi.Util {
         public static int CalculateWaitTime(int fps) {
             if (fps <= 0 || fps > Constants.FPS_MAX) {
                 fps = Constants.FPS_DEFAULT;
-                Console.WriteLine("LOGTHIS Invalid fps value. Using default fps");
+                Log.ForContext("ClassName", "ThreadHelpers").Information("Invalid fps value: {fps}. Using default fps: {default}", fps, Constants.FPS_MAX);
             }
             float value = (1f / (float)fps) * 1000f;
             return (int)Math.Floor(value);

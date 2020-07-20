@@ -12,9 +12,14 @@ namespace ChristmasPi.Data.Models {
         [Argument("ignorepriv", "Ignore admin privilege requirement", true)]
         public bool IgnorePrivileges;
 
+        [HelpSection("Debug")]
+        [Argument("debug", "Sets the logging level to debug", true)]
+        public bool DebugLogging;
+
         public DebugConfiguration() {
             AllowTestRenderer = false;
             IgnorePrivileges = false;
+            DebugLogging = false;
         }
     }
 }

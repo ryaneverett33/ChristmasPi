@@ -6,6 +6,8 @@ using ChristmasPi.Data.Models;
 using ChristmasPi.Data.Models.Scheduler;
 using ChristmasPi.Util.Arguments;
 using Newtonsoft.Json;
+using Serilog;
+using Serilog.Exceptions;
 
 namespace ChristmasPi.Data {
     public class ConfigurationManager {
@@ -39,11 +41,14 @@ namespace ChristmasPi.Data {
         /// </summary>
         public WeekSchedule CurrentSchedule;
 
+        // Actions to be performed during shutdown
+        private Dictionary<string, Action> shutdownActions;
+
         public void LoadConfiguration(string configuration = null) {
             if (configuration == null)
                 configuration = Constants.CONFIGURATION_FILE;
             if (!File.Exists(configuration)) {
-                Console.WriteLine("LOGTHIS Tree Configuration file not found, using default configuration values");
+                Log.ForContext("ClassName", "ConfigurationManager").Information("Tree Configuration file not found, using default values");
                 StartupTreeConfig = TreeConfiguration.DefaultSettings();
             }
             else {
@@ -79,9 +84,7 @@ namespace ChristmasPi.Data {
                 File.WriteAllText(configuration, json);
             }
             catch (Exception e) {
-                Console.WriteLine("LOGTHIS Failed to save tree configuration, an exception occurred");
-                Console.WriteLine(e.Message);
-                Console.WriteLine(e.StackTrace);
+                Log.ForContext("ClassName", "ConfigurationManager").Error(e, "Failed to save tree configuration");
             }
         }
 
@@ -99,9 +102,7 @@ namespace ChristmasPi.Data {
                 File.WriteAllText(schedule, json);
             }
             catch (Exception e) {
-                Console.WriteLine("LOGTHIS Failed to save schedule info, an exception occurred");
-                Console.WriteLine(e.Message);
-                Console.WriteLine(e.StackTrace);
+                Log.ForContext("ClassName", "ConfigurationManager").Error(e, "Failed to save schedule info");
             }
         }
 
@@ -114,6 +115,64 @@ namespace ChristmasPi.Data {
             DebugConfiguration = new DebugConfiguration();
             ArgumentHelper helper = new ArgumentHelper(DebugConfiguration);
             return helper.Parse(args);
+        }
+
+        /// <summary>
+        /// Handles setting up the neccessary parameters for logging
+        /// </summary>
+        public void InitializeLogger() {
+            var configuration = new LoggerConfiguration();
+            if (DebugConfiguration.DebugLogging)
+                configuration.MinimumLevel.Debug();
+            else
+                configuration.MinimumLevel.Information();
+            configuration.WriteTo.Console(outputTemplate: Constants.LOG_FORMAT)
+            .Enrich.WithExceptionDetails()
+            .WriteTo.File(Constants.LOG_FILE,
+                rollingInterval: RollingInterval.Day,
+                rollOnFileSizeLimit: true,
+                outputTemplate: Constants.LOG_FORMAT);
+            Log.Logger = configuration.CreateLogger();
+            RegisterOnShutdownAction("Logger", () => {
+                Log.CloseAndFlush();
+            });
+        }
+
+        /// <summary>
+        /// Handles setting functionality for safe shutdown
+        /// </summary>
+        public void InitializeShutdown() {
+            shutdownActions = new Dictionary<string, Action>();
+            AppDomain.CurrentDomain.ProcessExit += new EventHandler((object sender, EventArgs args) => {
+                if (shutdownActions.Count > 0) {
+                    List<string> keys = new List<string>(shutdownActions.Keys);
+                    foreach (string key in keys) {
+                        Action action = shutdownActions[key];
+                        Log.Debug("Performing shutdown action for {key}", key);
+                        try {
+                            action();
+                        }
+                        catch (Exception e) {
+                            Log.Debug(e, "Shutdown action failed for {key}", key);
+                        }
+                    }
+                }
+            });
+        }
+
+        /// <summary>
+        /// Register Action to be run during shutdown
+        /// </summary>
+        /// <param name="name">The name of the action to avoid duplicates</param>
+        /// <param name="action">The action to be performed</param>
+        public void RegisterOnShutdownAction(string name, Action action) {
+            if (name == null)
+                throw new ArgumentNullException("name");
+            if (action == null)
+                throw new ArgumentNullException("action");
+            if (shutdownActions.ContainsKey(name))
+                throw new ArgumentException("Action already registered for name");
+            shutdownActions.Add(name, action);
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Drawing;
+using Serilog;
 
 namespace ChristmasPi.Data.Models {
     public class RandomColor {
@@ -110,19 +111,19 @@ namespace ChristmasPi.Data.Models {
                 if (usage.HasFlag(DelegateUsage.RedDelegate)) {
                     r = rDelegate();
                     if (r < Constants.RANDOM_MIN || r > Constants.RANDOM_MAX - 1)
-                        Console.WriteLine("LOGTHIS, Red delegate function returned values out of range and was clamped");
+                        Log.ForContext("ClassName", "RandomColor").Debug("Red delegate function returned values out of range and was clamped");
                     r = Math.Clamp(r, Constants.RANDOM_MIN, Constants.RANDOM_MAX - 1);
                 }
                 else if (usage.HasFlag(DelegateUsage.GreenDelegate)) {
                     g = gDelegate();
                     if (g < Constants.RANDOM_MIN || g > Constants.RANDOM_MAX - 1)
-                        Console.WriteLine("LOGTHIS, Green delegate function returned values out of range and was clamped");
+                        Log.ForContext("ClassName", "RandomColor").Debug("Green delegate function returned values out of range and was clamped");
                     g = Math.Clamp(g, Constants.RANDOM_MIN, Constants.RANDOM_MAX - 1);
                 }
                 else if (usage.HasFlag(DelegateUsage.BlueDelegate)) {
                     b = bDelegate();
                     if (b < Constants.RANDOM_MIN || g > Constants.RANDOM_MAX - 1)
-                        Console.WriteLine("LOGTHIS, Blue delegate function returned values out of range and was clamped");
+                        Log.ForContext("ClassName", "RandomColor").Debug("Blue delegate function returned values out of range and was clamped");
                     b = Math.Clamp(b, Constants.RANDOM_MIN, Constants.RANDOM_MAX - 1);
                 }
                 r = r != -1 ? r : Constants.RANDOM_DEFAULT;

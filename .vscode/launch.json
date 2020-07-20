@@ -12,7 +12,8 @@
             "program": "${workspaceFolder}/build/bin/Debug/netcoreapp3.0/ChristmasPi.Server.dll",
             "args": [
                 "--tr",
-                "--ignorepriv"
+                "--ignorepriv",
+                "--debug"
             ],
             "cwd": "${workspaceFolder}/build/bin/Debug/netcoreapp3.0/",
             "stopAtEntry": false,

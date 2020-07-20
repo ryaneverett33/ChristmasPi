@@ -36,11 +36,13 @@ namespace ChristmasPi.Data {
         public static readonly string CONFIGURATION_FILE_OLD = "configuration.old.json";
         public static readonly string SCHEDULE_FILE = "schedule.json";
         public static readonly string SCHEDULE_FILE_OLD = "schedule.old.json";
+        public static readonly string LOG_FILE = "ChristmasPi.log";
 
         // Networking
         public static readonly int PORT = 50808;                        // set in asp.net configuration
 
         // Misc
         public static readonly string USAGE_STRING = "Usage: dotnet ChristmasPi.dll [OPTION]";
+        public static readonly string LOG_FORMAT = "{Timestamp:HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception} {Properties:j}";
     }
 }

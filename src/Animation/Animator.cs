@@ -11,6 +11,7 @@ using ChristmasPi.Hardware.Interfaces;
 using ChristmasPi.Hardware.Factories;
 using ChristmasPi.Util;
 using System.Drawing;
+using Serilog;
 
 namespace ChristmasPi.Animation {
     public class Animator : IDisposable {
@@ -147,10 +148,7 @@ namespace ChristmasPi.Animation {
                         renderer.Render(renderer);
                     }
                     catch (Exception e) {
-                        Console.WriteLine("LOGTHIS An exception occurred within the animator's worker thread");
-                        Console.WriteLine(e.Message);
-                        Console.WriteLine(e.StackTrace);
-                        Console.WriteLine("Render Thread exiting");
+                        Log.ForContext("ClassName", "Animator").Error(e, "Render Thread exiting");
                         doRender = false;
                         _currentState = AnimationState.Error;
                         return;
@@ -158,8 +156,8 @@ namespace ChristmasPi.Animation {
                     TimeSpan renderTime = DateTime.Now - beforeRender;
                     int newWaitTime = waitTime;
                     if (renderTime.TotalMilliseconds > waitTime) {
-                        Console.WriteLine("LOGTHIS Took longer to render frame than fps waittime");
-                        Console.WriteLine($"waitTime: {waitTime}, renderTime: {renderTime}");
+                        Log.ForContext("ClassName", "Animator").Error("Took long to render frame than fps waittime");
+                        Log.ForContext("ClassName", "Animator").Error("WaitTime: {waitTime}, renderTime: {renderTime}", waitTime, renderTime);
                     }
                     else {
                         newWaitTime = waitTime - (int)renderTime.TotalMilliseconds;

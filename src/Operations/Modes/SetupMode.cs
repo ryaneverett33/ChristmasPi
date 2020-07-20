@@ -11,6 +11,7 @@ using ChristmasPi.Data.Models;
 using ChristmasPi.Util;
 using ChristmasPi.Models;
 using System.Drawing;
+using Serilog;
 
 namespace ChristmasPi.Operations.Modes {
     public class SetupMode : IOperationMode, ISetupMode {
@@ -232,7 +233,7 @@ namespace ChristmasPi.Operations.Modes {
                 defaultColor = Util.ColorConverter.Convert(color);
             }
             catch (Exception) {
-                Console.WriteLine("LOGTHIS -- SetupMode::SetDefaults() could not convert color");
+                Log.ForContext("ClassName", "SetupMode").Error("SetDefaults() could not convert color: {color}", color);
                 return false;
             }
             Configuration.tree.color.DefaultColor = defaultColor;
