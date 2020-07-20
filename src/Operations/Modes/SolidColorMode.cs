@@ -9,6 +9,7 @@ using ChristmasPi.Hardware.Factories;
 using ChristmasPi.Data.Exceptions;
 using ChristmasPi.Data;
 using Microsoft.AspNetCore.Http;
+using Serilog;
 
 namespace ChristmasPi.Operations.Modes {
     public class SolidColorMode : IOperationMode, ISolidColorMode {
@@ -63,21 +64,15 @@ namespace ChristmasPi.Operations.Modes {
                 return 200;
             }
             catch (InvalidRendererException e) {
-                Console.WriteLine("LOGTHIS SolidController::Update failed to get renderer");
-                Console.WriteLine(e.Message);
-                Console.WriteLine(e.StackTrace);
+                Log.ForContext("ClassName", "SolidColorMode").Error(e, "Update() failed to get renderer");
                 return StatusCodes.Status500InternalServerError;
             }
             catch (InvalidColorFormatException e) {
-                Console.WriteLine("LOGTHIS SolidController invalid color format exception");
-                Console.WriteLine(e.Message);
-                Console.WriteLine(e.StackTrace);
+                Log.ForContext("ClassName", "SolidColorMode").Error(e, "Update() invalid color format exception");
                 return StatusCodes.Status400BadRequest;
             }
             catch (Exception e) {
-                Console.WriteLine("LOGTHIS SolidController::Update failed, an exception occured");
-                Console.WriteLine(e.Message);
-                Console.WriteLine(e.StackTrace);
+                Log.ForContext("ClassName", "SolidColorMode").Error(e, "Update() failed");
                 return StatusCodes.Status500InternalServerError;
             }
         }

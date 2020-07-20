@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ChristmasPi.Data;
+using Serilog;
 
 namespace ChristmasPi.Data.Models.Scheduler {
     [JsonConverter(typeof(WeekScheduleConverter))]
@@ -174,8 +175,8 @@ namespace ChristmasPi.Data.Models.Scheduler {
             if (error) {
                 // remove rules
                 if (!RemoveRule(start, end, repeats, true)) {
-                    Console.WriteLine("LOGTHIS Failed to remove overlapping rule from schedule");
-                    Console.WriteLine("Schedule may be corrupted");
+                    Log.ForContext("ClassName", "WeekSchedule").Error("Failed to remove overlapping rule from scheduled.");
+                    Log.ForContext("ClassName", "WeekSchedule").Error("Schedule may be corrupted");
                     return false;
                 }
                 return false;
@@ -243,8 +244,8 @@ namespace ChristmasPi.Data.Models.Scheduler {
                     error = true;
             }
             if (error && !ignoreErrors) {
-                Console.WriteLine("LOGTHIS An error occurred removing a rule from the schedule");
-                Console.WriteLine("Schedule may be corrupted");
+                Log.ForContext("ClassName", "WeekSchedule").Error("An error occurred removing a rule from the schedule");
+                Log.ForContext("ClassName", "WeekSchedule").Error("Schedule may be corrupted");
                 return false;
             }
             return removed;

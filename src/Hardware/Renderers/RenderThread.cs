@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using ChristmasPi.Hardware.Interfaces;
 using ChristmasPi.Util;
 using ChristmasPi.Data;
+using Serilog;
 
 namespace ChristmasPi.Hardware.Renderers {
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1063:Implement IDisposable Correctly", Justification = "Using boolean signature causes compile errors")]
@@ -68,18 +69,15 @@ namespace ChristmasPi.Hardware.Renderers {
                         renderer.Render(renderer);
                     }
                     catch (Exception e) {
-                        Console.WriteLine("LOGTHIS An exception occurred within the render thread.");
-                        Console.WriteLine(e.Message);
-                        Console.WriteLine(e.StackTrace);
-                        Console.WriteLine("Render Thread exiting");
+                        Log.ForContext("ClassName", "RenderThread").Error(e, "Render Thread exiting");
                         Rendering = false;
                         return;
                     }
                     TimeSpan renderTime = DateTime.Now - beforeRender;
                     int newWaitTime = waitTime;
                     if (renderTime.TotalMilliseconds > waitTime) {
-                        Console.WriteLine("LOGTHIS Took longer to render frame than fps waittime");
-                        Console.WriteLine($"waitTime: {waitTime}, renderTime: {renderTime}");
+                        Log.ForContext("ClassName", "RenderThread").Error("Took long to render frame than fps waittime");
+                        Log.ForContext("ClassName", "RenderThread").Error("WaitTime: {waitTime}, renderTime: {renderTime}", waitTime, renderTime);
                     }
                     else {
                         newWaitTime = waitTime - (int)renderTime.TotalMilliseconds;

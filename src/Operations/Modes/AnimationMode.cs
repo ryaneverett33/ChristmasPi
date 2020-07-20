@@ -9,6 +9,7 @@ using ChristmasPi.Data.Exceptions;
 using ChristmasPi.Data.Models;
 using ChristmasPi.Data;
 using Microsoft.AspNetCore.Http;
+using Serilog;
 
 namespace ChristmasPi.Operations.Modes {
     public class AnimationMode : IOperationMode, IAnimationMode {
@@ -37,7 +38,7 @@ namespace ChristmasPi.Operations.Modes {
             if (defaultmode) {
                 // try and play default animation
                 if (StartAnimation(ConfigurationManager.Instance.CurrentTreeConfig.tree.defaultanimation) != 200) {
-                    Console.WriteLine("LOGTHIS Failed to play default animation");
+                    Log.ForContext("ClassName", "AnimationMode").Error("Failed to play default animation");
                     StartAnimation(Constants.DEFAULT_ANIMATION);
                 }
             }
@@ -74,15 +75,11 @@ namespace ChristmasPi.Operations.Modes {
                 return StatusCodes.Status200OK;
             }
             catch (InvalidAnimationActionException e) {
-                Console.WriteLine("LOGTHIS AnimationManager::StartAnimation() encountered an exception while stopping animation");
-                Console.WriteLine(e.Message);
-                Console.WriteLine(e.StackTrace);
+                Log.ForContext("ClassName", "AnimationMode").Error(e, "StartAnimation() encountered an invalid animation action exception while stopping animation");
                 return StatusCodes.Status400BadRequest;
             }
             catch (Exception e) {
-                Console.WriteLine("LOGTHIS AnimationManager::StartAnimation() encountered an exception while stopping animation");
-                Console.WriteLine(e.Message);
-                Console.WriteLine(e.StackTrace);
+                Log.ForContext("ClassName", "AnimationMode").Error(e, "StartAnimation() encountered an exception while stopping animation");
                 return StatusCodes.Status500InternalServerError;
             }
         }
@@ -109,15 +106,11 @@ namespace ChristmasPi.Operations.Modes {
                 return StatusCodes.Status200OK;
             }
             catch (InvalidAnimationActionException e) {
-                Console.WriteLine("LOGTHIS AnimationManager::StartAnimation() encountered an exception while stopping animation");
-                Console.WriteLine(e.Message);
-                Console.WriteLine(e.StackTrace);
+                Log.ForContext("ClassName", "AnimationMode").Error(e, "StartAnimation() encountered an invalid animation action exception while stopping animation");
                 return StatusCodes.Status400BadRequest;
             }
             catch (Exception e) {
-                Console.WriteLine("LOGTHIS AnimationManager::StartAnimation() encountered an exception while stopping animation");
-                Console.WriteLine(e.Message);
-                Console.WriteLine(e.StackTrace);
+                Log.ForContext("ClassName", "AnimationMode").Error(e, "StartAnimation() encountered an exception while stopping animation");
                 return StatusCodes.Status500InternalServerError;
             }
         }
@@ -131,15 +124,11 @@ namespace ChristmasPi.Operations.Modes {
                 return StatusCodes.Status200OK;
             }
             catch (InvalidAnimationActionException e) {
-                Console.WriteLine("LOGTHIS AnimationManager::StartAnimation() encountered an exception while stopping animation");
-                Console.WriteLine(e.Message);
-                Console.WriteLine(e.StackTrace);
+                Log.ForContext("ClassName", "AnimationMode").Error(e, "StartAnimation() encountered an invalid animation action exception while stopping animation");
                 return StatusCodes.Status400BadRequest;
             }
             catch (Exception e) {
-                Console.WriteLine("LOGTHIS AnimationManager::StartAnimation() encountered an exception while stopping animation");
-                Console.WriteLine(e.Message);
-                Console.WriteLine(e.StackTrace);
+                Log.ForContext("ClassName", "AnimationMode").Error(e, "StartAnimation() encountered an exception while stopping animation");
                 return StatusCodes.Status500InternalServerError;
             }
         }
@@ -152,15 +141,11 @@ namespace ChristmasPi.Operations.Modes {
                 return StatusCodes.Status200OK;
             }
             catch (InvalidAnimationActionException e) {
-                Console.WriteLine("LOGTHIS AnimationManager::StartAnimation() encountered an exception while stopping animation");
-                Console.WriteLine(e.Message);
-                Console.WriteLine(e.StackTrace);
+                Log.ForContext("ClassName", "AnimationMode").Error(e, "StartAnimation() encountered an invalid animation action exception while stopping animation");
                 return StatusCodes.Status400BadRequest;
             }
             catch (Exception e) {
-                Console.WriteLine("LOGTHIS AnimationManager::StartAnimation() encountered an exception while stopping animation");
-                Console.WriteLine(e.Message);
-                Console.WriteLine(e.StackTrace);
+                Log.ForContext("ClassName", "AnimationMode").Error(e, "StartAnimation() encountered an exception while stopping animation");
                 return StatusCodes.Status500InternalServerError;
             }
         }
