@@ -19,4 +19,4 @@ An ASP.NET Server powering WS2811 lights.
 
 ### Screenshots
 
-[Screenshots](/screenshots/Readme.md)
+[Screenshots](/screenshots/README.md)
