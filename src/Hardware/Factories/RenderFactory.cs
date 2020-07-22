@@ -23,8 +23,8 @@ namespace ChristmasPi.Hardware.Factories {
         /// Gets and configures the hardware renderer
         /// </summary>
         public static IRenderer GetRenderer(RendererType? rendererType = null, TreeConfiguration configuration = null) {
-            if (rendererType.HasValue && configuration == null || configuration == null && !rendererType.HasValue)
-                throw new InvalidOperationException("Either both params are null or filled, null arguments can not be mismatched");
+            if (configuration == null)
+                configuration = ConfigurationManager.Instance.CurrentTreeConfig;
             lock (locker) {
                 RendererType type = rendererType.HasValue ? rendererType.Value : ConfigurationManager.Instance.CurrentTreeConfig.hardware.type;
                 var hardware = configuration == null ? ConfigurationManager.Instance.CurrentTreeConfig.hardware : configuration.hardware;

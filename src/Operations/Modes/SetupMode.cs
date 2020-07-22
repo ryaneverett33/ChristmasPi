@@ -120,7 +120,7 @@ namespace ChristmasPi.Operations.Modes {
         /// <remarks>This should only be called by the SetupController</remarks>
         public void SetCurrentStep(string newstep) {
             Console.WriteLine("Setting current step: {0}", newstep);
-            if (newstep == null || newstep.Length == 0)
+            if (newstep == null || newstep.Length == 0 || newstep == "null")
                 return;
             SetupStep step = steps.Where(step => step.Name.Equals(newstep)).Single();
             CurrentStepName = step.Name;
