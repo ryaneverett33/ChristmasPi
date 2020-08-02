@@ -131,15 +131,17 @@ namespace ChristmasPi.Data {
             else
                 configuration.MinimumLevel.Information();
             configuration.Enrich.WithExceptionDetails()
-            .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Information)
-            .WriteTo.Logger(lg => lg
-                .Filter.ByIncludingOnly(aspExp)
-                .WriteTo.File(Constants.ASP_LOG_FILE,
-                    rollingInterval: RollingInterval.Day,
-                    rollOnFileSizeLimit: true,
-                    outputTemplate: Constants.LOG_FORMAT)
-            )
-            .WriteTo.Logger(lg => lg
+            .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Information);
+            if (DebugConfiguration.ASPLogging) {
+                configuration.WriteTo.Logger(lg => lg
+                    .Filter.ByIncludingOnly(aspExp)
+                    .WriteTo.File(Constants.ASP_LOG_FILE,
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        outputTemplate: Constants.LOG_FORMAT)
+                );
+            }
+            configuration.WriteTo.Logger(lg => lg
                 .Filter.ByExcluding(aspExp)
                 .WriteTo.File(Constants.LOG_FILE,
                     rollingInterval: RollingInterval.Day,

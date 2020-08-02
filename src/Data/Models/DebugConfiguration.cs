@@ -16,10 +16,15 @@ namespace ChristmasPi.Data.Models {
         [Argument("debug", "Sets the logging level to debug", true)]
         public bool DebugLogging;
 
+        [HelpSection("Debug")]
+        [Argument("log-asp", "Additionally logs ASP.NET data to a seperate log file", true)]
+        public bool ASPLogging;
+
         public DebugConfiguration() {
             AllowTestRenderer = false;
             IgnorePrivileges = false;
             DebugLogging = false;
+            ASPLogging = false;
         }
     }
 }

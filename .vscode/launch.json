@@ -13,7 +13,8 @@
             "args": [
                 "--tr",
                 "--ignorepriv",
-                "--debug"
+                "--debug",
+                "--log-asp"
             ],
             "cwd": "${workspaceFolder}/build/bin/Debug/netcoreapp3.0/",
             "stopAtEntry": false,
