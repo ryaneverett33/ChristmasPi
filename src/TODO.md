@@ -18,6 +18,7 @@
 - [FRONTEND] Replace hardware/unknown.png or give proper credit
 - [BACKEND] Refactor AnimationParameters to use Attributes
 - [BACKEND] Refactor Console.WriteLine usages to Logging
+- [BACKEND] Conditionally create asp.net log (add configuration argument)
 - [FRONTEND] Add Settings tab
 - [FRONTEND] Implement main settings page
 - [BACKEND] Create a settings controller
