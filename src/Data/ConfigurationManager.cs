@@ -7,6 +7,9 @@ using ChristmasPi.Data.Models.Scheduler;
 using ChristmasPi.Util.Arguments;
 using Newtonsoft.Json;
 using Serilog;
+using Serilog.Events;
+using Serilog.Filters;
+using Serilog.Filters.Expressions;
 using Serilog.Exceptions;
 
 namespace ChristmasPi.Data {
@@ -122,16 +125,28 @@ namespace ChristmasPi.Data {
         /// </summary>
         public void InitializeLogger() {
             var configuration = new LoggerConfiguration();
+            var aspExp = "StartsWith(SourceContext, 'Microsoft') or SourceContext = 'Serilog.AspNetCore.RequestLoggingMiddleware'";
             if (DebugConfiguration.DebugLogging)
                 configuration.MinimumLevel.Debug();
             else
                 configuration.MinimumLevel.Information();
-            configuration.WriteTo.Console(outputTemplate: Constants.LOG_FORMAT)
-            .Enrich.WithExceptionDetails()
-            .WriteTo.File(Constants.LOG_FILE,
-                rollingInterval: RollingInterval.Day,
-                rollOnFileSizeLimit: true,
-                outputTemplate: Constants.LOG_FORMAT);
+            configuration.Enrich.WithExceptionDetails()
+            .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Information)
+            .WriteTo.Logger(lg => lg
+                .Filter.ByIncludingOnly(aspExp)
+                .WriteTo.File(Constants.ASP_LOG_FILE,
+                    rollingInterval: RollingInterval.Day,
+                    rollOnFileSizeLimit: true,
+                    outputTemplate: Constants.LOG_FORMAT)
+            )
+            .WriteTo.Logger(lg => lg
+                .Filter.ByExcluding(aspExp)
+                .WriteTo.File(Constants.LOG_FILE,
+                    rollingInterval: RollingInterval.Day,
+                    rollOnFileSizeLimit: true,
+                    outputTemplate: Constants.LOG_FORMAT)
+                .WriteTo.Console(outputTemplate: Constants.LOG_FORMAT)
+            );
             Log.Logger = configuration.CreateLogger();
             RegisterOnShutdownAction("Logger", () => {
                 Log.CloseAndFlush();
@@ -144,6 +159,7 @@ namespace ChristmasPi.Data {
         public void InitializeShutdown() {
             shutdownActions = new Dictionary<string, Action>();
             AppDomain.CurrentDomain.ProcessExit += new EventHandler((object sender, EventArgs args) => {
+                Log.Debug("Starting shutdown procedure, actions count: {count}", shutdownActions.Count);
                 if (shutdownActions.Count > 0) {
                     List<string> keys = new List<string>(shutdownActions.Keys);
                     foreach (string key in keys) {

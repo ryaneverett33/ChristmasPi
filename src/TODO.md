@@ -17,11 +17,13 @@
 - [BACKEND] RedirectHandler should try and catch 404 errors
 - [FRONTEND] Replace hardware/unknown.png or give proper credit
 - [BACKEND] Refactor AnimationParameters to use Attributes
-- [BACKEND] Implement logging
+- [BACKEND] Refactor Console.WriteLine usages to Logging
 - [FRONTEND] Add Settings tab
 - [FRONTEND] Implement main settings page
 - [BACKEND] Create a settings controller
 - [BACKEND] Allow updating various settings of the tree
+- [BACKEND] ConfigurationManager should not parse args
+	- Move --config from ConfigurationManager
 - [BACKEND] Allow monitoring of services
 	- Check if they're alive
 	- Maybe start them if they're not alive?

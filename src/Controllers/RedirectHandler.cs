@@ -70,7 +70,7 @@ namespace ChristmasPi.Controllers {
         }
 
         public static void RegisterActionLookup(string controller, Dictionary<string, string> lookupTable) {
-            Console.WriteLine($"Registering lookup for {controller}");
+            Log.ForContext("ClassName", "RedirectHandler").Debug("Registering lookup for {controller}", controller);
             if (controller == null || controller.Length == 0)
                 throw new ArgumentNullException("controller");
             if (lookupTable == null || lookupTable.Count == 0)
@@ -83,7 +83,7 @@ namespace ChristmasPi.Controllers {
         }
         
         public static void RegisterLookupRules(string controller, Func<string, string, string, string> ruleFunc) {
-            Console.WriteLine($"Registering rules for {controller}");
+            Log.ForContext("ClassName", "RedirectHandler").Debug("Registering rules for {controller}", controller);
             if (controller == null || controller.Length == 0)
                 throw new ArgumentNullException("controller");
             if (ruleFunc == null)
@@ -117,11 +117,11 @@ namespace ChristmasPi.Controllers {
 
         private string shouldRedirectControllers(string controller, string action, string method) {
             if (!functionRuleTable.ContainsKey(controller)) {
-                Console.WriteLine($"Function rule doesn't contain a function for {controller}");
+                Log.ForContext("ClassName", "RedirectHandler").Debug("Function rule doesn't contain a function for {controller}", controller);
                 return null;
             }
             if (actionLookupTable.ContainsKey(controller)) {
-                Console.WriteLine($"Looking up action for controller: {controller}, action: {action}, method: {method}");
+                Log.ForContext("ClassName", "RedirectHandler").Debug("Looking up action for controller: {controller}, action: {action}, method: {method}", controller, action, method);
                 Dictionary<string, string> lookupTable = actionLookupTable[controller];
                 string useAction;
                 if (!lookupTable.ContainsKey(action)) {
@@ -136,7 +136,7 @@ namespace ChristmasPi.Controllers {
                 return ruleFunc(controller, useAction, method);
             }
             else {
-                Console.WriteLine($"Does not have a lookup table for controller: {controller}");
+                Log.ForContext("ClassName", "RedirectHandler").Debug("Does not have a lookup table for controller: {controller}", controller);
                 Func<string, string, string, string> ruleFunc = functionRuleTable[controller];
                 return ruleFunc(controller, action, method);
             }
