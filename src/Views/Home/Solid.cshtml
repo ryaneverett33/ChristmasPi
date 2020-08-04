@@ -4,6 +4,16 @@
     @model ChristmasPi.Models.SolidModel;
     ViewBag.TreeName = Model.TreeName;
 }
+@section Scripts {
+<script type="text/javascript">
+    $(function () {
+        var test = document.getElementById('test');
+        new SuperGif({gif: test, on_end: function(gif) {
+            console.log("playback finished");
+        }}).load();
+    });
+</script>
+}
 
 <div id="cp2" data-color="rgb(@Model.CurrentColor.R, @Model.CurrentColor.G, @Model.CurrentColor.B)"></div>
 <button class="btn btn-just-icon" id="default-color" style="background-color: @ChristmasPi.Util.ColorConverter.ToHex(Model.DefaultColor)"
@@ -11,3 +21,6 @@
     <i class="nc-icon nc-palette"></i>
 </button>
 <button class="btn btn-primary" onclick="SubmitColor()">Update</button>
+
+<img id="test" src="/img/gifs/testy.gif" rel:animated_src="/img/gifs/testy.gif"
+		rel:auto_play="1" />

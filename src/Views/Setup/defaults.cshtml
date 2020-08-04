@@ -9,22 +9,23 @@
 @section Scripts {
 <script>
     $(function () {
-    $('#setup-colorpicker').colorpicker({
-        inline: true,
-        container: false,
-        format: "rgb",
-        useAlpha: false,
-        customClass: 'colorpicker-2x',
-        sliders: {
-            saturation: {
-                maxLeft: 200,
-                maxTop: 200
-            },
-            hue: {
-                maxTop: 200
-            },
-            alpha: {
-                maxTop: 200
+        $('#setup-colorpicker').colorpicker({
+            inline: true,
+            container: false,
+            format: "rgb",
+            useAlpha: false,
+            customClass: 'colorpicker-2x',
+            sliders: {
+                saturation: {
+                    maxLeft: 200,
+                    maxTop: 200
+                },
+                hue: {
+                    maxTop: 200
+                },
+                alpha: {
+                    maxTop: 200
+                }
             }
         }
     });
