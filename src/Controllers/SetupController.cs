@@ -9,6 +9,7 @@ using ChristmasPi.Operations.Interfaces;
 using ChristmasPi.Data.Models;
 using ChristmasPi.Util;
 using System.Drawing;
+using Serilog;
 
 namespace ChristmasPi.Controllers {
 /*
@@ -189,7 +190,7 @@ Defaults
         }
         [HttpPost("/setup/defaults/submit")]
         public IActionResult SubmitDefaults([FromForm]string mode, [FromForm]string animation, [FromForm]string color) {
-            Console.WriteLine($"Submitting new default color: {color}");
+            Log.ForContext("ClassName", "SetupController").Information("Submitting new default color: {color}", color);
             if (RedirectHandler.ShouldRedirect(this.RouteData, "post") is IActionResult redirect)
                 return redirect;
             if ((OperationManager.Instance.CurrentOperatingMode as ISetupMode).SetDefaults(animation, mode, color)) {

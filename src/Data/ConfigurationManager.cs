@@ -77,7 +77,7 @@ namespace ChristmasPi.Data {
         /// Saves the current tree configuration to a json file
         /// </summary>
         public void SaveConfiguration(string configuration = null) {
-            Console.WriteLine("Saving configuration");
+            Log.ForContext("ClassName", "ConfigurationManager").Information("Saving configuration");
             try {
                 if (configuration == null)
                     configuration = Constants.CONFIGURATION_FILE;
@@ -95,7 +95,7 @@ namespace ChristmasPi.Data {
         /// Saves the current schedule to a json file
         /// </summary>
         public void SaveSchedule(string schedule = null) {
-            Console.WriteLine("Saving schedule");
+            Log.ForContext("ClassName", "ConfigurationManager").Information("Saving schedule");
             try {
                 if (schedule == null)
                     schedule = Constants.SCHEDULE_FILE;

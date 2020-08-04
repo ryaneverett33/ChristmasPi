@@ -30,7 +30,6 @@ namespace ChristmasPi.Data.Models.Scheduler {
         /// </summary>
         /// <returns>Array of schedule rules<</returns>
         public TimeSlot[] GetRules() {
-            // Console.WriteLine($"Has {times.Count} rules");
             return times.ToArray();
         }
 

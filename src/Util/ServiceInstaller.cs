@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Collections.Generic;
+using Serilog;
 
 namespace ChristmasPi.Util {
     public class ServiceInstaller : IDisposable {
@@ -68,7 +69,7 @@ namespace ChristmasPi.Util {
             try {
                 startInstall();
                 if (installer()) {
-                    Console.WriteLine("Success");
+                    Log.ForContext("ClassName", "ServiceInstaller").Debug("Success");
                     finishInstall();
                     OnInstallSuccess.Invoke(getState());
                 }

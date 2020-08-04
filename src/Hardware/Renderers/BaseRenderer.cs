@@ -7,6 +7,7 @@ using ChristmasPi.Data;
 using ChristmasPi.Data.Models;
 using ChristmasPi.Data.Extensions;
 using ChristmasPi.Data.Models.Hardware;
+using Serilog;
 
 namespace ChristmasPi.Hardware.Renderers {
     public abstract class BaseRenderer : IRenderer {
@@ -32,7 +33,8 @@ namespace ChristmasPi.Hardware.Renderers {
         /// <param name="color">New color for the LED</param>
         public void SetLEDColor(int index, Color color) {
             if (index < 0 || index >= ledColors.Length) {
-                Console.WriteLine($"index: {index}, range [0, {LightCount - 1}], ledColors length: {ledColors.Length}");
+                Log.ForContext("ClassName", "BaseRenderer").Debug("index: {index}, range [0, {LightCount}], ledColors length: {length}",
+                                                                    index, LightCount - 1, ledColors.Length);
                 throw new ArgumentOutOfRangeException("index");
             }
             ledColors[index] = color;

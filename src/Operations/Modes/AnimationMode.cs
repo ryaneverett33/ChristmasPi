@@ -34,7 +34,7 @@ namespace ChristmasPi.Operations.Modes {
         }
         #region IOperationMode Methods
         public void Activate(bool defaultmode) {
-            Console.WriteLine("Activated Animation Mode");
+            Log.ForContext("ClassName", "AnimationMode").Information("Activated Animation Mode");
             if (defaultmode) {
                 // try and play default animation
                 if (StartAnimation(ConfigurationManager.Instance.CurrentTreeConfig.tree.defaultanimation) != 200) {
@@ -46,7 +46,7 @@ namespace ChristmasPi.Operations.Modes {
         public void Deactivate() {
             if (Animating)
                 StopAnimation();
-            Console.WriteLine("Deactivated Animation Mode");
+            Log.ForContext("ClassName", "AnimationMode").Information("Deactivated Animation Mode");
         }
         public object Info() {
             /// TODO fill in with relevant info

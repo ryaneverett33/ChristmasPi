@@ -30,11 +30,11 @@ namespace ChristmasPi.Operations.Modes {
             renderer = RenderFactory.GetRenderer();
             renderer.Start();
             SetColor(_currentColor);
-            Console.WriteLine("Activated Solid Color Mode");
+            Log.ForContext("ClassName", "SolidColorMode").Information("Activated Solid Color Mode");
         }
         public void Deactivate() {
             renderer.Stop();
-            Console.WriteLine("Deactivated Solid Color Mode");
+            Log.ForContext("ClassName", "SolidColorMode").Information("Deactivated Solid Color Mode");
             renderer = null;
         }
         public object Info() {

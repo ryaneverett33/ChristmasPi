@@ -10,6 +10,7 @@ using ChristmasPi.Data.Models;
 using ChristmasPi.Data.Models.Hardware;
 using ChristmasPi.Data.Extensions;
 using rpi_ws281x;
+using Serilog;
 
 namespace ChristmasPi.Hardware.Renderers {
     /// <summary>
@@ -32,7 +33,7 @@ namespace ChristmasPi.Hardware.Renderers {
         /// <param name="ledCount">Number of LEDs to render</param>
         /// <param name="pin">GPIO pin to connect to</param>
         public WS281xRenderer(int ledCount, int pin, int fps) : base(ledCount) {
-            Console.WriteLine($"Creating a new Renderer with {ledCount} leds on pin {pin}");
+            Log.ForContext("ClassName", "WS281xRenderer").Debug("Creating a new Renderer with {ledCount}, leds on pin {pin}", ledCount, pin);
             var settings = Settings.CreateDefaultSettings();
             settings.Channel_1 = new Channel(ledCount, 
                                             pin, 

@@ -33,7 +33,7 @@ namespace ChristmasPi.Util {
                 return false;
             }
             catch (Exception e) {
-                Console.WriteLine(e);
+                Log.ForContext("ClassName", "ThreadHelpers").Error(e, "SafeSleep encountered an exception");
                 return false;
             }
         }

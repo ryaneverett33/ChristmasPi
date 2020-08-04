@@ -81,12 +81,12 @@ namespace ChristmasPi.Operations.Modes {
         }
         #region IOperationMode Methods
         public void Activate(bool defaultmode) {
-            Console.WriteLine("Activated Setup Mode");
+            Log.ForContext("ClassName", "AnimationMode").Information("Activated Setup Mode");
             Configuration = ConfigurationManager.Instance.CurrentTreeConfig;
             SetCurrentStep("start");
         }
         public void Deactivate() {
-            Console.WriteLine("Deactivated Setup Mode");
+            Log.ForContext("ClassName", "AnimationMode").Information("Deactivated Setup Mode");
             SetCurrentStep("null");
         }
         public object Info() {
@@ -119,7 +119,7 @@ namespace ChristmasPi.Operations.Modes {
         /// <param name="newstep">The new setup step</param>
         /// <remarks>This should only be called by the SetupController</remarks>
         public void SetCurrentStep(string newstep) {
-            Console.WriteLine("Setting current step: {0}", newstep);
+            Log.ForContext("ClassName", "AnimationMode").Debug("Setting current step: {newstep}", newstep);
             if (newstep == null || newstep.Length == 0 || newstep == "null")
                 return;
             SetupStep step = steps.Where(step => step.Name.Equals(newstep)).Single();
@@ -128,7 +128,7 @@ namespace ChristmasPi.Operations.Modes {
         public void CompleteStep() {
             // completes the current step in a linear fashion
             if (CurrentStepName == null || CurrentStepName.Length == 0) {
-                Console.WriteLine("CompleteStep() CurrentStepName is null");
+                Log.ForContext("ClassName", "AnimationMode").Error("CompleteStep() CurrentStepName is null");
                 return;
             }
             int currentStepIndex = -1;
@@ -333,7 +333,7 @@ namespace ChristmasPi.Operations.Modes {
             if (currentServiceInstaller != null)
                 return false;
             this.installSchedulerService = installSchedulerService;
-            Console.WriteLine("Install Scheduler Service? {0}", installSchedulerService);
+            Log.ForContext("ClassName", "AnimationMode").Debug("Install Scheduler Service? {installSchedulerService}", installSchedulerService);
             currentServiceInstaller = new ServiceInstaller("ChristmasPi.service", "some path");
             currentServiceInstaller.OnInstallFailure = serviceInstallHandler;
             currentServiceInstaller.OnInstallProgress = serviceInstallHandler;
@@ -428,7 +428,7 @@ namespace ChristmasPi.Operations.Modes {
         }
         #endregion
         public string ShouldRedirect(string controller, string action, string method) {
-            Console.WriteLine("Called SetupMode ShouldRedirect");
+            Log.ForContext("ClassName", "AnimationMode").Debug("Called SetupMode ShouldRedirect");
             if (!(OperationManager.Instance.CurrentOperatingMode is ISetupMode)) {
                 // If on the index page, don't redirect
                 // ignore these actions to allow the ability to start setupmode
@@ -454,7 +454,7 @@ namespace ChristmasPi.Operations.Modes {
                 // redirect to current page
                 // NOTE: SetCurrentPage is called after navigating to page, so redirect should account for going to the next page
                 string nextPage = GetNext(CurrentStepName);
-                Console.WriteLine($"nextPage: {nextPage}, currentStepName: {CurrentStepName}");
+                Log.ForContext("ClassName", "AnimationMode").Debug("nextPage: {nextPage}, currentStepName: {CurrentStepName}", nextPage, CurrentStepName);
                 if (method.ToUpper() == "POST") // don't redirect on POST requests
                     return null;
                 if (action.ToUpper() == CurrentStepName.ToUpper())  // don't redirect on the current step

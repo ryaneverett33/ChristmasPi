@@ -1,5 +1,6 @@
 ﻿using System;
 using ChristmasPi.Operations.Interfaces;
+using Serilog;
 
 namespace ChristmasPi.Operations.Modes {
 
@@ -12,10 +13,10 @@ namespace ChristmasPi.Operations.Modes {
         public bool CanBeDefault => false;
 
         public void Activate(bool defaultmode) {
-            Console.WriteLine("Activated nothing mode");
+            Log.ForContext("ClassName", "AnimationMode").Information("Activated nothing mode");
         }
         public void Deactivate() {
-            Console.WriteLine("Deactivated nothing mode");
+            Log.ForContext("ClassName", "AnimationMode").Information("Deactivated nothing mode");
         }
         public object Info() { return null; }
         public object GetProperty(string property) { return null; }

@@ -17,7 +17,6 @@
 - [BACKEND] RedirectHandler should try and catch 404 errors
 - [FRONTEND] Replace hardware/unknown.png or give proper credit
 - [BACKEND] Refactor AnimationParameters to use Attributes
-- [BACKEND] Refactor Console.WriteLine usages to Logging
 - [FRONTEND] Add Settings tab
 - [FRONTEND] Implement main settings page
 - [BACKEND] Create a settings controller

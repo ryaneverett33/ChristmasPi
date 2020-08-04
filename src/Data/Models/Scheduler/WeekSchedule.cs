@@ -81,7 +81,7 @@ namespace ChristmasPi.Data.Models.Scheduler {
                 else if (rule.repeats.HasFlag(RepeatUsage.RepeatSunday))
                     days[6].Add(rule);
                 else {
-                    Console.WriteLine("INVALID Schedule Rule, no day set!");
+                    Log.ForContext("ClassName", "WeekSchedule").Error("INVALID Schedule Rule, no day set!");
                 }
             }
             // sort each list

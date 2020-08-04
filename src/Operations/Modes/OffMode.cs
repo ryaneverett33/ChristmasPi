@@ -7,6 +7,7 @@ using ChristmasPi.Hardware.Interfaces;
 using ChristmasPi.Hardware.Factories;
 using ChristmasPi.Data.Exceptions;
 using ChristmasPi.Data;
+using Serilog;
 
 namespace ChristmasPi.Operations.Modes {
     public class OffMode : IOperationMode, IOffMode {
@@ -28,12 +29,12 @@ namespace ChristmasPi.Operations.Modes {
             renderer.Start();
             TurnOff();
             _active = true;
-            Console.WriteLine("Activated Off Mode");
+            Log.ForContext("ClassName", "AnimationMode").Information("Activated Off Mode");
         }
         public void Deactivate() {
             renderer.Stop();
             _active = false;
-            Console.WriteLine("Deactivated Off Mode");
+            Log.ForContext("ClassName", "AnimationMode").Information("Deactivated Off Mode");
             renderer = null;
         }
         public object Info() {

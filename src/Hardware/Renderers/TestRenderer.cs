@@ -4,6 +4,7 @@ using System.IO;
 using ChristmasPi.Data.Models;
 using ChristmasPi.Data.Models.Hardware;
 using ChristmasPi.Hardware.Interfaces;
+using Serilog;
 
 namespace ChristmasPi.Hardware.Renderers {
     public class TestRenderer : BaseRenderer, IRenderer {
@@ -17,7 +18,7 @@ namespace ChristmasPi.Hardware.Renderers {
         // write current value to file
         public override void Render(IRenderer renderer) {
             if (writer == null) {
-                Console.WriteLine("Cannot render, failed to call Start method");
+                Log.ForContext("ClassName", "TestRenderer").Error("Cannot render, failed to call Start method");
                 return;
             }
             if (BeforeRenderEvent != null)
