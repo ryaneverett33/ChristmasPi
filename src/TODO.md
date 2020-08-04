@@ -1,19 +1,27 @@
 ﻿# TODO
 
 ## Release 0.5
-- [FRONTEND] Services start reindeer when installing
 - [FRONTEND] Services reindeer gif transition to checkmark
-- [FRONTEND] Add Checkmark icon and transition gif
+	- Start reindeer when installing
+	- Add appropriate gifs, reindeer->checkmark gif and reindeer->failure gif
+	- Transition to checkmark/failure on service installation finish
 - [BACKEND] Implement services installation
+	- On successful ChristmasPi service installation, the server should restart gracefully
 - [FRONTEND] Replace hardware/unknown.png or give proper credit
 - [FRONTEND] Implement mobile version of schedule
 - [FRONTEND] Schedule add rule modal should work for mobile
 - [BACKEND] Refactor other controllers to use RedirectHandler
+- [BACKEND] Save setup progress and restore setup progress
+	- Allow for setup wizard to restart (after installing service)
+- [BACKEND] Add wait for old ChristmasPi instance to close
+	- Add configuration argument for specifying PID to wait for (or flag to just wait in general)
 - [BACKEND] Cleanup animations
 	- Implement debug property for animations
 	- Add debug configuration for allowing debug animations
 	- Implement controller logic for filtering out debug animations
 	- Select which animations should be debug animations
+- [GENERAL] Create installer package
+	- Maybe add bootstrapper script to start setup process
 
 ## General
 - [?] branch animation is the result of a basic animation

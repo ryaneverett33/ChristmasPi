@@ -11,6 +11,20 @@
         $(window).on("load", function () {
             $("#continue-btn").hide();
             $("#installprogress").hide();
+            var pi_reindeer_gif = new SuperGif({gif: document.getElementById("pi_reindeer"),
+                        progressbar_height: 0,
+                        loop_mode: true,
+                        auto_play: false,
+                        on_end: function(gif) {
+                console.log("playback finished");
+            }}).load();
+            var scheduler_reindeer_gif = new SuperGif({gif: document.getElementById("scheduler_reindeer"),
+                        progressbar_height: 0,
+                        loop_mode: true,
+                        auto_play: false,
+                        on_end: function(gif) {
+                console.log("playback finished");
+            }}).load();
         });
         var buttonActive = $("#toggle-icon").hasClass("nc-minimal-down");
         function toggleOutput() {
@@ -51,13 +65,13 @@
             <li class="list-group-item" id="main-service-item">
                 <div>
                     <h4 class="h-no-newline" id="main-service-status">ChristmasPi Service - Installing</h4>
-                    <img class="float-right" id="main-service-icon" src="/img/icons/reindeer.gif" width="57.6" height="41.4" />
+                    <img id="pi_reindeer" class="float-right" id="main-service-icon" src="/img/icons/reindeer.gif" width="57.6" height="41.4" rel:auto_play="0" />
                 </div>
             </li>
             <li class="list-group-item" id="scheduler-service-item">
                 <div>
                     <h4 class="h-no-newline" id="scheduler-service-status">Scheduler Service - Waiting</h4>
-                    <img class="float-right hidden" id="scheduler-service-icon" src="/img/icons/reindeer.gif" width="57.6" height="41.4" />
+                    <img id="scheduler_reindeer" class="float-right hidden" id="scheduler-service-icon" src="/img/icons/reindeer.gif" width="57.6" height="41.4" rel:auto_play="0" />
                 </div>
             </li>
             <li class="list-group-item">

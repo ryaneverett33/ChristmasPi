@@ -924,6 +924,17 @@
             get_auto_play    : function() { return options.auto_play },
             get_length       : function() { return player.length() },
             get_current_frame: function() { return player.current_frame() },
+
+            // Custom methods
+            // Stops the gif from looping
+            stop_loop        : function() { overrideLoopMode = false; },
+            // Starts playing a looping gif
+            restart_and_loop : function() {
+                player.current_frame = 0;
+                overrideLoopMode = true;
+                player.play();
+            },
+
             load_url: function(src,callback){
                 if (!load_setup(callback)) return;
 
