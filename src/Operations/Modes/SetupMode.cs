@@ -82,6 +82,7 @@ namespace ChristmasPi.Operations.Modes {
         #region IOperationMode Methods
         public void Activate(bool defaultmode) {
             Log.ForContext("ClassName", "AnimationMode").Information("Activated Setup Mode");
+            // TODO Load current setup progress
             Configuration = ConfigurationManager.Instance.CurrentTreeConfig;
             SetCurrentStep("start");
         }

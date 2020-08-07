@@ -38,6 +38,7 @@ namespace ChristmasPi.Data {
         public static readonly string SCHEDULE_FILE_OLD = "schedule.old.json";
         public static readonly string LOG_FILE = "ChristmasPi.log";
         public static readonly string ASP_LOG_FILE = "aspnet.log";
+        public static readonly string SETUP_PROGRESS_FILE = "Setup.Progress.json";
 
         // Networking
         public static readonly int PORT = 50808;                        // set in asp.net configuration

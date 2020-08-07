@@ -15,8 +15,13 @@
 - [LOGGING] RedirectHandler should have it's own log
 - [BACKEND] Save setup progress and restore setup progress
 	- Allow for setup wizard to restart (after installing service)
+- [BACKEND] SetupMode allow going back to a previous step
 - [BACKEND] Add wait for old ChristmasPi instance to close
 	- Add configuration argument for specifying PID to wait for (or flag to just wait in general)
+- [BACKEND] Use reflection for OperatingMode.GetProperty?
+- [GENERAL] Cleanup TODOs
+	- Implement Animator Dispose
+	- AnimationMode do Info()
 - [BACKEND] Cleanup animations
 	- Implement debug property for animations
 	- Add debug configuration for allowing debug animations

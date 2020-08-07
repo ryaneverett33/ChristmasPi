@@ -40,7 +40,6 @@ namespace ChristmasPi.Data.Models.Scheduler {
         /// </summary>
         /// <returns>An array where each day (Monday=0, Sunday=6) is an array of timeslots</returns>
         public TimeSlot[][] GetSimpleSchedule() {
-            /// TODO
             TimeSlot[][] times = new TimeSlot[7][];
             if (Monday != null && Monday.RuleCount != 0)
                 times[0] = Monday.GetRules();
