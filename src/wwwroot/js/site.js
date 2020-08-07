@@ -588,9 +588,12 @@ function installService(installScheduler) {
             showErrorModal("Failed to start installation process");
         }
         else {
-            if (!installScheduler)
+            if (!installScheduler) {
                 setServiceTitle(false, "Not Installing");
+                viewDisableService("scheduler");
+            }
             $("#installprogress").show();
+            viewStartInstall("christmaspi");
             servicePoller = setInterval(servicesInstallPoller, 500);
         }
     });
@@ -623,21 +626,27 @@ function servicesInstallPoller() {
                     updateText(obj["output"]);
                     successInstall = true;
                     setServiceTitle(true, "Installed");
-                    if (doInstallScheduler)
+                    if (doInstallScheduler) {
                         setServiceTitle(false, "Installing");
+                        viewStartInstall("scheduler");
+                        viewInstallSuccess("christmaspi");
+                    }
                     break;
                 case "Failure":
                     clearInterval(servicePoller);
                     $("#continue-btn").show();
                     updateText(obj["output"]);
                     setServiceTitle(!successInstall, "Failed");
+                    viewInstallFailure();
                     break;
                 case "AllDone":
                     clearInterval(servicePoller);
-                    if (doInstallScheduler)
+                    setServiceTitle(true, "Installed");
+                    viewInstallSuccess("christmaspi");
+                    if (doInstallScheduler) {
                         setServiceTitle(false, "Installed");
-                    else
-                        setServiceTitle(true, "Installed");
+                        viewInstallSuccess("scheduler");
+                    }
                     $("#continue-btn").show();
                     break;
             }

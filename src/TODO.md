@@ -11,6 +11,7 @@
 - [FRONTEND] Implement mobile version of schedule
 - [FRONTEND] Schedule add rule modal should work for mobile
 - [BACKEND] Refactor other controllers to use RedirectHandler
+- [LOGGING] RedirectHandler should have it's own log
 - [BACKEND] Save setup progress and restore setup progress
 	- Allow for setup wizard to restart (after installing service)
 - [BACKEND] Add wait for old ChristmasPi instance to close

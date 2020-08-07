@@ -27,12 +27,11 @@
                     maxTop: 200
                 }
             }
-        }
+        });
+        $('#setup-colorpicker').on('colorpickerChange colorpickerCreate', function (event) {
+            $("#color").val(event.color.toString());
+        });
     });
-    $('#setup-colorpicker').on('colorpickerChange colorpickerCreate', function (event) {
-        $("#color").val(event.color.toString());
-    });
-});
 </script>
 }
 @if (Model.HasError) {

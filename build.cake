@@ -12,11 +12,45 @@ var configuration = Argument("configuration", "Debug");
 // TASKS
 //////////////////////////////////////////////////////////////////////
 
-Task("Clean")
+Task("CleanSrc")
     .Does(() =>
 {
-    var buildDir = Directory("./src/Example/bin") + Directory(configuration);
-    CleanDirectory(buildDir);
+    Information("Cleaning Src");
+    DotNetCoreClean("src/src.csproj");
+    if (DirectoryExists("build/bin/Debug/netcoreapp3.0/wwwroot")) {
+        DeleteDirectory("build/bin/Debug/netcoreapp3.0/wwwroot", new DeleteDirectorySettings {
+            Recursive = true
+        });
+    }
+});
+Task("CleanBranchConfigurator")
+    .IsDependentOn("CleanSrc")
+    .Does(() =>
+{
+    Information("Cleaning Branch Configurator");
+    DotNetCoreClean("build/BranchConfigurator.csproj");
+});
+Task("CleanScheduler")
+    .IsDependentOn("CleanSrc")
+    .Does(() =>
+{
+    Information("Cleaning Scheduler");
+    DotNetCoreClean("build/Scheduler.csproj");
+});
+Task("CleanServer")
+    .IsDependentOn("CleanSrc")
+    .Does(() =>
+{
+    Information("Cleaning Server");
+    DotNetCoreClean("build/Server.csproj");
+});
+Task("Clean")
+    .IsDependentOn("CleanSrc")
+    .Does(() =>
+{
+    RunTarget("CleanServer");
+    RunTarget("CleanScheduler");
+    RunTarget("CleanBranchConfigurator");
 });
 
 Task("BuildSrc")

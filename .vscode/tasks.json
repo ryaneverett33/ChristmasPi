@@ -7,6 +7,12 @@
 			"group": "build",
 			"problemMatcher": [],
 			"label": "build"
+		},
+		{
+			"type": "shell",
+			"command": "dotnet cake --Target=Clean",
+			"problemMatcher": [],
+			"label": "clean"
 		}
 	]
 }

@@ -30,6 +30,5 @@
                 "/Views": "${workspaceFolder}/src/"
             }
         }
-
     ]
 }

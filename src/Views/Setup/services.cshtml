@@ -8,23 +8,24 @@
 }
 @section Scripts {
     <script type="text/javascript">
+        var pi_reindeer_gif = null;
+        var scheduler_reindeer_gif = null;
+        var servicesStatus = ["waiting", "waiting"]
         $(window).on("load", function () {
             $("#continue-btn").hide();
             $("#installprogress").hide();
-            var pi_reindeer_gif = new SuperGif({gif: document.getElementById("pi_reindeer"),
+            pi_reindeer_gif = new SuperGif({gif: document.getElementById("pi_reindeer"),
                         progressbar_height: 0,
                         loop_mode: true,
                         auto_play: false,
-                        on_end: function(gif) {
-                console.log("playback finished");
-            }}).load();
-            var scheduler_reindeer_gif = new SuperGif({gif: document.getElementById("scheduler_reindeer"),
+                        });
+            pi_reindeer_gif.load();
+            scheduler_reindeer_gif = new SuperGif({gif: document.getElementById("scheduler_reindeer"),
                         progressbar_height: 0,
                         loop_mode: true,
                         auto_play: false,
-                        on_end: function(gif) {
-                console.log("playback finished");
-            }}).load();
+                        })
+            scheduler_reindeer_gif.load();
         });
         var buttonActive = $("#toggle-icon").hasClass("nc-minimal-down");
         function toggleOutput() {
@@ -54,6 +55,53 @@
             oReq.open("POST", "/setup/services/finish");
             oReq.send();
         }
+        function viewGifPlaybackFinished(service) {
+            console.log(`playback finished for ${service}`);
+        }
+        function viewStartInstall(service) {
+            console.log(`start install ${service}`);
+            if (service == "christmaspi") {
+                servicesStatus[0] = "installing";
+                pi_reindeer_gif.play();
+            }
+            else {
+                servicesStatus[1] = "installing";
+                scheduler_reindeer_gif.play();
+            }
+        }
+        function viewInstallSuccess(service) {
+            console.log(`install success ${service}`);
+            if (service == "christmaspi") {
+                if (servicesStatus[0] == "installing") {
+                    servicesStatus[0] = "success";
+                    pi_reindeer_gif.stop_loop();
+                    pi_reindeer_gif.set_on_end(function(gif) {
+                        viewGifPlaybackFinished("christmaspi");
+                    });
+                }
+            }
+            else {
+                if (servicesStatus[1] == "installing") {
+                    servicesStatus[1] = "success";
+                    scheduler_reindeer_gif.stop_loop();
+                    scheduler_reindeer_gif.set_on_end(function(gif) {
+                        viewGifPlaybackFinished("scheduler");
+                    });
+                }
+            }
+        }
+        function viewInstallFailure() {
+            console.log(`install failure`);
+        }
+        function viewDisableService(service) {
+            console.log(`disable service ${service}`);
+            if (service == "christmaspi") {
+                servicesStatus[0] = "disabled";
+            }
+            else {
+                servicesStatus[1] = "disabled";
+            }       
+        }
     </script>
 }
 <h4>Would you like to enable the Scheduler service?</h4>
@@ -65,13 +113,17 @@
             <li class="list-group-item" id="main-service-item">
                 <div>
                     <h4 class="h-no-newline" id="main-service-status">ChristmasPi Service - Installing</h4>
-                    <img id="pi_reindeer" class="float-right" id="main-service-icon" src="/img/icons/reindeer.gif" width="57.6" height="41.4" rel:auto_play="0" />
+                    <div class="h-no-newline">
+                        <img id="pi_reindeer" class="float-right h-no-newline" id="main-service-icon" src="/img/icons/reindeer.gif" width="57.6" height="41.4" rel:auto_play="0" />
+                    </div>
                 </div>
             </li>
             <li class="list-group-item" id="scheduler-service-item">
                 <div>
                     <h4 class="h-no-newline" id="scheduler-service-status">Scheduler Service - Waiting</h4>
-                    <img id="scheduler_reindeer" class="float-right hidden" id="scheduler-service-icon" src="/img/icons/reindeer.gif" width="57.6" height="41.4" rel:auto_play="0" />
+                    <div class="h-no-newline">
+                        <img id="scheduler_reindeer" class="float-right hidden" id="scheduler-service-icon" src="/img/icons/reindeer.gif" width="57.6" height="41.4" rel:auto_play="0" />
+                    </div>
                 </div>
             </li>
             <li class="list-group-item">

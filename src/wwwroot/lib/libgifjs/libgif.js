@@ -934,6 +934,8 @@
                 overrideLoopMode = true;
                 player.play();
             },
+            // Sets the callback to fire when the loop finishes
+            set_on_end       : function(callback) { onEndListener = callback; },
 
             load_url: function(src,callback){
                 if (!load_setup(callback)) return;
