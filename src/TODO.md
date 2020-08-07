@@ -10,6 +10,7 @@
 - [FRONTEND] Replace hardware/unknown.png or give proper credit
 - [FRONTEND] Implement mobile version of schedule
 - [FRONTEND] Schedule add rule modal should work for mobile
+- [FRONTEND] Refactor site.js into Section Scripts
 - [BACKEND] Refactor other controllers to use RedirectHandler
 - [LOGGING] RedirectHandler should have it's own log
 - [BACKEND] Save setup progress and restore setup progress
