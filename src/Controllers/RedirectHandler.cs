@@ -40,7 +40,7 @@ namespace ChristmasPi.Controllers {
 
         public static void Init() {
             Instance.DoSetup = ConfigurationManager.Instance.CurrentTreeConfig.setup.firstrun;
-            if (!ConfigurationManager.Instance.DebugConfiguration.IgnorePrivileges)
+            if (!ConfigurationManager.Instance.RuntimeConfiguration.IgnorePrivileges)
                 Instance.NotAdminError = !OSUtils.IsAdmin();
             if (Instance.actionLookupTable == null)
                 Instance.actionLookupTable = new Dictionary<string, Dictionary<string, string>>();

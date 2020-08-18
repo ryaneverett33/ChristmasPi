@@ -2,8 +2,7 @@
 using ChristmasPi.Util.Arguments;
 
 namespace ChristmasPi.Data.Models {
-    public class DebugConfiguration {
-
+    public class RuntimeConfiguration {
         [HelpSection("Debug")]
         [Argument("tr", "Allows the test renderer to be selected during setup", true)]
         public bool AllowTestRenderer;
@@ -20,11 +19,15 @@ namespace ChristmasPi.Data.Models {
         [Argument("log-asp", "Additionally logs ASP.NET data to a seperate log file", true)]
         public bool ASPLogging;
 
-        public DebugConfiguration() {
+        [Argument("setup-progress-file", "Use data to continue the setup process", "", ArgumentFlags.HasValue)]
+        public string SetupProgressFile;
+
+        public RuntimeConfiguration() {
             AllowTestRenderer = false;
             IgnorePrivileges = false;
             DebugLogging = false;
             ASPLogging = false;
+            SetupProgressFile = null;
         }
     }
 }

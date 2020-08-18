@@ -11,7 +11,9 @@ using ChristmasPi.Data.Models;
 using ChristmasPi.Util;
 using ChristmasPi.Models;
 using System.Drawing;
+using System.IO;
 using Serilog;
+using Newtonsoft.Json;
 
 namespace ChristmasPi.Operations.Modes {
     public class SetupMode : IOperationMode, ISetupMode {
@@ -35,6 +37,7 @@ namespace ChristmasPi.Operations.Modes {
         private bool serviceHasUpdate;
         private bool servicesInstalled;
         private ServiceStatusModel lastStatusUpdate;
+        private SetupProgress currentProgress;
         #endregion
         public SetupMode() {
             steps = new SetupStep[] {
@@ -69,6 +72,7 @@ namespace ChristmasPi.Operations.Modes {
                 {"ServicesFinish","services/finish"},
                 {"SetupComplete","setup/complete"}
             };
+            loadCurrentProgress();
             SetCurrentStep(null);
             Controllers.RedirectHandler.AddOnRegisteringLookupHandler(() => {
                 if (!Controllers.RedirectHandler.IsActionLookupRegistered("Setup")) {
@@ -427,6 +431,41 @@ namespace ChristmasPi.Operations.Modes {
             if (!renderer.AutoRender)
                 renderer.Render(renderer);
         }
+
+        private void loadCurrentProgress() {
+            string SetupProgressFile = ConfigurationManager.Instance.RuntimeConfiguration.SetupProgressFile;
+            if (SetupProgressFile != null) {
+                if (!File.Exists(SetupProgressFile)) {
+                    Log.ForContext("ClassName", "SetupMode").Information("Setup Progress file not found");
+                    Log.ForContext("ClassName", "SetupMode").Debug("Using a blank setup progress object");
+                    currentProgress = new SetupProgress();
+                }
+                else {
+                    string json = "";
+                    try {
+                        json = File.ReadAllText(SetupProgressFile);
+                        currentProgress = JsonConvert.DeserializeObject<SetupProgress>(json);
+                    }
+                    catch (JsonSerializationException jsonerr) {
+                        Log.ForContext("ClassName", "SetupMode").Error(jsonerr, "Failed to deserialize progress file");
+                        Log.ForContext("ClassName", "SetupMode").Debug("Progress file contents: {json}", json);   
+                    }
+                    catch (Exception e) {
+                        Log.ForContext("ClassName", "SetupMode").Error(e, "Failed to load current progress");
+                    }
+                    finally {
+                        if (currentProgress == null) {
+                            Log.ForContext("ClassName", "SetupMode").Debug("Using a blank setup progress object");
+                            currentProgress = new SetupProgress();
+                        }
+                    }
+                }
+            }
+            else {
+                Log.Debug("Using a blank setup progress object");
+                currentProgress = new SetupProgress();
+            }
+        }
         #endregion
         public string ShouldRedirect(string controller, string action, string method) {
             Log.ForContext("ClassName", "AnimationMode").Debug("Called SetupMode ShouldRedirect");
@@ -466,13 +505,6 @@ namespace ChristmasPi.Operations.Modes {
                     return null;
                 return $"/setup/{CurrentStepName}";
             }
-        }
-    }
-    public class SetupStep {
-        public string Name;
-        public bool Completed;
-        public SetupStep(string name) {
-            Name = name;
         }
     }
 }

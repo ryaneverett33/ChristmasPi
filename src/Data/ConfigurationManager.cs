@@ -27,7 +27,7 @@ namespace ChristmasPi.Data {
         /// <summary>
         /// Debug configuration specified at runtime
         /// </summary>
-        public DebugConfiguration DebugConfiguration;
+        public RuntimeConfiguration RuntimeConfiguration;
 
         /// <summary>
         /// Tree Configuration loaded at startup
@@ -55,8 +55,17 @@ namespace ChristmasPi.Data {
                 StartupTreeConfig = TreeConfiguration.DefaultSettings();
             }
             else {
-                string json = File.ReadAllText(configuration);
-                StartupTreeConfig = JsonConvert.DeserializeObject<TreeConfiguration>(json);
+                try {
+                    string json = File.ReadAllText(configuration);
+                    StartupTreeConfig = JsonConvert.DeserializeObject<TreeConfiguration>(json);
+                }
+                catch (JsonSerializationException jsonerr) {
+                    Log.ForContext("ClassName", "ConfigurationManager").Debug(jsonerr, "Unable to deserialize configuration file");
+                    Log.ForContext("ClassName", "ConfigurationManager").Error("Unable to load configuration, file may be corrupted");
+                }
+                catch (Exception e) {
+                    Log.ForContext("ClassName", "ConfigurationManager").Error(e, "Failed to load configuration info");
+                }
             }
             CurrentTreeConfig = StartupTreeConfig;
         }
@@ -68,8 +77,17 @@ namespace ChristmasPi.Data {
                 CurrentSchedule = WeekSchedule.DefaultSchedule();
             }
             else {
-                string json = File.ReadAllText(schedule);
-                CurrentSchedule = JsonConvert.DeserializeObject<WeekSchedule>(json);
+                try {
+                    string json = File.ReadAllText(schedule);
+                    CurrentSchedule = JsonConvert.DeserializeObject<WeekSchedule>(json);
+                }
+                catch (JsonSerializationException jsonerr) {
+                    Log.ForContext("ClassName", "ConfigurationManager").Debug(jsonerr, "Unable to deserialize schedule file");
+                    Log.ForContext("ClassName", "ConfigurationManager").Error("Unable to load schedule, file may be corrupted");
+                }
+                catch (Exception e) {
+                    Log.ForContext("ClassName", "ConfigurationManager").Error(e, "Exception occurred when loading schedule");
+                }
             }
         }
 
@@ -85,6 +103,10 @@ namespace ChristmasPi.Data {
                 if (File.Exists(configuration))
                     File.Move(configuration, Constants.CONFIGURATION_FILE_OLD, true);
                 File.WriteAllText(configuration, json);
+            }
+            catch (JsonSerializationException jsonerr) {
+                Log.ForContext("ClassName", "ConfigurationManager").Debug(jsonerr, "Unable to serialize configuration file");
+                Log.ForContext("ClassName", "ConfigurationManager").Error("Unable to save configuration, data may be corrupted");
             }
             catch (Exception e) {
                 Log.ForContext("ClassName", "ConfigurationManager").Error(e, "Failed to save tree configuration");
@@ -104,6 +126,10 @@ namespace ChristmasPi.Data {
                     File.Move(schedule, Constants.SCHEDULE_FILE_OLD, true);
                 File.WriteAllText(schedule, json);
             }
+            catch (JsonSerializationException jsonerr) {
+                Log.ForContext("ClassName", "ConfigurationManager").Debug(jsonerr, "Unable to serialize schedule file");
+                Log.ForContext("ClassName", "ConfigurationManager").Error("Unable to save schedule, data may be corrupted");
+            }
             catch (Exception e) {
                 Log.ForContext("ClassName", "ConfigurationManager").Error(e, "Failed to save schedule info");
             }
@@ -115,24 +141,25 @@ namespace ChristmasPi.Data {
         /// <param name="args">the Arguments passed to the main entry point</param>
         /// <returns>Whether or not parsing was successful (and the program should continue)</returns>
         public bool LoadDebugConfiguration(string[] args) {
-            DebugConfiguration = new DebugConfiguration();
-            ArgumentHelper helper = new ArgumentHelper(DebugConfiguration);
+            RuntimeConfiguration = new RuntimeConfiguration();
+            ArgumentHelper helper = new ArgumentHelper(RuntimeConfiguration);
             return helper.Parse(args);
         }
 
+
         /// <summary>
-        /// Handles setting up the neccessary parameters for logging
+        /// Handles setting up the necessary parameters for logging
         /// </summary>
         public void InitializeLogger() {
             var configuration = new LoggerConfiguration();
             var aspExp = "StartsWith(SourceContext, 'Microsoft') or SourceContext = 'Serilog.AspNetCore.RequestLoggingMiddleware'";
-            if (DebugConfiguration.DebugLogging)
+            if (RuntimeConfiguration.DebugLogging)
                 configuration.MinimumLevel.Debug();
             else
                 configuration.MinimumLevel.Information();
             configuration.Enrich.WithExceptionDetails()
             .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Information);
-            if (DebugConfiguration.ASPLogging) {
+            if (RuntimeConfiguration.ASPLogging) {
                 configuration.WriteTo.Logger(lg => lg
                     .Filter.ByIncludingOnly(aspExp)
                     .WriteTo.File(Constants.ASP_LOG_FILE,

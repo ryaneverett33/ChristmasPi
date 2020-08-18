@@ -109,7 +109,7 @@ namespace ChristmasPi.Util.Arguments {
         /// <param name="message">Help message</param>
         /// <returns>A filled-out RuntimeArgument object with ArgumentFlags.Reserved applied</returns>
         public static RuntimeArgument Reserved(string key, string message) {
-            Argument arg = new Argument(key, message, null, ArgumentFlags.Reserved);
+            Argument arg = Argument.Reserved(key, message, null);
             HelpSection helpSection = new HelpSection("Reserved");
             return new RuntimeArgument(arg, helpSection);
         }

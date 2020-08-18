@@ -29,8 +29,10 @@ namespace ChristmasPi.Util.Arguments {
         public object DefaultValue { get; private set; }
 
         public Argument(string key, string message, object defaultvalue, ArgumentFlags flags) {
-            // if (flags.HasFlag(ArgumentFlags.Reserved))
-            //    throw new FieldAccessException("User arguments are not allowed to use the Reserved flag");
+            if (flags.HasFlag(ArgumentFlags.Reserved))
+                throw new FieldAccessException("User arguments are not allowed to use the Reserved flag");
+            if (defaultvalue == null && flags.HasFlag(ArgumentFlags.HasValue))
+                throw new ArgumentException("Default Value cannot be null with ArgumentFlags.HasValue");
             Key = key;
             Message = message;
             Flags = flags;
@@ -41,6 +43,12 @@ namespace ChristmasPi.Util.Arguments {
             Key = key;
             Message = message;
             DefaultValue = defaultvalue;
+        }
+
+        protected internal static Argument Reserved(string key, string message, object defaultvalue) {
+            Argument arg = new Argument(key, message, defaultvalue);
+            arg.Flags = ArgumentFlags.Reserved;
+            return arg;
         }
     }
 
