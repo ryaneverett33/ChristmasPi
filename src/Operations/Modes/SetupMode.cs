@@ -73,7 +73,8 @@ namespace ChristmasPi.Operations.Modes {
                 {"SetupComplete","setup/complete"}
             };
             loadCurrentProgress();
-            SetCurrentStep(null);
+            currentProgress.LoadSteps(steps);
+            currentProgress.SetCurrentStep(null);
             Controllers.RedirectHandler.AddOnRegisteringLookupHandler(() => {
                 if (!Controllers.RedirectHandler.IsActionLookupRegistered("Setup")) {
                     Controllers.RedirectHandler.RegisterActionLookup("Setup", validActions);
@@ -102,59 +103,11 @@ namespace ChristmasPi.Operations.Modes {
         }
         #endregion
         #region Methods
-        /// <summary>
-        /// Gets the next step in the setup process
-        /// </summary>
-        /// <param name="currentpage">The current step in the setup process</param>
-        /// <returns>The name of the next setup step</returns>
-        public string GetNext(string currentpage) {
-            for (int i = 0; i < steps.Length; i++) {
-                if (steps[i].Name.Equals(currentpage, StringComparison.CurrentCultureIgnoreCase)) {
-                    if (i + 1 >= steps.Length)
-                        return null;
-                    return steps[i+1].Name;
-                }
-            }
-            return null;
-        }
 
-        /// <summary>
-        /// Sets the current step in the setup process
-        /// </summary>
-        /// <param name="newstep">The new setup step</param>
-        /// <remarks>This should only be called by the SetupController</remarks>
-        public void SetCurrentStep(string newstep) {
-            Log.ForContext("ClassName", "AnimationMode").Debug("Setting current step: {newstep}", newstep);
-            if (newstep == null || newstep.Length == 0 || newstep == "null")
-                return;
-            SetupStep step = steps.Where(step => step.Name.Equals(newstep)).Single();
-            CurrentStepName = step.Name;
-        }
-        public void CompleteStep() {
-            // completes the current step in a linear fashion
-            if (CurrentStepName == null || CurrentStepName.Length == 0) {
-                Log.ForContext("ClassName", "AnimationMode").Error("CompleteStep() CurrentStepName is null");
-                return;
-            }
-            int currentStepIndex = -1;
-            // get index of current step and check if previous steps are completed
-            for (int i = 0; i < steps.Length; i++) {
-                if (steps[i].Name == CurrentStepName) {
-                    currentStepIndex = i;
-                    break;
-                }
-                else {
-                    if (!steps[i].Completed)
-                        throw new ApplicationException("Setup not completed in linear order");
-                }
-            }
-            if (currentStepIndex == -1)
-                throw new ApplicationException("Unable to find index for the current setup step");
-            steps[currentStepIndex].Completed = true;
-        }
-        public bool IsStepFinished(string step) {
-            return steps.Where(s => s.Name == step).Single().Completed;
-        }
+        public string GetNext(string currentpage) => currentProgress.GetNextStep(currentpage);
+        public void SetCurrentStep(string newstep) => currentProgress.SetCurrentStep(newstep);
+        public void CompleteStep() => currentProgress.CompleteStep();
+        public bool IsStepFinished(string step) => currentProgress.IsStepFinished(step);
 
         /// <summary>
         /// Complete the setup process and switch to the default operating mode
