@@ -31,10 +31,10 @@ namespace ChristmasPi.Operations {
             }
             // Set Current Operating mode
             try {
+                DefaultOperatingMode = ConfigurationManager.Instance.CurrentTreeConfig.tree.defaultmode;
                 if (ConfigurationManager.Instance.CurrentTreeConfig.setup.firstrun)
-                    setCurrentMode("NothingMode", true);
+                    setCurrentMode("SetupMode", true);
                 else {
-                    DefaultOperatingMode = ConfigurationManager.Instance.CurrentTreeConfig.tree.defaultmode;
                     setCurrentMode(ConfigurationManager.Instance.CurrentTreeConfig.tree.defaultmode, true);
                 }
             }

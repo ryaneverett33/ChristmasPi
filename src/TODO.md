@@ -14,10 +14,18 @@
 - [BACKEND] Refactor other controllers to use RedirectHandler
 - [LOGGING] RedirectHandler should have it's own log
 - [BACKEND] Save setup progress and restore setup progress
-	- Allow for setup wizard to restart (after installing service)
-- [BACKEND] SetupMode allow going back to a previous step
+	- Allow for setup wizard to restart (after installing service)	/
+	- Write pid file before installing service
 - [BACKEND] Add wait for old ChristmasPi instance to close
 	- Add configuration argument for specifying PID to wait for (or flag to just wait in general)
+		- Add daemon flag
+			- Check for existence of pid file
+			- Don't log to Console
+		- Write pid to file and then exit program
+		- Handle frontend reboot view
+		- Add startup check for pid
+		- Handle waiting for pid to exit
+			- https://stackoverflow.com/a/9153003 `kill(pid, 0)` -> check errno
 - [BACKEND] Use reflection for OperatingMode.GetProperty?
 - [GENERAL] Cleanup TODOs
 	- Implement Animator Dispose

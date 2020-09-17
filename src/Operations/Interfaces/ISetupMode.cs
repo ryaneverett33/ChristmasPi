@@ -13,6 +13,7 @@ namespace ChristmasPi.Operations.Interfaces {
         void SetCurrentStep(string currentstep);
         void CompleteStep();
         bool IsStepFinished(string step);
+        void Start();
         void Finish();
         bool SetHardware(RendererType rendererType, int datapin);
         bool SetLights(int lightcount, int fps, int brightness);
@@ -25,5 +26,6 @@ namespace ChristmasPi.Operations.Interfaces {
         bool RemoveLight();
         bool StartServicesInstall(bool installSchedulerService);
         ServiceStatusModel GetServicesInstallProgress();
+        string SaveSetupProgress();
     }
 }

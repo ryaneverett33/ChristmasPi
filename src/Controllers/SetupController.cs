@@ -31,12 +31,6 @@ Defaults
         public IActionResult Index() {
             if (RedirectHandler.ShouldRedirect(this.RouteData, "get") is IActionResult redirect)
                 return redirect;
-            // redirect to current page if setup has already started
-            //if (OperationManager.Instance.CurrentOperatingMode is ISetupMode) {
-            //    string currentStep = (OperationManager.Instance.CurrentOperatingMode as ISetupMode).CurrentStepName;
-            //    return new RedirectResult($"/setup/{currentStep}");
-            //}
-            
             return View();
         }
 
@@ -47,13 +41,17 @@ Defaults
             // check if we can start the setup process
             if (!ConfigurationManager.Instance.CurrentTreeConfig.setup.firstrun)
                 return new BadRequestObjectResult("Setup already ran");
-            if (OperationManager.Instance.CurrentOperatingMode is ISetupMode)
-                return new BadRequestObjectResult("Already started setup");
+            if (OperationManager.Instance.CurrentOperatingMode is ISetupMode) {
+                if ((OperationManager.Instance.CurrentOperatingMode as ISetupMode).CurrentStepName != "index" &&
+                    (OperationManager.Instance.CurrentOperatingMode as ISetupMode).CurrentStepName != "start")
+                    return new BadRequestObjectResult("Already started setup");
+            }
             // start setup mode
-            OperationManager.Instance.SwitchModes("SetupMode");
+            if (!(OperationManager.Instance.CurrentOperatingMode is ISetupMode))
+                OperationManager.Instance.SwitchModes("SetupMode");
             if (!(OperationManager.Instance.CurrentOperatingMode is ISetupMode))
                 return new StatusCodeResult(500);
-            (OperationManager.Instance.CurrentOperatingMode as ISetupMode).CompleteStep();
+            (OperationManager.Instance.CurrentOperatingMode as ISetupMode).Start();
             return new OkResult();
         }
         [HttpGet("/setup/next")]
@@ -265,6 +263,8 @@ Defaults
             if (RedirectHandler.ShouldRedirect(this.RouteData, "post") is IActionResult redirect)
                 return redirect;
             (OperationManager.Instance.CurrentOperatingMode as ISetupMode).Finish();
+            // switch to default operating mode
+            OperationManager.Instance.SwitchModes(OperationManager.Instance.DefaultOperatingMode);
             return Ok();
         }
     }

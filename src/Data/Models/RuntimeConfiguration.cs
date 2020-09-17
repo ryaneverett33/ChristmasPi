@@ -19,15 +19,11 @@ namespace ChristmasPi.Data.Models {
         [Argument("log-asp", "Additionally logs ASP.NET data to a seperate log file", true)]
         public bool ASPLogging;
 
-        [Argument("setup-progress-file", "Use data to continue the setup process", "", ArgumentFlags.HasValue)]
-        public string SetupProgressFile;
-
         public RuntimeConfiguration() {
             AllowTestRenderer = false;
             IgnorePrivileges = false;
             DebugLogging = false;
             ASPLogging = false;
-            SetupProgressFile = null;
         }
     }
 }

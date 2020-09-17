@@ -23,10 +23,9 @@ namespace ChristmasPi.Operations.Modes {
         public bool IsInstallingAService => currentServiceInstaller != null;
         #endregion
         #region Fields
-        private SetupStep[] steps;
         private Dictionary<string, string> validActions;
-        public string CurrentStepName { get; private set; }
-        public TreeConfiguration Configuration { get; private set; } 
+        public string CurrentStepName => currentProgress == null ? "" : currentProgress.CurrentStep;
+        public TreeConfiguration Configuration => currentProgress == null ? null : currentProgress.CurrentConfiguration;
         public bool IsSettingUpBranches { get; private set; }
         private IRenderer renderer;
         private List<Color> usedColors;
@@ -40,17 +39,17 @@ namespace ChristmasPi.Operations.Modes {
         private SetupProgress currentProgress;
         #endregion
         public SetupMode() {
-            steps = new SetupStep[] {
-                new SetupStep("start"),
-                new SetupStep("hardware"),
-                new SetupStep("lights"),
-                new SetupStep("branches"),
-                new SetupStep("defaults"),
-                new SetupStep("services"),
-                new SetupStep("finished")
+            string[] steps = new string[] {
+                "start",
+                "hardware",
+                "lights",
+                "branches",
+                "defaults",
+                "services",
+                "finished"
             };
             validActions = new Dictionary<string, string>() {
-                {"Index","index"},
+                {"Index","start"},
                 {"Start","start"},
                 {"Next","next"},
                 {"SetupHardware","hardware"},
@@ -74,7 +73,6 @@ namespace ChristmasPi.Operations.Modes {
             };
             loadCurrentProgress();
             currentProgress.LoadSteps(steps);
-            currentProgress.SetCurrentStep(null);
             Controllers.RedirectHandler.AddOnRegisteringLookupHandler(() => {
                 if (!Controllers.RedirectHandler.IsActionLookupRegistered("Setup")) {
                     Controllers.RedirectHandler.RegisterActionLookup("Setup", validActions);
@@ -87,9 +85,7 @@ namespace ChristmasPi.Operations.Modes {
         #region IOperationMode Methods
         public void Activate(bool defaultmode) {
             Log.ForContext("ClassName", "AnimationMode").Information("Activated Setup Mode");
-            // TODO Load current setup progress
-            Configuration = ConfigurationManager.Instance.CurrentTreeConfig;
-            SetCurrentStep("start");
+            //currentProgress.StartSetup();
         }
         public void Deactivate() {
             Log.ForContext("ClassName", "AnimationMode").Information("Deactivated Setup Mode");
@@ -110,8 +106,16 @@ namespace ChristmasPi.Operations.Modes {
         public bool IsStepFinished(string step) => currentProgress.IsStepFinished(step);
 
         /// <summary>
-        /// Complete the setup process and switch to the default operating mode
+        /// Starts the setup process
         /// </summary>
+        public void Start() {
+            currentProgress.StartSetup();
+        }
+
+        /// <summary>
+        /// Complete the setup process
+        /// </summary>
+        /// <remarks>The caller function should set the current operating mode to the default operating mode</remarks>
         public void Finish() {
             // set firstrun to false
             // set current configuration
@@ -120,6 +124,7 @@ namespace ChristmasPi.Operations.Modes {
             Configuration.setup.firstrun = false;
             ConfigurationManager.Instance.CurrentTreeConfig = Configuration;
             ConfigurationManager.Instance.SaveConfiguration();
+            currentProgress.FinishSetup();
         }
 
         /// <summary>
@@ -299,6 +304,33 @@ namespace ChristmasPi.Operations.Modes {
             currentServiceInstaller.StartInstall();
             return true;
         }
+        
+        /// <summary>
+        /// Save current setup progress to a file
+        /// </summary>
+        /// <returns>Filename where data is saved</returns>
+        public string SaveSetupProgress() {
+            if (currentProgress == null) {
+                Log.ForContext("ClassName", "SetupMode").Debug("Attempted to save setup progress but progress object has been created");
+                Log.ForContext("ClassName", "SetupMode").Error("Unable to Save Setup Progress");
+                return null;
+            }
+            try {
+                string json = JsonConvert.SerializeObject(currentProgress);
+                File.WriteAllText(Constants.SETUP_PROGRESS_FILE, json);
+                return Constants.SETUP_PROGRESS_FILE;
+            }
+            catch (JsonSerializationException jsonerr) {
+                Log.ForContext("ClassName", "SetupMode").Error(jsonerr, "Unable to serialize setup progress object");
+            }
+            catch (IOException ioerr) {
+                Log.ForContext("ClassName", "SetupMode").Error(ioerr, "Unable to save progress file due to an IO error");
+            }
+            catch (Exception e) {
+                Log.ForContext("ClassName", "SetupMode").Error(e, "Unable to Save Setup Progress due to an error");
+            }
+            return null;
+        }
         private void serviceInstallHandler(ServiceInstallState state) {
             switch (state.Status) {
                 case InstallationStatus.Success:
@@ -386,7 +418,9 @@ namespace ChristmasPi.Operations.Modes {
         }
 
         private void loadCurrentProgress() {
-            string SetupProgressFile = ConfigurationManager.Instance.RuntimeConfiguration.SetupProgressFile;
+            string SetupProgressFile = null;
+            if (File.Exists(Constants.SETUP_PROGRESS_FILE))
+                SetupProgressFile = Constants.SETUP_PROGRESS_FILE;
             if (SetupProgressFile != null) {
                 if (!File.Exists(SetupProgressFile)) {
                     Log.ForContext("ClassName", "SetupMode").Information("Setup Progress file not found");
@@ -432,32 +466,28 @@ namespace ChristmasPi.Operations.Modes {
             }
                 
             // redirect to current page if setup has begun
-            // redirect to setup start if setup hasn't begun
-            bool activated = OperationManager.Instance.CurrentOperatingMode is ISetupMode;
-            if (!activated) {
-                if (action != "Index") // if not actively running setup, only allow the index page to be viewed
-                    return "/setup/";
-                else
-                    return null;
-            }
-            else {
-                // ignore these actions
-                if (action.ToLower() == "start" || action.ToLower() == "next" || action.ToLower() == "finished")
-                    return null;
-                // redirect to current page
-                // NOTE: SetCurrentPage is called after navigating to page, so redirect should account for going to the next page
-                string nextPage = GetNext(CurrentStepName);
-                Log.ForContext("ClassName", "AnimationMode").Debug("nextPage: {nextPage}, currentStepName: {CurrentStepName}", nextPage, CurrentStepName);
-                if (method.ToUpper() == "POST") // don't redirect on POST requests
-                    return null;
-                if (action.ToUpper() == CurrentStepName.ToUpper())  // don't redirect on the current step
-                    return null;
-                if (action.ToUpper() == nextPage.ToUpper() && IsStepFinished(CurrentStepName)) // don't redirect when navigating to the next step
-                    return null;
-                if (action.ToLower() == "services/progress" && CurrentStepName.ToLower() == "services") // don't redirect when trying to get service installation progress
-                    return null;
+            // ignore these actions
+            if ((action.ToLower() == "start" && !IsStepFinished("start")) 
+                || action.ToLower() == "next"
+                || (action.ToLower() == "finished" && !IsStepFinished("finished")))
+                return null;
+            if (method.ToUpper() == "POST") // don't redirect on POST requests
+                return null;
+            // redirect to current page
+            // NOTE: SetCurrentPage is called after navigating to page, so redirect should account for going to the next page
+            string nextPage = GetNext(CurrentStepName);
+            if (nextPage == null)
                 return $"/setup/{CurrentStepName}";
-            }
+            Log.ForContext("ClassName", "AnimationMode").Debug("nextPage: {nextPage}, currentStepName: {CurrentStepName}", nextPage, CurrentStepName);
+            if (CurrentStepName == null)
+                return null;
+            if (action.ToUpper() == CurrentStepName.ToUpper())  // don't redirect on the current step
+                return null;
+            if (action.ToUpper() == nextPage.ToUpper() && IsStepFinished(CurrentStepName)) // don't redirect when navigating to the next step
+                return null;
+            if (action.ToLower() == "services/progress" && CurrentStepName.ToLower() == "services") // don't redirect when trying to get service installation progress
+                return null;
+            return $"/setup/{CurrentStepName}";
         }
     }
 }
