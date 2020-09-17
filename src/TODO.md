@@ -13,9 +13,6 @@
 - [FRONTEND] Refactor site.js into Section Scripts
 - [BACKEND] Refactor other controllers to use RedirectHandler
 - [LOGGING] RedirectHandler should have it's own log
-- [BACKEND] Save setup progress and restore setup progress
-	- Allow for setup wizard to restart (after installing service)	/
-	- Write pid file before installing service
 - [BACKEND] Add wait for old ChristmasPi instance to close
 	- Add configuration argument for specifying PID to wait for (or flag to just wait in general)
 		- Add daemon flag

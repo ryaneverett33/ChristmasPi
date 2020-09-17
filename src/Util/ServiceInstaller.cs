@@ -1,7 +1,9 @@
 using System;
 using System.Diagnostics;
 using System.Threading;
+using System.IO;
 using System.Collections.Generic;
+using ChristmasPi.Data;
 using Serilog;
 
 namespace ChristmasPi.Util {
@@ -90,6 +92,8 @@ namespace ChristmasPi.Util {
             writeline("Starting installation process");
             writeline("Info\t\tname: {0}, path: {1}", this.serviceName, this.servicePath);
             OnInstallProgress.Invoke(getState());
+            writePIDFile();
+            writeline("Wrote PID file");
             Thread.Sleep(1500);
             for (int i = 0; i < 10; i++) {
                 writeline("Step {0}", i);
@@ -129,6 +133,29 @@ namespace ChristmasPi.Util {
         private bool daemonReload() {
             // systemctl daemon-reload
             return false;
+        }
+        // Save current process PID to a file
+        private void writePIDFile() {
+            int pid = Process.GetCurrentProcess().Id;
+            string fileContents = String.Format("pid:{0}", pid);
+            try {
+                if (File.Exists(Constants.PID_FILE))
+                    File.Delete(Constants.PID_FILE);
+                using (StreamWriter writer = File.CreateText(Constants.PID_FILE)) {
+                    try {
+                        writer.WriteLine(fileContents);
+                        writer.Flush();
+                    }
+                    catch (IOException writeerr) {
+                        Log.ForContext<ServiceInstaller>().Error(writeerr, "Failed writing pid file");
+                        throw;
+                    }
+                }
+            }
+            catch (UnauthorizedAccessException autherr) {
+                Log.ForContext<ServiceInstaller>().Error(autherr, "Unable to modify file, unauthorized exception");
+                throw;
+            }
         }
 
         private void startInstall() {
