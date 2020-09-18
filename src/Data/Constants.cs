@@ -15,14 +15,17 @@ namespace ChristmasPi.Data {
         public static readonly string REGEX_HEX_WEB_FORMAT = @"[0-9a-fA-F]{3,6}";
         public static readonly string REGEX_AMPM_FORMAT = @"(0|1){0,1}[0-9]:[0-5][0-9] *((AM)|(PM))";
         public static readonly string REGEX_24HR_FORMAT = @"(0|1|2){0,1}[0-9]:[0-5][0-9]";
+        public static readonly string REGEX_PID_FORMAT = @"pid:[0-9]+";
 
         // Operations
         public static readonly string DEFAULT_OPERATING_MODE = "SolidColorMode";
         public static readonly string DEFAULT_ANIMATION = "Twinkle";
         public static readonly int ACTIVATION_TIMEOUT = 1000;           // in ms
         public static readonly int SCHEDULER_MAX_ATTEMPTS = 5;
+        public static readonly int REBOOT_MAX_ATTEMPTS = 30 * 10;      // 30s at 10 polls a second
         public static readonly TimeSpan SCHEDULER_ERR_SLEEP = new TimeSpan(0, 30, 0);
         public static readonly TimeSpan SCHEDULER_LONG_SLEEP = new TimeSpan(1, 0, 0);
+        public static readonly TimeSpan REBOOT_POLL_SLEEP = new TimeSpan(0, 0, 0, 0, 100);      // 100 ms
 
         // Colors
         public static readonly int RANDOM_DEFAULT = 255;

@@ -15,15 +15,16 @@
 - [LOGGING] RedirectHandler should have it's own log
 - [BACKEND] Add wait for old ChristmasPi instance to close
 	- Add configuration argument for specifying PID to wait for (or flag to just wait in general)
-		- Add daemon flag
-			- Check for existence of pid file
-			- Don't log to Console
+		- Add daemon flag /
+			- Check for existence of pid file /
+			- Don't log to Console	/
 		- Write pid to file and then exit program
 		- Handle frontend reboot view
-		- Add startup check for pid
-		- Handle waiting for pid to exit
+		- Handle waiting for pid to exit /
 			- https://stackoverflow.com/a/9153003 `kill(pid, 0)` -> check errno
 - [BACKEND] Use reflection for OperatingMode.GetProperty?
+- [LOGGING] --log-asp should be default and not a debug flag
+	- Add --no-asp-logging as debug flag to remove ASP logging entirely
 - [GENERAL] Cleanup TODOs
 	- Implement Animator Dispose
 	- AnimationMode do Info()

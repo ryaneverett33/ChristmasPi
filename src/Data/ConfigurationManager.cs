@@ -168,14 +168,13 @@ namespace ChristmasPi.Data {
                         outputTemplate: Constants.LOG_FORMAT)
                 );
             }
-            configuration.WriteTo.Logger(lg => lg
-                .Filter.ByExcluding(aspExp)
-                .WriteTo.File(Constants.LOG_FILE,
-                    rollingInterval: RollingInterval.Day,
-                    rollOnFileSizeLimit: true,
-                    outputTemplate: Constants.LOG_FORMAT)
-                .WriteTo.Console(outputTemplate: Constants.LOG_FORMAT)
-            );
+            configuration.Filter.ByExcluding(aspExp)
+            .WriteTo.File(Constants.LOG_FILE,
+                rollingInterval: RollingInterval.Day,
+                rollOnFileSizeLimit: true,
+                outputTemplate: Constants.LOG_FORMAT);
+            if (!RuntimeConfiguration.DaemonMode || RuntimeConfiguration.DaemonLogToConsole)
+                configuration.WriteTo.Console(outputTemplate: Constants.LOG_FORMAT);
             Log.Logger = configuration.CreateLogger();
             RegisterOnShutdownAction("Logger", () => {
                 Log.CloseAndFlush();

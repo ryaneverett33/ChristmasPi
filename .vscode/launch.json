@@ -14,7 +14,9 @@
                 "--tr",
                 "--ignorepriv",
                 "--debug",
-                "--log-asp"
+                "--log-asp",
+                "--daemon",
+                "--daemon-log-console"
             ],
             "cwd": "${workspaceFolder}/build/bin/Debug/netcoreapp3.0/",
             "stopAtEntry": false,

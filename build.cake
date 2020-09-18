@@ -1,5 +1,6 @@
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.11.1
 #load build/tools.cake
+using System.Runtime.InteropServices;
 
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS
@@ -64,6 +65,10 @@ Task("BuildSrc")
         });
     }
     CopyDirectory("src/wwwroot/", "build/bin/Debug/netcoreapp3.0/wwwroot/");
+    if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        CopyFile("src/lib/libpidexists.dylib", "build/bin/Debug/netcoreapp3.0/libpidexists.dylib");
+    else
+        CopyFile("src/lib/libpidexists.so", "build/bin/Debug/netcoreapp3.0/libpidexists.so");
 });
 Task("BuildServer")
     .IsDependentOn("BuildSrc")

@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace ChristmasPi.Util.Wrappers {
     public sealed class pidexistswrapper {
-        [DllImport("libpidexists.so")]
+        [DllImport("pidexists", ExactSpelling=true)]
 		private static extern int pidexists(int pid);
 
         /// <summary>

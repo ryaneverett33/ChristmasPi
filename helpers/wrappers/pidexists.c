@@ -13,6 +13,6 @@ int pidexists(int pid) {
     }
     else {
         // kill returned zero so the process exists
-        return 1;
+        return 0;
     }
 }

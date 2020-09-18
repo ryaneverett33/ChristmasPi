@@ -19,11 +19,25 @@ namespace ChristmasPi.Data.Models {
         [Argument("log-asp", "Additionally logs ASP.NET data to a seperate log file", true)]
         public bool ASPLogging;
 
+        [HelpSection("Debug")]
+        [Argument("ignore-restart", "Ignore any restart attempts", true)]
+        public bool IgnoreRestarts;
+
+        [HelpSection("Debug")]
+        [Argument("daemon-log-console", "Allow console logging in daemon mode", true)]
+        public bool DaemonLogToConsole;
+
+        [Argument("daemon", "Starts the server in a daemon configuration", true)]
+        public bool DaemonMode;
+
         public RuntimeConfiguration() {
             AllowTestRenderer = false;
             IgnorePrivileges = false;
             DebugLogging = false;
             ASPLogging = false;
+            IgnoreRestarts = false;
+            DaemonMode = false;
+            DaemonLogToConsole = false;
         }
     }
 }

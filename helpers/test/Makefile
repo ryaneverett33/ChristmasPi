@@ -2,7 +2,7 @@ CC=gcc
 CFLAGS=-L
 OUT=./
 
-WRAPPERSDIR=../wrappers/
+WRAPPERSDIR=./
 
 testpidexists: testpidexists.c
 	$(MAKE) -C ../wrappers/ pidexists
@@ -10,8 +10,8 @@ testpidexists: testpidexists.c
 	$(CC) $(CFLAGS). -lpidexists testpidexists.c -o $(OUT)testpidexists
 
 clean-testpidexists: 
-	-rm $(OUT)testpidexists
 	-rm $(OUT)libpidexists.so
+	-rm $(OUT)testpidexists
 
 clean: clean-testpidexists
 

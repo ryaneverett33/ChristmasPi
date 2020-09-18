@@ -1,9 +1,10 @@
 CC=gcc
+AR=ar
 CFLAGS=-shared
 OUT=./
 
 pidexists: pidexists.c
-	$(CC) $(CFLAGS) pidexists.c -o $(OUT)libpidexists.so 
+	$(CC) $(CFLAGS) pidexists.c -o $(OUT)libpidexists.so
 
 clean-pidexists: 
 	-rm libpidexists.so

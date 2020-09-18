@@ -16,8 +16,9 @@ using ChristmasPi.Operations;
 using ChristmasPi.Animation;
 using ChristmasPi.Hardware;
 using ChristmasPi.Data.Models.Scheduler;
-using ChristmasPi.Util;
+using ChristmasPi.Util.Wrappers;
 using System.IO;
+using System.Threading;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 
@@ -92,6 +93,25 @@ namespace ChristmasPi
             ConfigurationManager.Instance.LoadConfiguration();
             ConfigurationManager.Instance.LoadSchedule();
             ConfigurationManager.Instance.Configuration = Configuration;
+            if (ConfigurationManager.Instance.RuntimeConfiguration.DaemonMode) {
+                // check for the existence of a pid file
+                if (PIDFile.Load() is int pid) {
+                    // start waiting for pid to exit
+                    bool pidexists = false;
+                    for (int i = 0; i < Constants.REBOOT_MAX_ATTEMPTS; i++) {
+                        if (!pidexistswrapper.PidExists(pid)) {
+                            pidexists = false;
+                            break;
+                        }
+                        pidexists = true;
+                        if (i == Constants.REBOOT_MAX_ATTEMPTS - 1)
+                            Log.ForContext<Startup>().Error("Timedout waiting for old process to exit");
+                        Thread.Sleep(Constants.REBOOT_POLL_SLEEP);
+                    }
+                    if (!pidexists)
+                        Log.ForContext<Startup>().Debug("Successfully rebooted process");
+                }
+            }
         }
         /// <summary>
         /// Starts tree services
