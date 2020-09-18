@@ -21,6 +21,7 @@
 		- Write pid to file and then exit program
 		- Handle frontend reboot view
 		- Handle waiting for pid to exit /
+			- Consume pidfile when waiting /
 			- https://stackoverflow.com/a/9153003 `kill(pid, 0)` -> check errno
 - [BACKEND] Use reflection for OperatingMode.GetProperty?
 - [LOGGING] --log-asp should be default and not a debug flag

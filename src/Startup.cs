@@ -96,6 +96,7 @@ namespace ChristmasPi
             if (ConfigurationManager.Instance.RuntimeConfiguration.DaemonMode) {
                 // check for the existence of a pid file
                 if (PIDFile.Load() is int pid) {
+                    PIDFile.Consume();
                     // start waiting for pid to exit
                     bool pidexists = false;
                     for (int i = 0; i < Constants.REBOOT_MAX_ATTEMPTS; i++) {

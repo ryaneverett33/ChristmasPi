@@ -36,7 +36,7 @@ namespace ChristmasPi.Data.Models {
         /// Loads the PID from a pid file
         /// </summary>
         /// <returns>A null value if the pid file doesn't exist, else the pid stored in the file</returns>
-        /// <exception></exception>
+        /// <seealso cref="Consume" />
         public static int? Load() {
             if (File.Exists(Constants.PID_FILE)) {
                 string fileContents = null;
@@ -67,6 +67,27 @@ namespace ChristmasPi.Data.Models {
                 return int.Parse(keyValue[1]);
             }
             return null;
+        }
+        /// <summary>
+        /// Destroys the current pid file after it's been loaded
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Thrown if there is no pidfile to consume or it has already been consumed</exception>
+        public static void Consume() {
+            if (File.Exists(Constants.PID_FILE)) {
+                try {
+                    File.Delete(Constants.PID_FILE);
+                }
+                catch (IOException ioerr) {
+                    Log.ForContext("ClassName", "PIDFile").Error(ioerr, "Unable to consume pidfile, an IO error occurred");
+                    throw;
+                }
+                catch (UnauthorizedAccessException autherr) {
+                    Log.ForContext("ClassName", "PIDFile").Error(autherr, "Unable to consume pidfile, an unauthorized error occurred");
+                    throw;
+                }
+            }
+            else
+                throw new InvalidOperationException("There is no pidfile to consume");
         }
     }
 }
