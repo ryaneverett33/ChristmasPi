@@ -45,14 +45,14 @@ namespace ChristmasPi.Animation {
     }
     public class BranchData {
         Branch branch;
-        string friendlyName;
+        //string friendlyName;
         public int index;              // position in the tree
         public int LightCount => branch.LightCount;
         public FrameList list;
 
         public BranchData(Branch branch, int index) {
             this.branch = branch;
-            this.friendlyName = null;
+            //this.friendlyName = null;
             this.index = index;
             list = new FrameList();
         }

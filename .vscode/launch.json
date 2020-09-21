@@ -14,7 +14,6 @@
                 "--tr",
                 "--ignorepriv",
                 "--debug",
-                "--log-asp",
                 "--daemon",
                 "--daemon-log-console"
             ],

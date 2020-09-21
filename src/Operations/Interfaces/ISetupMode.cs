@@ -27,5 +27,7 @@ namespace ChristmasPi.Operations.Interfaces {
         bool StartServicesInstall(bool installSchedulerService);
         ServiceStatusModel GetServicesInstallProgress();
         string SaveSetupProgress();
+        bool IsRebootRequired();
+        bool Reboot();
     }
 }

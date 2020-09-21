@@ -1,0 +1,18 @@
+@{
+    ViewData["Title"] = "Setup";
+    ViewData["SetupTitle"] = "Rebooting";
+    ViewData["SetupStep"] = 5;
+    ViewBag.BreadCrumbs = new string[] { "Hardware", "Lights", "Branches", "Defaults", "Services" };
+    ViewBag.ShowProgress = false;
+}
+@section Scripts {
+    <script type="text/javascript">
+        $(window).on('load', function() {
+
+        });
+    </script>
+}
+<h4>Rebooting, please wait</h4>
+<div class='fa-3x'>
+    <i class="fas fa-stroopwafel fa-spin"></i>
+</div>

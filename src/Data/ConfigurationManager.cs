@@ -140,7 +140,7 @@ namespace ChristmasPi.Data {
         /// </summary>
         /// <param name="args">the Arguments passed to the main entry point</param>
         /// <returns>Whether or not parsing was successful (and the program should continue)</returns>
-        public bool LoadDebugConfiguration(string[] args) {
+        public bool LoadRuntimeConfiguration(string[] args) {
             RuntimeConfiguration = new RuntimeConfiguration();
             ArgumentHelper helper = new ArgumentHelper(RuntimeConfiguration);
             return helper.Parse(args);
@@ -159,7 +159,7 @@ namespace ChristmasPi.Data {
                 configuration.MinimumLevel.Information();
             configuration.Enrich.WithExceptionDetails()
             .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Information);
-            if (RuntimeConfiguration.ASPLogging) {
+            if (!RuntimeConfiguration.NoASPLogging) {
                 configuration.WriteTo.Logger(lg => lg
                     .Filter.ByIncludingOnly(aspExp)
                     .WriteTo.File(Constants.ASP_LOG_FILE,

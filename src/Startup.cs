@@ -29,6 +29,7 @@ namespace ChristmasPi
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            HandleWaitForPid();
             ConfigureTree();
             ConfigurationManager.Instance.InitializeShutdown();
             ConfigurationManager.Instance.InitializeLogger();
@@ -92,7 +93,13 @@ namespace ChristmasPi
         public void ConfigureTree() {
             ConfigurationManager.Instance.LoadConfiguration();
             ConfigurationManager.Instance.LoadSchedule();
-            ConfigurationManager.Instance.Configuration = Configuration;
+            ConfigurationManager.Instance.Configuration = Configuration;   
+        }
+
+        /// <summary>
+        /// Handles waiting for a PID to exit if required
+        /// </summary>
+        public void HandleWaitForPid() {
             if (ConfigurationManager.Instance.RuntimeConfiguration.DaemonMode) {
                 // check for the existence of a pid file
                 if (PIDFile.Load() is int pid) {

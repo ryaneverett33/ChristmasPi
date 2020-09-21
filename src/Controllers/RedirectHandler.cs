@@ -117,16 +117,16 @@ namespace ChristmasPi.Controllers {
 
         private string shouldRedirectControllers(string controller, string action, string method) {
             if (!functionRuleTable.ContainsKey(controller)) {
-                Log.ForContext("ClassName", "RedirectHandler").Debug("Function rule doesn't contain a function for {controller}", controller);
+                Log.ForContext<RedirectHandler>().Debug("Function rule doesn't contain a function for {controller}", controller);
                 return null;
             }
             if (actionLookupTable.ContainsKey(controller)) {
-                Log.ForContext("ClassName", "RedirectHandler").Debug("Looking up action for controller: {controller}, action: {action}, method: {method}", controller, action, method);
+                Log.ForContext<RedirectHandler>().Debug("Looking up action for controller: {controller}, action: {action}, method: {method}", controller, action, method);
                 Dictionary<string, string> lookupTable = actionLookupTable[controller];
                 string useAction;
                 if (!lookupTable.ContainsKey(action)) {
-                    Log.ForContext("ClassName", "RedirectHandler").Debug("Lookup table failed");
-                    Log.ForContext("ClassName", "RedirectHandler").Debug("Lookup table for controller {controller} does not have a mapping for action {action}",
+                    Log.ForContext<RedirectHandler>().Debug("Lookup table failed");
+                    Log.ForContext<RedirectHandler>().Debug("Lookup table for controller {controller} does not have a mapping for action {action}",
                                                                         controller, action);
                     useAction = action;
                 }

@@ -16,8 +16,8 @@ namespace ChristmasPi
     {
         public static void Main(string[] args)
         {
-            if (!ConfigurationManager.Instance.LoadDebugConfiguration(args)) {
-                Console.WriteLine("Debug Configuration failed to load, exiting");
+            if (!ConfigurationManager.Instance.LoadRuntimeConfiguration(args)) {
+                Console.WriteLine("Runtime Configuration failed to load, exiting");
                 return;
             }
             CreateWebHostBuilder(args).Build().Run();

@@ -20,7 +20,7 @@ namespace ChristmasPi.Models {
 
         public SetupDefaultsModel() {
             this.HasError = false;
-            DefaultAnimations = Animation.AnimationManager.Instance.GetAnimations();
+            DefaultAnimations = Animation.AnimationManager.Instance.GetAnimations(overrideDebugFlag: true);
             DefaultModes = Operations.OperationManager.Instance.GetModes(false);
             DefaultColor = Data.Constants.DEFAULT_COLOR;
         }

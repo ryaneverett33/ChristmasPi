@@ -133,6 +133,12 @@ Defaults
             };
             return new JsonResult(model);
         }
+        [HttpGet("/setup/services/reboot")]
+        public IActionResult ServicesGetReboot() {
+            if (RedirectHandler.ShouldRedirect(this.RouteData, "get") is IActionResult redirect)
+                return redirect;
+            return View();
+        }
         [HttpGet("/setup/finished")]
         public IActionResult Finished() {
             if (RedirectHandler.ShouldRedirect(this.RouteData, "get") is IActionResult redirect)

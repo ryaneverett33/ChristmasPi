@@ -19,20 +19,27 @@
 			- Check for existence of pid file /
 			- Don't log to Console	/
 		- Write pid to file and then exit program
+		- Handle backend reboot
+			- Installer is responsible for prompting a reboot
+			- Add support for auxiliary setup views
+				- Views that are not setup steps but are part of the setup process
+				- Add support to redirect handler
+			- Implement GetNext for auxiliary views
 		- Handle frontend reboot view
+			- Services page is automatically redirected to reboot page
+			- Implement reboot view+logic
+				- Poll for activity, redirect to next page when activity is detected
 		- Handle waiting for pid to exit /
 			- Consume pidfile when waiting /
 			- https://stackoverflow.com/a/9153003 `kill(pid, 0)` -> check errno
 - [BACKEND] Use reflection for OperatingMode.GetProperty?
-- [LOGGING] --log-asp should be default and not a debug flag
-	- Add --no-asp-logging as debug flag to remove ASP logging entirely
 - [GENERAL] Cleanup TODOs
 	- Implement Animator Dispose
 	- AnimationMode do Info()
 - [BACKEND] Cleanup animations
-	- Implement debug property for animations
-	- Add debug configuration for allowing debug animations
-	- Implement controller logic for filtering out debug animations
+	- Implement debug property for animations /
+	- Add debug configuration for allowing debug animations /
+	- Implement controller logic for filtering out debug animations /
 	- Select which animations should be debug animations
 - [GENERAL] Create installer package
 	- Maybe add bootstrapper script to start setup process

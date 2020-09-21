@@ -377,6 +377,10 @@ namespace ChristmasPi.Operations.Modes {
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public ServiceStatusModel GetServicesInstallProgress() {
             if (currentServiceInstaller == null)
                 return null;
@@ -387,6 +391,24 @@ namespace ChristmasPi.Operations.Modes {
             else {
                 return ServiceStatusModel.Stale();
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public bool IsRebootRequired() {
+            // if service installer requires a reboot
+            throw new NotImplementedException();
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public bool Reboot() {
+            // mark reboot step as complete and exit
+            throw new NotImplementedException();
         }
 
         private void renderLight(Color color, bool increment) {

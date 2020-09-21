@@ -54,12 +54,16 @@ namespace ChristmasPi.Animation {
             };
         }
 
-        public string[] GetAnimations(bool includeDebug = false) {
+        public string[] GetAnimations(bool overrideDebugFlag = false) {
             ICollection<string> keys = Animations.Keys;
             List<string> animationList = new List<string>();
             foreach (string key in keys) {
-                if (Animations[key].isDebugAnimation && !includeDebug)
-                    continue;
+                if (Animations[key].isDebugAnimation) {
+                    // If AllowDebugAnimations is true and override debug flag is false, add the animation
+                    // If override debug flag is true and AllowDebugAnimations, don't add the animation
+                    if (!(ConfigurationManager.Instance.RuntimeConfiguration.AllowDebugAnimations && !overrideDebugFlag))
+                        continue;
+                }
                 animationList.Add(key);
             }
             return animationList.ToArray();
