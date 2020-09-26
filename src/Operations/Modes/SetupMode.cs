@@ -26,6 +26,11 @@ namespace ChristmasPi.Operations.Modes {
         private Dictionary<string, string> validActions;
         public string CurrentStepName => currentProgress == null ? "" : currentProgress.CurrentStep;
         public TreeConfiguration Configuration => currentProgress == null ? null : currentProgress.CurrentConfiguration;
+        public SetupProgress CurrentProgress {
+            get {
+                return currentProgress;
+            }
+        }
         public bool IsSettingUpBranches { get; private set; }
         private IRenderer renderer;
         private List<Color> usedColors;
@@ -49,30 +54,35 @@ namespace ChristmasPi.Operations.Modes {
                 "finished"
             };
             validActions = new Dictionary<string, string>() {
-                {"Index","start"},
-                {"Start","start"},
-                {"Next","next"},
-                {"SetupHardware","hardware"},
-                {"SetupLights","lights"},
-                {"SetupBranches","branches"},
-                {"SetupDefaults","defaults"},
-                {"SetupServices","services"},
-                {"Finished","finished"},
-                {"SubmitHardware","hardware/submit"},
-                {"SubmitLights","light/submit"},
-                {"SubmitBranches","branches/submit"},
-                {"SubmitDefaults","defaults/submit"},
-                {"BranchesNewBranch","branch/new"},
-                {"BranchesRemoveBranch","branch/remove"},
-                {"BranchesAddLight","light/new"},
-                {"BranchesRemoveLight","light/remove"},
-                {"ServicesStartInstall","services/install"},
-                {"ServicesGetProgress","services/progress"},
-                {"ServicesFinish","services/finish"},
-                {"SetupComplete","setup/complete"}
+                {"Index", "start"},
+                {"Start", "start"},
+                {"Next", "next"},
+                {"SetupHardware", "hardware"},
+                {"SetupLights", "lights"},
+                {"SetupBranches", "branches"},
+                {"SetupDefaults", "defaults"},
+                {"SetupServices", "services"},
+                {"Finished", "finished"},
+                {"SubmitHardware", "hardware/submit"},
+                {"SubmitLights", "light/submit"},
+                {"SubmitBranches", "branches/submit"},
+                {"SubmitDefaults", "defaults/submit"},
+                {"BranchesNewBranch", "branch/new"},
+                {"BranchesRemoveBranch", "branch/remove"},
+                {"BranchesAddLight", "light/new"},
+                {"BranchesRemoveLight", "light/remove"},
+                {"ServicesStartInstall", "services/install"},
+                {"ServicesGetProgress", "services/progress"},
+                {"ServicesFinish", "services/finish"},
+                {"SetupComplete", "setup/complete"},
+                {"ServicesAuxGetReboot", "aux/reboot"}
+            };
+            Tuple<string, string, string>[] auxSteps = new Tuple<string, string, string>[] {
+                new Tuple<string, string, string>("reboot", "finish", "services")
             };
             loadCurrentProgress();
             currentProgress.LoadSteps(steps);
+            currentProgress.LoadAuxiliarySteps(auxSteps);
             Controllers.RedirectHandler.AddOnRegisteringLookupHandler(() => {
                 if (!Controllers.RedirectHandler.IsActionLookupRegistered("Setup")) {
                     Controllers.RedirectHandler.RegisterActionLookup("Setup", validActions);
@@ -309,6 +319,7 @@ namespace ChristmasPi.Operations.Modes {
         /// Save current setup progress to a file
         /// </summary>
         /// <returns>Filename where data is saved</returns>
+        /// <remarks>The method call is blocking</remarks>
         public string SaveSetupProgress() {
             if (currentProgress == null) {
                 Log.ForContext("ClassName", "SetupMode").Debug("Attempted to save setup progress but progress object has been created");
@@ -499,7 +510,7 @@ namespace ChristmasPi.Operations.Modes {
             // NOTE: SetCurrentPage is called after navigating to page, so redirect should account for going to the next page
             string nextPage = GetNext(CurrentStepName);
             if (nextPage == null)
-                return $"/setup/{CurrentStepName}";
+                return null;
             Log.ForContext("ClassName", "AnimationMode").Debug("nextPage: {nextPage}, currentStepName: {CurrentStepName}", nextPage, CurrentStepName);
             if (CurrentStepName == null)
                 return null;

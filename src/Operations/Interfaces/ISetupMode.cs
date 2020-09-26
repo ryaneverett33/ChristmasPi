@@ -7,6 +7,7 @@ namespace ChristmasPi.Operations.Interfaces {
     public interface ISetupMode {
         string CurrentStepName { get; }
         TreeConfiguration Configuration { get; }
+        SetupProgress CurrentProgress { get; }
         bool IsSettingUpBranches { get; }
         bool IsInstallingAService { get; }
         string GetNext(string current);

@@ -72,6 +72,8 @@ Defaults
                     return new RedirectResult("/setup/services");
                 case "finished":
                     return new RedirectResult("/setup/finished");
+                case "aux/reboot":
+                    return new RedirectResult("/setup/aux/reboot");
                 default:
                     return new BadRequestObjectResult($"Unable to find next step for {current}");
             }
@@ -133,11 +135,12 @@ Defaults
             };
             return new JsonResult(model);
         }
-        [HttpGet("/setup/services/reboot")]
-        public IActionResult ServicesGetReboot() {
+        [HttpGet("/setup/aux/reboot")]
+        public IActionResult ServicesAuxGetReboot() {
             if (RedirectHandler.ShouldRedirect(this.RouteData, "get") is IActionResult redirect)
                 return redirect;
-            return View();
+            (OperationManager.Instance.CurrentOperatingMode as ISetupMode).CurrentProgress.SetCurrentAuxStep("reboot");
+            return View("reboot");
         }
         [HttpGet("/setup/finished")]
         public IActionResult Finished() {
