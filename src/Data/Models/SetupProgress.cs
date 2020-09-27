@@ -16,18 +16,17 @@ namespace ChristmasPi.Data.Models {
         public SetupStep[] CurrentStepProgress { get; private set; }
         public AuxiliaryStep[] AuxiliarySteps { get; private set; }
         public string CurrentStep { get; private set; }
-        private bool currentStepIsAuxiliary; 
 
         public SetupProgress() {
             CurrentConfiguration = ConfigurationManager.Instance.CurrentTreeConfig;
             CurrentState = SetupState.NotStarted;
-            setCurrentStep(null, false);
+            setCurrentStep(null);
             CurrentStepProgress = null;
         }
 
         internal SetupProgress(TreeConfiguration configuration, string currentStep, SetupState state) {
             this.CurrentConfiguration = configuration;
-            setCurrentStep(currentStep, false);
+            setCurrentStep(currentStep);
             this.CurrentState = state;
             CurrentStepProgress = null;
         }
@@ -48,21 +47,17 @@ namespace ChristmasPi.Data.Models {
                 else
                     return null;
             }
-            int stepIndex = -1;
-            if (currentStepIsAuxiliary)
-                stepIndex = Array.FindIndex<AuxiliaryStep>(AuxiliarySteps, step => step.Name == searchStep);
-            else
-                stepIndex = Array.FindIndex<SetupStep>(CurrentStepProgress, step => step.Name == searchStep);
+            int stepIndex = getStepIndex(searchStep);
             if (stepIndex == -1) {
                 Log.ForContext<SetupProgress>().Debug("CurrentStepProgress does not contain currentstep: {currentstep}", currentStep);
                 throw new ArgumentException("currentStep is not a valid setup step"); 
             }
             else {
-                int lastPageIndex = currentStepIsAuxiliary ? AuxiliarySteps.Length - 1 : CurrentStepProgress.Length - 1;
-                if (stepIndex == lastPageIndex)
+                int lastPageIndex = isAuxiliaryStep(CurrentStep) ? AuxiliarySteps.Length - 1 : CurrentStepProgress.Length - 1;
+                if (stepIndex == lastPageIndex && !isAuxiliaryStep(CurrentStep))
                     return null;
                 else
-                    return currentStepIsAuxiliary ? AuxiliarySteps[stepIndex].Next : CurrentStepProgress[stepIndex + 1].Name;
+                    return isAuxiliaryStep(CurrentStep) ? AuxiliarySteps[stepIndex].Next : CurrentStepProgress[stepIndex + 1].Name;
             }
         }
 
@@ -104,7 +99,7 @@ namespace ChristmasPi.Data.Models {
             }
             if (!isValidStep)
                 throw new InvalidSetupActionException($"Can't set current step to auxiliary {auxstep}, it doesn't exist");
-            setCurrentStep($"aux/{auxstep}", true);
+            setCurrentStep($"aux/{auxstep}");
         }
 
         /// <summary>
@@ -115,14 +110,14 @@ namespace ChristmasPi.Data.Models {
                 Log.ForContext<SetupProgress>().Debug("CompleteStep() silently handling null CurrentStep");
                 return;
             }
-            if (currentStepIsAuxiliary) {
+            if (isAuxiliaryStep(CurrentStep)) {
                 // We don't care about the completion status of auxiliary steps
-                setCurrentStep(GetNextStep(CurrentStep), false);
+                setCurrentStep(GetNextStep(CurrentStep));
                 return;
             }
-            int currentStepIndex = Array.FindIndex<SetupStep>(CurrentStepProgress, step => step.Name == CurrentStep);
+            int currentStepIndex = getStepIndex(CurrentStep);
             CurrentStepProgress[currentStepIndex].Completed = true;
-            setCurrentStep(GetNextStep(CurrentStep), false);
+            setCurrentStep(GetNextStep(CurrentStep));
             //if (OperationManager.Instance.CurrentOperatingModeName == "SetupMode")
             //    (OperationManager.Instance.CurrentOperatingMode as ISetupMode).SaveSetupProgress();
         }
@@ -136,14 +131,12 @@ namespace ChristmasPi.Data.Models {
         public bool IsStepFinished(string step) {
             if (step == null)
                 throw new ArgumentNullException("step");
-            if (step.Contains("aux/")) {
-                int stepIndex = Array.FindIndex<AuxiliaryStep>(AuxiliarySteps, s => s.Name == step);
-                if (stepIndex != -1)
-                    return true;
-                else
-                    throw new ArgumentException($"{step} is not a valid setup step");
-            }
-            return CurrentStepProgress.Where(s => s.Name == step).Single().Completed;
+            int stepIndex = getStepIndex(step);
+            if (stepIndex == -1)
+                throw new ArgumentException($"{step} is not a valid setup step");
+            if (isAuxiliaryStep(step))
+                return true;
+            return CurrentStepProgress[stepIndex].Completed;
         }
         
         /// <summary>
@@ -167,7 +160,7 @@ namespace ChristmasPi.Data.Models {
             if (CurrentStepProgress.Any(s => !s.Completed)) {
                 throw new InvalidSetupActionException("Unable to Finish Setup, some steps aren't complete");
             }
-            setCurrentStep(null, false);
+            setCurrentStep(null);
             CurrentState = SetupState.Finished;
             // Delete any setup files
             if (File.Exists(Constants.SETUP_PROGRESS_FILE))
@@ -183,7 +176,14 @@ namespace ChristmasPi.Data.Models {
             if (steps == null)
                 throw new ArgumentNullException("steps");
             if (CurrentStepProgress != null)
-                throw new InvalidOperationException("Already called LoadSteps, duplicate call would overwrite state");
+                throw new InvalidSetupActionException("Already called LoadSteps, duplicate call would overwrite state");
+            if (isAuxiliaryStep(CurrentStep)) {
+                if (AuxiliarySteps == null)
+                    throw new InvalidSetupActionException("Current step is an auxiliary function, must call LoadAuxiliarySteps before calling LoadSteps");
+                else {
+                    CurrentStep = AuxiliarySteps[getStepIndex(CurrentStep)].Next;
+                }
+            }
             CurrentStepProgress = new SetupStep[steps.Length];
             int currentStepIndex = -1;
             // assign step names
@@ -199,7 +199,7 @@ namespace ChristmasPi.Data.Models {
                 }
             }
             if (CurrentStep == null) {
-                setCurrentStep(GetNextStep(), false);
+                setCurrentStep(GetNextStep());
             }
         }
         
@@ -222,10 +222,19 @@ namespace ChristmasPi.Data.Models {
         }
 
         // Handles updating CurrentStep while keeping currentStepIsAuxiliary in sync
-        private void setCurrentStep(string stepname, bool isAuxiliaryStep) {
+        private void setCurrentStep(string stepname) {
             CurrentStep = stepname;
-            currentStepIsAuxiliary = isAuxiliaryStep;
         }
+        // get the index of a step or auxiliary step
+        private int getStepIndex(string stepname) {
+            int index = -1;
+            if (isAuxiliaryStep(stepname))
+                index = Array.FindIndex<AuxiliaryStep>(AuxiliarySteps, s => s.Name == stepname.Substring("aux/".Length));
+            else
+                index = Array.FindIndex<SetupStep>(CurrentStepProgress, s => s.Name == stepname);
+            return index;
+        }
+        private bool isAuxiliaryStep(string stepname) => stepname == null ? false : stepname.Contains("aux/");
     }
     public enum SetupState {
         NotStarted,

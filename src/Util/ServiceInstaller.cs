@@ -37,6 +37,7 @@ namespace ChristmasPi.Util {
         private string serviceName;
         private string servicePath;
         private bool isDisposed;
+        private bool rebootRequired;
         public ServiceInstaller(string name, string path) {
             status = InstallationStatus.Waiting;
             locker = new object();
@@ -44,6 +45,7 @@ namespace ChristmasPi.Util {
             serviceName = name;
             servicePath = path;
             isDisposed = false;
+            rebootRequired = false;
         }
 
         // Starts the installation process with progress reported to Progress
@@ -100,7 +102,10 @@ namespace ChristmasPi.Util {
                 OnInstallProgress.Invoke(getState());
                 Thread.Sleep(750);
             }
-            writeline("Finised installation process");
+            writeline("Finished installation process");
+            OnInstallProgress.Invoke(getState());
+            rebootRequired = true;
+            writeline("Reboot required");
             OnInstallProgress.Invoke(getState());
             return true;
         }
@@ -134,10 +139,6 @@ namespace ChristmasPi.Util {
             // systemctl daemon-reload
             return false;
         }
-        // Save current process PID to a file
-        private void writePIDFile() {
-            
-        }
 
         private void startInstall() {
             lock (locker) {
@@ -151,7 +152,10 @@ namespace ChristmasPi.Util {
         }
         private void finishInstall() {
             lock(locker) {
-                status = InstallationStatus.Success;
+                if (rebootRequired)
+                    status = InstallationStatus.Rebooting;
+                else
+                    status = InstallationStatus.Success;
             }
         }        
         private void writeline(string format, params object[] args) {

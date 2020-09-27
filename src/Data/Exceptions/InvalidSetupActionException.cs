@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace ChristmasPi.Data.Exceptions {
     /// <summary>
-    /// Tried to create a renderer that's not supported
+    /// Tried to do a setup action that's invalid
     /// </summary>
     public class InvalidSetupActionException : Exception {
         public InvalidSetupActionException() {

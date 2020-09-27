@@ -26,6 +26,7 @@ namespace ChristmasPi.Data {
         public static readonly TimeSpan SCHEDULER_ERR_SLEEP = new TimeSpan(0, 30, 0);
         public static readonly TimeSpan SCHEDULER_LONG_SLEEP = new TimeSpan(1, 0, 0);
         public static readonly TimeSpan REBOOT_POLL_SLEEP = new TimeSpan(0, 0, 0, 0, 100);      // 100 ms
+        public static readonly TimeSpan REBOOT_DELAY_SLEEP = new TimeSpan(0, 0, 1);
 
         // Colors
         public static readonly int RANDOM_DEFAULT = 255;
@@ -50,5 +51,6 @@ namespace ChristmasPi.Data {
         // Misc
         public static readonly string USAGE_STRING = "Usage: dotnet ChristmasPi.dll [OPTION]";
         public static readonly string LOG_FORMAT = "{Timestamp:HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception} {Properties:j}";
+        public static readonly int EXIT_REBOOT = 10;
     }
 }

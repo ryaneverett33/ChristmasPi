@@ -75,14 +75,15 @@ namespace ChristmasPi.Operations.Modes {
                 {"ServicesGetProgress", "services/progress"},
                 {"ServicesFinish", "services/finish"},
                 {"SetupComplete", "setup/complete"},
-                {"ServicesAuxGetReboot", "aux/reboot"}
+                {"ServicesAuxGetReboot", "aux/reboot"},
+                {"AuxCompleteStep","aux/complete"}
             };
             Tuple<string, string, string>[] auxSteps = new Tuple<string, string, string>[] {
-                new Tuple<string, string, string>("reboot", "finish", "services")
+                new Tuple<string, string, string>("reboot", "finished", "services")
             };
             loadCurrentProgress();
-            currentProgress.LoadSteps(steps);
             currentProgress.LoadAuxiliarySteps(auxSteps);
+            currentProgress.LoadSteps(steps);
             Controllers.RedirectHandler.AddOnRegisteringLookupHandler(() => {
                 if (!Controllers.RedirectHandler.IsActionLookupRegistered("Setup")) {
                     Controllers.RedirectHandler.RegisterActionLookup("Setup", validActions);
@@ -130,11 +131,11 @@ namespace ChristmasPi.Operations.Modes {
             // set firstrun to false
             // set current configuration
             // save configuration
+            currentProgress.FinishSetup();
             Controllers.RedirectHandler.SetupComplete();
             Configuration.setup.firstrun = false;
             ConfigurationManager.Instance.CurrentTreeConfig = Configuration;
             ConfigurationManager.Instance.SaveConfiguration();
-            currentProgress.FinishSetup();
         }
 
         /// <summary>
@@ -383,6 +384,26 @@ namespace ChristmasPi.Operations.Modes {
                     lastStatusUpdate = new ServiceStatusModel(currentServiceInstaller.GetWriter(), currentServiceInstaller.GetStatus());
                     serviceHasUpdate = true;
                     break;
+                case InstallationStatus.Rebooting:
+                    lastStatusUpdate = lastStatusUpdate.Reboot();
+                    serviceHasUpdate = true;
+                    servicesInstalled = true;
+                    // Start reboot process
+                    /*
+                        Allow the frontend to process the reboot request but don't actually reboot on the backend.
+                        The frontend processes the reboot by waiting for the application to become alive again,
+                        so if the application never dies then the frontend will continue to work normally.
+                    */
+                    if (!ConfigurationManager.Instance.RuntimeConfiguration.IgnoreRestarts) {
+                        Task.Run(async () => {
+                            await Task.Delay(Constants.REBOOT_DELAY_SLEEP);
+                            Log.ForContext<SetupMode>().Information("Rebooting");
+                            SaveSetupProgress();
+                            await Task.Delay(Constants.REBOOT_DELAY_SLEEP);
+                            Environment.Exit(Constants.EXIT_REBOOT);
+                        });
+                    }
+                    break;
                 default:
                     break;
             }
@@ -509,10 +530,14 @@ namespace ChristmasPi.Operations.Modes {
             // redirect to current page
             // NOTE: SetCurrentPage is called after navigating to page, so redirect should account for going to the next page
             string nextPage = GetNext(CurrentStepName);
-            if (nextPage == null)
+            if (nextPage == null && action.ToUpper() == CurrentStepName) // on current page, no redirect
                 return null;
+            if (nextPage == null) // there's no next page, but we're not on the right page so redirect
+                return $"/setup/{CurrentStepName}";
             Log.ForContext("ClassName", "AnimationMode").Debug("nextPage: {nextPage}, currentStepName: {CurrentStepName}", nextPage, CurrentStepName);
             if (CurrentStepName == null)
+                return null;
+            if (action.Contains("aux/")) // allow the frontend to control auxiliary navigation
                 return null;
             if (action.ToUpper() == CurrentStepName.ToUpper())  // don't redirect on the current step
                 return null;

@@ -59,24 +59,7 @@ Defaults
             if (RedirectHandler.ShouldRedirect(this.RouteData, "get") is IActionResult redirect)
                 return redirect;
             string next = (OperationManager.Instance.CurrentOperatingMode as ISetupMode).GetNext(current);
-            switch (next) {
-                case "hardware":
-                    return new RedirectResult("/setup/hardware");
-                case "lights":
-                    return new RedirectResult("/setup/lights");
-                case "branches":
-                    return new RedirectResult("/setup/branches");
-                case "defaults":
-                    return new RedirectResult("/setup/defaults");
-                case "services":
-                    return new RedirectResult("/setup/services");
-                case "finished":
-                    return new RedirectResult("/setup/finished");
-                case "aux/reboot":
-                    return new RedirectResult("/setup/aux/reboot");
-                default:
-                    return new BadRequestObjectResult($"Unable to find next step for {current}");
-            }
+            return handleRedirectForStepName(next);
         }
         [HttpGet("/setup/hardware")]
         public IActionResult SetupHardware() {
@@ -139,6 +122,7 @@ Defaults
         public IActionResult ServicesAuxGetReboot() {
             if (RedirectHandler.ShouldRedirect(this.RouteData, "get") is IActionResult redirect)
                 return redirect;
+            (OperationManager.Instance.CurrentOperatingMode as ISetupMode).CurrentProgress.CompleteStep();
             (OperationManager.Instance.CurrentOperatingMode as ISetupMode).CurrentProgress.SetCurrentAuxStep("reboot");
             return View("reboot");
         }
@@ -275,6 +259,37 @@ Defaults
             // switch to default operating mode
             OperationManager.Instance.SwitchModes(OperationManager.Instance.DefaultOperatingMode);
             return Ok();
+        }
+        [HttpPost("/setup/aux/complete")]
+        public IActionResult AuxCompleteStep() {
+            if (RedirectHandler.ShouldRedirect(this.RouteData, "post") is IActionResult redirect)
+                return redirect;
+            SetupProgress currentProgress = (OperationManager.Instance.CurrentOperatingMode as ISetupMode).CurrentProgress;
+            if (currentProgress.CurrentStep.Contains("aux/")) {
+                // Handle reboot case where frontend can exist with the wrong state. Only complete step if current step is an auxiliary function.
+                (OperationManager.Instance.CurrentOperatingMode as ISetupMode).CurrentProgress.CompleteStep();
+            }
+            return handleRedirectForStepName(currentProgress.CurrentStep);
+        }
+        private IActionResult handleRedirectForStepName(string step) {
+            switch (step) {
+                case "hardware":
+                    return new RedirectResult("/setup/hardware");
+                case "lights":
+                    return new RedirectResult("/setup/lights");
+                case "branches":
+                    return new RedirectResult("/setup/branches");
+                case "defaults":
+                    return new RedirectResult("/setup/defaults");
+                case "services":
+                    return new RedirectResult("/setup/services");
+                case "finished":
+                    return new RedirectResult("/setup/finished");
+                case "aux/reboot":
+                    return new RedirectResult("/setup/aux/reboot");
+                default:
+                    return new BadRequestObjectResult($"Unable to find next step for {step}");
+            }
         }
     }
     public class BranchesSubmitArgument {

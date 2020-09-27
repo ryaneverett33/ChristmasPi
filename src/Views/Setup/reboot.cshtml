@@ -7,8 +7,23 @@
 }
 @section Scripts {
     <script type="text/javascript">
+        var intervalHandler = null;
+        function rebootPoller() {
+            var oReq = new XMLHttpRequest();
+            oReq.addEventListener("load", function () {
+                if (this.status !== 200) {
+                    console.log("no response from server yet");
+                }
+                else {
+                    clearInterval(intervalHandler);
+                    auxCompleteStep();
+                }
+            });
+            oReq.open("GET", "/");
+            oReq.send();
+        }
         $(window).on('load', function() {
-
+            intervalHandler = setInterval(rebootPoller, 5000);
         });
     </script>
 }

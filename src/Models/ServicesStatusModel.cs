@@ -24,5 +24,10 @@ namespace ChristmasPi.Models {
             this.Status = "AllDone";
             return this;
         }
+
+        public ServiceStatusModel Reboot() {
+            this.Status = "Reboot";
+            return this;
+        }
     }
 }

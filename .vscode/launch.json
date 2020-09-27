@@ -15,7 +15,8 @@
                 "--ignorepriv",
                 "--debug",
                 "--daemon",
-                "--daemon-log-console"
+                "--daemon-log-console",
+                "--ignore-restart"
             ],
             "cwd": "${workspaceFolder}/build/bin/Debug/netcoreapp3.0/",
             "stopAtEntry": false,

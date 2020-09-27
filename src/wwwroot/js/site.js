@@ -632,6 +632,17 @@ function servicesInstallPoller() {
                         viewInstallSuccess("christmaspi");
                     }
                     break;
+                case "Reboot":
+                    saveText(obj["output"]);
+                    updateText(obj["output"]);
+                    successInstall = true;
+                    setServiceTitle(true, "Installed");
+                    viewInstallSuccess("christmaspi");
+                    if (doInstallScheduler) {
+                        setServiceTitle(false, "Installed");
+                        viewInstallSuccess("scheduler");
+                    }
+                    window.location.href = "/setup/aux/reboot";
                 case "Failure":
                     clearInterval(servicePoller);
                     $("#continue-btn").show();
@@ -655,4 +666,17 @@ function servicesInstallPoller() {
     oReq.open("GET", "/setup/services/progress");
     oReq.send();
     // clearInterval(servicePoller);
+}
+function auxCompleteStep() {
+    var oReq = new XMLHttpRequest();
+    oReq.addEventListener("load", function () {
+        if (this.status !== 200) {
+            showErrorModal("Failed to complete step");
+        }
+        else {
+            window.location.href = this.responseURL;
+        }
+    });
+    oReq.open("POST", "/setup/aux/complete");
+    oReq.send();
 }
