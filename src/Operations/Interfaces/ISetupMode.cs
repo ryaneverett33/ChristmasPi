@@ -10,10 +10,6 @@ namespace ChristmasPi.Operations.Interfaces {
         SetupProgress CurrentProgress { get; }
         bool IsSettingUpBranches { get; }
         bool IsInstallingAService { get; }
-        string GetNext(string current);
-        void SetCurrentStep(string currentstep);
-        void CompleteStep();
-        bool IsStepFinished(string step);
         void Start();
         void Finish();
         bool SetHardware(RendererType rendererType, int datapin);

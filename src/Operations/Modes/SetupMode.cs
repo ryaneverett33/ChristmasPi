@@ -100,7 +100,7 @@ namespace ChristmasPi.Operations.Modes {
         }
         public void Deactivate() {
             Log.ForContext("ClassName", "AnimationMode").Information("Deactivated Setup Mode");
-            SetCurrentStep("null");
+            currentProgress.SetCurrentStep("null");
         }
         public object Info() {
             return new {};
@@ -110,11 +110,6 @@ namespace ChristmasPi.Operations.Modes {
         }
         #endregion
         #region Methods
-
-        public string GetNext(string currentpage) => currentProgress.GetNextStep(currentpage);
-        public void SetCurrentStep(string newstep) => currentProgress.SetCurrentStep(newstep);
-        public void CompleteStep() => currentProgress.CompleteStep();
-        public bool IsStepFinished(string step) => currentProgress.IsStepFinished(step);
 
         /// <summary>
         /// Starts the setup process
@@ -521,15 +516,15 @@ namespace ChristmasPi.Operations.Modes {
                 
             // redirect to current page if setup has begun
             // ignore these actions
-            if ((action.ToLower() == "start" && !IsStepFinished("start")) 
+            if ((action.ToLower() == "start" && !CurrentProgress.IsStepFinished("start")) 
                 || action.ToLower() == "next"
-                || (action.ToLower() == "finished" && !IsStepFinished("finished")))
+                || (action.ToLower() == "finished" && !CurrentProgress.IsStepFinished("finished")))
                 return null;
             if (method.ToUpper() == "POST") // don't redirect on POST requests
                 return null;
             // redirect to current page
             // NOTE: SetCurrentPage is called after navigating to page, so redirect should account for going to the next page
-            string nextPage = GetNext(CurrentStepName);
+            string nextPage = currentProgress.GetNextStep(CurrentStepName);
             if (nextPage == null && action.ToUpper() == CurrentStepName) // on current page, no redirect
                 return null;
             if (nextPage == null) // there's no next page, but we're not on the right page so redirect
@@ -541,7 +536,7 @@ namespace ChristmasPi.Operations.Modes {
                 return null;
             if (action.ToUpper() == CurrentStepName.ToUpper())  // don't redirect on the current step
                 return null;
-            if (action.ToUpper() == nextPage.ToUpper() && IsStepFinished(CurrentStepName)) // don't redirect when navigating to the next step
+            if (action.ToUpper() == nextPage.ToUpper() && CurrentProgress.IsStepFinished(CurrentStepName)) // don't redirect when navigating to the next step
                 return null;
             if (action.ToLower() == "services/progress" && CurrentStepName.ToLower() == "services") // don't redirect when trying to get service installation progress
                 return null;

@@ -58,14 +58,14 @@ Defaults
         public IActionResult Next(string current) {
             if (RedirectHandler.ShouldRedirect(this.RouteData, "get") is IActionResult redirect)
                 return redirect;
-            string next = (OperationManager.Instance.CurrentOperatingMode as ISetupMode).GetNext(current);
+            string next = (OperationManager.Instance.CurrentOperatingMode as ISetupMode).CurrentProgress.GetNextStep(current);
             return handleRedirectForStepName(next);
         }
         [HttpGet("/setup/hardware")]
         public IActionResult SetupHardware() {
             if (RedirectHandler.ShouldRedirect(this.RouteData, "get") is IActionResult redirect)
                 return redirect;
-            (OperationManager.Instance.CurrentOperatingMode as ISetupMode).SetCurrentStep("hardware");
+            (OperationManager.Instance.CurrentOperatingMode as ISetupMode).CurrentProgress.SetCurrentStep("hardware");
             var model = new SetupHardwareModel();
             return View("hardware", model);
         }
@@ -73,7 +73,7 @@ Defaults
         public IActionResult SetupLights() {
             if (RedirectHandler.ShouldRedirect(this.RouteData, "get") is IActionResult redirect)
                 return redirect;
-            (OperationManager.Instance.CurrentOperatingMode as ISetupMode).SetCurrentStep("lights");
+            (OperationManager.Instance.CurrentOperatingMode as ISetupMode).CurrentProgress.SetCurrentStep("lights");
             var model = new SetupLightsModel();
             return View("lights", model);
         }
@@ -82,7 +82,7 @@ Defaults
             if (RedirectHandler.ShouldRedirect(this.RouteData, "get") is IActionResult redirect)
                 return redirect;
             ISetupMode setupMode = (ISetupMode)OperationManager.Instance.CurrentOperatingMode;
-            setupMode.SetCurrentStep("branches");
+            setupMode.CurrentProgress.SetCurrentStep("branches");
             setupMode.StartSettingUpBranches();
             var model = new SetupBranchesModel();
             return View("branches", model);
@@ -91,7 +91,7 @@ Defaults
         public IActionResult SetupDefaults() {
             if (RedirectHandler.ShouldRedirect(this.RouteData, "get") is IActionResult redirect)
                 return redirect;
-            (OperationManager.Instance.CurrentOperatingMode as ISetupMode).SetCurrentStep("defaults");
+            (OperationManager.Instance.CurrentOperatingMode as ISetupMode).CurrentProgress.SetCurrentStep("defaults");
             var model = new SetupDefaultsModel();
             return View("defaults", model);
         }
@@ -99,7 +99,7 @@ Defaults
         public IActionResult SetupServices() {
             if (RedirectHandler.ShouldRedirect(this.RouteData, "get") is IActionResult redirect)
                 return redirect;
-            (OperationManager.Instance.CurrentOperatingMode as ISetupMode).SetCurrentStep("services");
+            (OperationManager.Instance.CurrentOperatingMode as ISetupMode).CurrentProgress.SetCurrentStep("services");
             var model = new SetupServicesModel();
             return View("services", model);
         }
@@ -130,14 +130,14 @@ Defaults
         public IActionResult Finished() {
             if (RedirectHandler.ShouldRedirect(this.RouteData, "get") is IActionResult redirect)
                 return redirect;
-            (OperationManager.Instance.CurrentOperatingMode as ISetupMode).SetCurrentStep("finished");
+            (OperationManager.Instance.CurrentOperatingMode as ISetupMode).CurrentProgress.SetCurrentStep("finished");
             return View();
         }
         [HttpPost("/setup/services/finish")]
         public IActionResult ServicesFinish() {
             if (RedirectHandler.ShouldRedirect(this.RouteData, "post") is IActionResult redirect)
                 return redirect;
-            (OperationManager.Instance.CurrentOperatingMode as ISetupMode).CompleteStep();
+            (OperationManager.Instance.CurrentOperatingMode as ISetupMode).CurrentProgress.CompleteStep();
             return new RedirectResult("/setup/next?current=services");
         }
         [HttpPost("/setup/hardware/submit")]
@@ -151,7 +151,7 @@ Defaults
             if (!(OperationManager.Instance.CurrentOperatingMode as ISetupMode).SetHardware(rendererType, datapin))
                 return View("hardware", new SetupHardwareModel("Invalid settings"));
             else {
-                (OperationManager.Instance.CurrentOperatingMode as ISetupMode).CompleteStep();
+                (OperationManager.Instance.CurrentOperatingMode as ISetupMode).CurrentProgress.CompleteStep();
                 return new RedirectResult("/setup/next?current=hardware");
             }
         }
@@ -162,7 +162,7 @@ Defaults
             if (!(OperationManager.Instance.CurrentOperatingMode as ISetupMode).SetLights(lightcount, fps, brightness))
                 return View("lights", new SetupLightsModel("Invalid settings"));
             else {
-                (OperationManager.Instance.CurrentOperatingMode as ISetupMode).CompleteStep();
+                (OperationManager.Instance.CurrentOperatingMode as ISetupMode).CurrentProgress.CompleteStep();
                 return new RedirectResult("/setup/next?current=lights");
             }
         }
@@ -173,7 +173,7 @@ Defaults
             if (!(OperationManager.Instance.CurrentOperatingMode as ISetupMode).IsSettingUpBranches)
                 return new BadRequestObjectResult("Not in branch setup mode");
             if ((OperationManager.Instance.CurrentOperatingMode as ISetupMode).SetBranches(argument)) {
-                (OperationManager.Instance.CurrentOperatingMode as ISetupMode).CompleteStep();
+                (OperationManager.Instance.CurrentOperatingMode as ISetupMode).CurrentProgress.CompleteStep();
                 return Ok();
             }
             else
@@ -185,7 +185,7 @@ Defaults
             if (RedirectHandler.ShouldRedirect(this.RouteData, "post") is IActionResult redirect)
                 return redirect;
             if ((OperationManager.Instance.CurrentOperatingMode as ISetupMode).SetDefaults(animation, mode, color)) {
-                (OperationManager.Instance.CurrentOperatingMode as ISetupMode).CompleteStep();
+                (OperationManager.Instance.CurrentOperatingMode as ISetupMode).CurrentProgress.CompleteStep();
                 return new RedirectResult("/setup/next?current=defaults");
             }
             else {

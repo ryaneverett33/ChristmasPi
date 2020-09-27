@@ -26,8 +26,7 @@
 	- Maybe add bootstrapper script to start setup process
 - [BACKEND] Remove SetupProgress::SetCurrentStep()
 	- Remove from SetupMode and ISetupMode
-- [BACKEND] Remove SetupMode wrapper functions for SetupProgress
-	- Ex: SetupMode::GetNext()
+- [BACKEND] Fix premature reboot when installing both services
 
 ## General
 - [?] branch animation is the result of a basic animation
