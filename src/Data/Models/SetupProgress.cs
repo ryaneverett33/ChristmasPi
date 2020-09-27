@@ -62,26 +62,6 @@ namespace ChristmasPi.Data.Models {
         }
 
         /// <summary>
-        /// Sets the current step in the setup process
-        /// </summary>
-        /// <param name="newstep">The new setup step</param>
-        /// <remarks>This should only be called by the SetupController</remarks>
-        public void SetCurrentStep(string newstep) {
-            //throw new NotImplementedException();
-            return;
-            // Don't implement this function
-
-
-            /*
-            Log.ForContext("ClassName", "AnimationMode").Debug("Setting current step: {newstep}", newstep);
-            if (newstep == null || newstep.Length == 0 || newstep == "null")
-                return;
-            SetupStep step = steps.Where(step => step.Name.Equals(newstep)).Single();
-            CurrentStepName = step.Name;
-            */
-        }
-
-        /// <summary>
         /// Sets the current step as an auxiliary step
         /// </summary>
         /// <param name="auxstep">The name of the step without the 'aux/' prefix</param>

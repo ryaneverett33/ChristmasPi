@@ -100,7 +100,6 @@ namespace ChristmasPi.Operations.Modes {
         }
         public void Deactivate() {
             Log.ForContext("ClassName", "AnimationMode").Information("Deactivated Setup Mode");
-            currentProgress.SetCurrentStep("null");
         }
         public object Info() {
             return new {};

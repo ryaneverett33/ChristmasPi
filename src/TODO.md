@@ -24,9 +24,8 @@
 	- Select which animations should be debug animations
 - [GENERAL] Create installer package
 	- Maybe add bootstrapper script to start setup process
-- [BACKEND] Remove SetupProgress::SetCurrentStep()
-	- Remove from SetupMode and ISetupMode
 - [BACKEND] Fix premature reboot when installing both services
+	- SetupMode creates two ServiceInstaller objects, wait until the last one has finished before rebooting
 
 ## General
 - [?] branch animation is the result of a basic animation

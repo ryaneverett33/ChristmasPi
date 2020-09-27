@@ -64,8 +64,7 @@ Defaults
         [HttpGet("/setup/hardware")]
         public IActionResult SetupHardware() {
             if (RedirectHandler.ShouldRedirect(this.RouteData, "get") is IActionResult redirect)
-                return redirect;
-            (OperationManager.Instance.CurrentOperatingMode as ISetupMode).CurrentProgress.SetCurrentStep("hardware");
+                return redirect;  
             var model = new SetupHardwareModel();
             return View("hardware", model);
         }
@@ -73,7 +72,6 @@ Defaults
         public IActionResult SetupLights() {
             if (RedirectHandler.ShouldRedirect(this.RouteData, "get") is IActionResult redirect)
                 return redirect;
-            (OperationManager.Instance.CurrentOperatingMode as ISetupMode).CurrentProgress.SetCurrentStep("lights");
             var model = new SetupLightsModel();
             return View("lights", model);
         }
@@ -82,7 +80,6 @@ Defaults
             if (RedirectHandler.ShouldRedirect(this.RouteData, "get") is IActionResult redirect)
                 return redirect;
             ISetupMode setupMode = (ISetupMode)OperationManager.Instance.CurrentOperatingMode;
-            setupMode.CurrentProgress.SetCurrentStep("branches");
             setupMode.StartSettingUpBranches();
             var model = new SetupBranchesModel();
             return View("branches", model);
@@ -91,7 +88,6 @@ Defaults
         public IActionResult SetupDefaults() {
             if (RedirectHandler.ShouldRedirect(this.RouteData, "get") is IActionResult redirect)
                 return redirect;
-            (OperationManager.Instance.CurrentOperatingMode as ISetupMode).CurrentProgress.SetCurrentStep("defaults");
             var model = new SetupDefaultsModel();
             return View("defaults", model);
         }
@@ -99,7 +95,6 @@ Defaults
         public IActionResult SetupServices() {
             if (RedirectHandler.ShouldRedirect(this.RouteData, "get") is IActionResult redirect)
                 return redirect;
-            (OperationManager.Instance.CurrentOperatingMode as ISetupMode).CurrentProgress.SetCurrentStep("services");
             var model = new SetupServicesModel();
             return View("services", model);
         }
@@ -130,7 +125,6 @@ Defaults
         public IActionResult Finished() {
             if (RedirectHandler.ShouldRedirect(this.RouteData, "get") is IActionResult redirect)
                 return redirect;
-            (OperationManager.Instance.CurrentOperatingMode as ISetupMode).CurrentProgress.SetCurrentStep("finished");
             return View();
         }
         [HttpPost("/setup/services/finish")]
