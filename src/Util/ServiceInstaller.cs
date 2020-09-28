@@ -37,7 +37,7 @@ namespace ChristmasPi.Util {
         private string serviceName;
         private string servicePath;
         private bool isDisposed;
-        private bool rebootRequired;
+        public bool RebootRequired { get; private set;}
         public ServiceInstaller(string name, string path) {
             status = InstallationStatus.Waiting;
             locker = new object();
@@ -45,7 +45,7 @@ namespace ChristmasPi.Util {
             serviceName = name;
             servicePath = path;
             isDisposed = false;
-            rebootRequired = false;
+            RebootRequired = false;
         }
 
         // Starts the installation process with progress reported to Progress
@@ -104,7 +104,7 @@ namespace ChristmasPi.Util {
             }
             writeline("Finished installation process");
             OnInstallProgress.Invoke(getState());
-            rebootRequired = true;
+            RebootRequired = true;
             writeline("Reboot required");
             OnInstallProgress.Invoke(getState());
             return true;
@@ -152,10 +152,7 @@ namespace ChristmasPi.Util {
         }
         private void finishInstall() {
             lock(locker) {
-                if (rebootRequired)
-                    status = InstallationStatus.Rebooting;
-                else
-                    status = InstallationStatus.Success;
+                status = InstallationStatus.Success;
             }
         }        
         private void writeline(string format, params object[] args) {

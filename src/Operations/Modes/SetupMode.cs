@@ -40,6 +40,7 @@ namespace ChristmasPi.Operations.Modes {
         private bool installSchedulerService;
         private bool serviceHasUpdate;
         private bool servicesInstalled;
+        private bool servicesRebootRequired;
         private ServiceStatusModel lastStatusUpdate;
         private SetupProgress currentProgress;
         #endregion
@@ -344,6 +345,8 @@ namespace ChristmasPi.Operations.Modes {
                     if (installSchedulerService) {
                         lastStatusUpdate = new ServiceStatusModel(currentServiceInstaller.GetWriter(), currentServiceInstaller.GetStatus());
                         serviceHasUpdate = true;
+                        if (currentServiceInstaller.RebootRequired)
+                            servicesRebootRequired = true;
                         Task t = new Task(() => {
                             installSchedulerService = false;
                             while (serviceHasUpdate) {
@@ -361,9 +364,33 @@ namespace ChristmasPi.Operations.Modes {
                         t.Start();
                     }
                     else {
-                        lastStatusUpdate = lastStatusUpdate.AllDone();
-                        serviceHasUpdate = true;
                         servicesInstalled = true;
+                        if (currentServiceInstaller.RebootRequired)
+                            servicesRebootRequired = true;
+                        if (servicesRebootRequired) {
+                            lastStatusUpdate = lastStatusUpdate.Reboot();
+                            serviceHasUpdate = true;
+                            servicesInstalled = true;
+                            // Start reboot process
+                            /*
+                                Allow the frontend to process the reboot request but don't actually reboot on the backend.
+                                The frontend processes the reboot by waiting for the application to become alive again,
+                                so if the application never dies then the frontend will continue to work normally.
+                            */
+                            if (!ConfigurationManager.Instance.RuntimeConfiguration.IgnoreRestarts) {
+                                Task.Run(async () => {
+                                    await Task.Delay(Constants.REBOOT_DELAY_SLEEP);
+                                    Log.ForContext<SetupMode>().Information("Rebooting");
+                                    SaveSetupProgress();
+                                    await Task.Delay(Constants.REBOOT_DELAY_SLEEP);
+                                    Environment.Exit(Constants.EXIT_REBOOT);
+                                });
+                            }
+                        }
+                        else {
+                            lastStatusUpdate = lastStatusUpdate.AllDone();
+                            serviceHasUpdate = true;
+                        }
                     }
                     break;
                 case InstallationStatus.Failed:
@@ -377,26 +404,6 @@ namespace ChristmasPi.Operations.Modes {
                     // Set service update info
                     lastStatusUpdate = new ServiceStatusModel(currentServiceInstaller.GetWriter(), currentServiceInstaller.GetStatus());
                     serviceHasUpdate = true;
-                    break;
-                case InstallationStatus.Rebooting:
-                    lastStatusUpdate = lastStatusUpdate.Reboot();
-                    serviceHasUpdate = true;
-                    servicesInstalled = true;
-                    // Start reboot process
-                    /*
-                        Allow the frontend to process the reboot request but don't actually reboot on the backend.
-                        The frontend processes the reboot by waiting for the application to become alive again,
-                        so if the application never dies then the frontend will continue to work normally.
-                    */
-                    if (!ConfigurationManager.Instance.RuntimeConfiguration.IgnoreRestarts) {
-                        Task.Run(async () => {
-                            await Task.Delay(Constants.REBOOT_DELAY_SLEEP);
-                            Log.ForContext<SetupMode>().Information("Rebooting");
-                            SaveSetupProgress();
-                            await Task.Delay(Constants.REBOOT_DELAY_SLEEP);
-                            Environment.Exit(Constants.EXIT_REBOOT);
-                        });
-                    }
                     break;
                 default:
                     break;
