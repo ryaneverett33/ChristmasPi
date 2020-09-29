@@ -13,6 +13,8 @@
 - [BACKEND] Refactor other controllers to use RedirectHandler
 - [LOGGING] RedirectHandler should have it's own log
 - [BACKEND] Use reflection for OperatingMode.GetProperty?
+	- Type.getFields()
+		- https://docs.microsoft.com/en-us/dotnet/api/system.type.getfields?view=netcore-3.1
 - [GENERAL] Cleanup TODOs
 	- Implement Animator Dispose
 	- AnimationMode do Info()
