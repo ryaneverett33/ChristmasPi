@@ -183,3 +183,14 @@ body {
 #programoutput {
     max-height: 50%;
 }
+.addRuleBtnOff {
+    background-color: #66615B;
+}
+.addRuleBtnOn {
+    background-color: #403D39;
+}
+.addRuleBtn {
+    padding: 0;
+    width: 45px;
+    height: 45px;
+}

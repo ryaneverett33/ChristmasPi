@@ -31,6 +31,17 @@
             "sourceFileMap": {
                 "/Views": "${workspaceFolder}/src/"
             }
+        },
+        {
+            "name": "Debug copyWWW",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/copyWWW.py",
+            "args": [
+                "src/wwwroot/",
+                "build/bin/Debug/netcoreapp3.0/wwwroot/"
+            ],
+            "cwd": "${workspaceFolder}",
         }
     ]
 }

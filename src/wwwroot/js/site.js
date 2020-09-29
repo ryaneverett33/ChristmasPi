@@ -70,40 +70,6 @@ function showErrorModal(errorMessage) {
     $("#genericErrorModalMessage").text(errorMessage);
     $('#genericErrorModal').modal();
 }
-function ShowAddRuleModal() {
-    $("#addrule-starttime").datetimepicker({
-        format: 'LT'
-    });
-    $("#addrule-endtime").datetimepicker({
-        format: 'LT',
-        icons: {
-            time: "fa fa-clock-o",
-            date: "fa fa-calendar",
-            up: "fa fa-chevron-up",
-            down: "fa fa-chevron-down",
-            previous: 'fa fa-chevron-left',
-            next: 'fa fa-chevron-right',
-            today: 'fa fa-screenshot',
-            clear: 'fa fa-trash',
-            close: 'fa fa-remove'
-        }
-    });
-    $('#ScheduleAddModal').modal();
-}
-function closeAddRuleModal() {
-    $('#ScheduleAddModal').modal('hide');
-}
-
-function ShowRemoveRuleModal(i, j) {
-    $('#scheduleremove-i').val(i);
-    $('#scheduleremove-j').val(j);
-    $('#ScheduleRemoveModal').modal();
-}
-function closeRemoveRuleModal() {
-    $('#scheduleremove-i').val("");
-    $('#scheduleremove-j').val("");
-    $('#ScheduleRemoveModal').modal('hide');
-}
 
 function SetColor(colorstring) {
     $("#cp2").colorpicker('setValue', colorstring);
@@ -215,7 +181,7 @@ function TurnOff() {
     oReq.send();
 }
 
-function checkAddRuleDays() {
+/*function checkAddRuleDays() {
     var monday = $("#monday-check:checked").val() === "on";
     var tuesday = $("#tuesday-check:checked").val() === "on";
     var wednesday = $("#wednesday-check:checked").val() === "on";
@@ -227,98 +193,21 @@ function checkAddRuleDays() {
         $("#scheduleAddRuleBtn").prop('disabled', false);
     else
         $("#scheduleAddRuleBtn").prop('disabled', true);
-}
-
-// seealso ChristmasPi.Data.Models.Scheduler.RepeatUsage
-var REPEATMONDAY = 1;
-var REPEATTUESDAY = 2;
-var REPEATWEDNESDAY = 4;
-var REPEATTHURSDAY = 8;
-var REPEATFRIDAY = 16;
-var REPEATSATURDAY = 32;
-var REPEATSUNDAY = 64;
-
-function getRepeatUsage() {
-    var monday = $("#monday-check:checked").val() === "on";
-    var tuesday = $("#tuesday-check:checked").val() === "on";
-    var wednesday = $("#wednesday-check:checked").val() === "on";
-    var thursday = $("#thursday-check:checked").val() === "on";
-    var friday = $("#friday-check:checked").val() === "on";
-    var saturday = $("#saturday-check:checked").val() === "on";
-    var sunday = $("#sunday-check:checked").val() === "on";
-
-    var mask = 0;
-    if (monday)
-        mask = mask | REPEATMONDAY;
-    if (tuesday)
-        mask = mask | REPEATTUESDAY;
-    if (wednesday)
-        mask = mask | REPEATWEDNESDAY;
-    if (thursday)
-        mask = mask | REPEATTHURSDAY;
-    if (friday)
-        mask = mask | REPEATFRIDAY;
-    if (saturday)
-        mask = mask | REPEATSATURDAY;
-    if (sunday)
-        mask = mask | REPEATSUNDAY;
-
-    return mask;
-}
-
-function RemoveRule() {
-    // /api/schedule/remove
-    var i = parseInt($("#scheduleremove-i").val());
-    var j = parseInt($("#scheduleremove-j").val());
-    closeRemoveRuleModal();
-    //var start = $(`#rstart-${i}:${j}`).val();
-    var start = document.getElementById(`rstart-${i}:${j}`).value;
-    //var end = $(`#rend-${i}:${j}`).val();
-    var end = document.getElementById(`rend-${i}:${j}`).value;
-    //var day = $(`#rday-${i}:${j}`).val();
-    var day = document.getElementById(`rday-${i}:${j}`).value;
-
-    var oReq = new XMLHttpRequest();
-    oReq.addEventListener("load", function () {
-        if (this.status !== 200) {
-            showErrorModal("Failed to remove rule");
-        }
-        else {
-            location.reload();
-        }
-    });
-    oReq.open("POST", "/api/schedule/remove");
-    oReq.setRequestHeader("Content-Type", "application/json");
-    oReq.send(JSON.stringify({
-        start: start,
-        end: end,
-        day: day
-    }));
-}
-
-function AddRule() {
-    // /api/schedule/add
-    var start = $('#addrule-starttime').data("DateTimePicker").viewDate().format("HH:mm");
-    var end = $('#addrule-endtime').data("DateTimePicker").viewDate().format("HH:mm");
-    var repeat = getRepeatUsage();
-    closeAddRuleModal();
-
-    var oReq = new XMLHttpRequest();
-    oReq.addEventListener("load", function () {
-        if (this.status !== 200) {
-            showErrorModal("Failed to add rule");
-        }
-        else {
-            location.reload();
-        }
-    });
-    oReq.open("POST", "/api/schedule/add");
-    oReq.setRequestHeader("Content-Type", "application/json");
-    oReq.send(JSON.stringify({
-        start: start,
-        end: end,
-        repeat: repeat
-    }));
+}*/
+function validate(a, b) {
+    var start = $('#addrule-starttime').val();
+    var end = $('#addrule-endtime').val();
+    var monday = $("#monday-btn").val() === "true";
+    var tuesday = $("#tuesday-btn").val() === "true";
+    var wednesday = $("#wednesday-btn").val() === "true";
+    var thursday = $("#thursday-btn").val() === "true";
+    var friday = $("#friday-btn").val() === "true";
+    var saturday = $("#saturday-btn").val() === "true";
+    var sunday = $("#sunday-btn").val() === "true";
+    var enabled = start !== "" && end !== "" && start !== end && (
+        monday || tuesday || wednesday || thursday || friday || saturday || sunday
+    );
+    $("#scheduleAddRuleBtn").prop('disabled', !enabled);
 }
 
 function StartSetup() {

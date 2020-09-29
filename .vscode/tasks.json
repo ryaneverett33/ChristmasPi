@@ -13,6 +13,12 @@
 			"command": "dotnet cake --Target=Clean",
 			"problemMatcher": [],
 			"label": "clean"
+		},
+		{
+			"type": "shell",
+			"command": "python build/copyWWW.py src/wwwroot/ build/bin/Debug/netcoreapp3.0/wwwroot/",
+			"problemMatcher": [],
+			"label": "copyWWW"
 		}
 	]
 }
