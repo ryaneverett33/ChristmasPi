@@ -11,8 +11,6 @@
 - [FRONTEND] Implement mobile version of schedule
 - [BACKEND] Refactor other controllers to use RedirectHandler
 - [LOGGING] RedirectHandler should have it's own log
-- [BACKEND] Cleanup unnecessary views
-	- remove Privacy.cshtml
 - [GENERAL] Cleanup TODOs
 	- Implement Animator Dispose
 	- AnimationMode do Info()
