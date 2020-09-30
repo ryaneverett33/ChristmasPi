@@ -11,6 +11,22 @@
         var pi_reindeer_gif = null;
         var scheduler_reindeer_gif = null;
         var servicesStatus = ["waiting", "waiting"]
+        var savedText = null;
+        var successInstall = false;
+        var doInstallScheduler = false;
+        var servicePoller = null;
+
+        // set current text
+        function updateText(text) {
+            newText = text;
+            if (savedText != null)
+                newText = savedText + '\n' + text;
+            $("#programoutput").text(newText);
+        }
+        // save text from previous installation
+        function saveText(text) {
+            savedText = text;
+        }
         $(window).on("load", function () {
             $("#continue-btn").hide();
             $("#installprogress").hide();
@@ -101,6 +117,102 @@
             else {
                 servicesStatus[1] = "disabled";
             }       
+        }
+        function setServiceTitle(isMainService, status) {
+            if (isMainService) {
+                var title = `ChristmasPi Service - ${status}`
+                $("#main-service-status").text(title);
+            }
+            else {
+                var title = `Scheduler Service - ${status}`
+                $("#scheduler-service-status").text(title);
+            }
+        }
+        function installService(installScheduler) {
+            doInstallScheduler = installScheduler;
+            var oReq = new XMLHttpRequest();
+            oReq.addEventListener("load", function () {
+                if (this.status !== 200) {
+                    showErrorModal("Failed to start installation process");
+                }
+                else {
+                    if (!installScheduler) {
+                        setServiceTitle(false, "Not Installing");
+                        viewDisableService("scheduler");
+                    }
+                    $("#installprogress").show();
+                    viewStartInstall("christmaspi");
+                    servicePoller = setInterval(servicesInstallPoller, 500);
+                }
+            });
+            oReq.open("POST", "/setup/services/install");
+            oReq.setRequestHeader("Content-Type", "application/json");
+            var data = {
+                installScheduler : installScheduler
+            };
+            var json = JSON.stringify(data);
+            oReq.send(json);
+        }
+        function servicesInstallPoller() {
+            var oReq = new XMLHttpRequest();
+            oReq.addEventListener("load", function () {
+                if (this.status !== 200) {
+                    showErrorModal("Failed to get installation progress");
+                    clearInterval(servicePoller);
+                }
+                else {
+                    var obj = JSON.parse(this.responseText);
+                    switch (obj["status"]) {
+                        case "Stale":
+                            break;
+                        case "Installing":
+                            updateText(obj["output"]);
+                            break;
+                        case "Success":
+                            saveText(obj["output"]);
+                            updateText(obj["output"]);
+                            successInstall = true;
+                            setServiceTitle(true, "Installed");
+                            if (doInstallScheduler) {
+                                setServiceTitle(false, "Installing");
+                                viewStartInstall("scheduler");
+                                viewInstallSuccess("christmaspi");
+                            }
+                            break;
+                        case "Reboot":
+                            saveText(obj["output"]);
+                            updateText(obj["output"]);
+                            successInstall = true;
+                            setServiceTitle(true, "Installed");
+                            viewInstallSuccess("christmaspi");
+                            if (doInstallScheduler) {
+                                setServiceTitle(false, "Installed");
+                                viewInstallSuccess("scheduler");
+                            }
+                            window.location.href = "/setup/aux/reboot";
+                        case "Failure":
+                            clearInterval(servicePoller);
+                            $("#continue-btn").show();
+                            updateText(obj["output"]);
+                            setServiceTitle(!successInstall, "Failed");
+                            viewInstallFailure();
+                            break;
+                        case "AllDone":
+                            clearInterval(servicePoller);
+                            setServiceTitle(true, "Installed");
+                            viewInstallSuccess("christmaspi");
+                            if (doInstallScheduler) {
+                                setServiceTitle(false, "Installed");
+                                viewInstallSuccess("scheduler");
+                            }
+                            $("#continue-btn").show();
+                            break;
+                    }
+                }
+            });
+            oReq.open("GET", "/setup/services/progress");
+            oReq.send();
+            // clearInterval(servicePoller);
         }
     </script>
 }

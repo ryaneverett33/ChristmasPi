@@ -9,11 +9,10 @@
 	- On successful ChristmasPi service installation, the server should restart gracefully
 - [FRONTEND] Replace hardware/unknown.png or give proper credit
 - [FRONTEND] Implement mobile version of schedule
-- [FRONTEND] Refactor site.js into Section Scripts
 - [BACKEND] Refactor other controllers to use RedirectHandler
 - [LOGGING] RedirectHandler should have it's own log
 - [BACKEND] Cleanup unnecessary views
-	- remove Privacy.cshmtl
+	- remove Privacy.cshtml
 - [GENERAL] Cleanup TODOs
 	- Implement Animator Dispose
 	- AnimationMode do Info()

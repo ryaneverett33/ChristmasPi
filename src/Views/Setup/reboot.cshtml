@@ -22,6 +22,19 @@
             oReq.open("GET", "/");
             oReq.send();
         }
+        function auxCompleteStep() {
+            var oReq = new XMLHttpRequest();
+            oReq.addEventListener("load", function () {
+                if (this.status !== 200) {
+                    showErrorModal("Failed to complete step");
+                }
+                else {
+                    window.location.href = this.responseURL;
+                }
+            });
+            oReq.open("POST", "/setup/aux/complete");
+            oReq.send();
+        }
         $(window).on('load', function() {
             intervalHandler = setInterval(rebootPoller, 5000);
         });

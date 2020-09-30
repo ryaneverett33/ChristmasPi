@@ -9,7 +9,34 @@
 }
 @section Scripts {
 <script type="text/javascript">
-
+    $(function () {
+        $('#brightness-slider').on('input', function (e) {
+            var ammount = e.target.value;
+            var percent = Math.round((ammount / 255) * 100);
+            $("#brightnessvalue").text(`${percent}%`);
+        });
+    });
+    function ValidateLights() {
+        // light count can't be zero
+        var lightcount = $("#lightcount").val();
+        var maxstr = $("#lightcount").prop("max");
+        try {
+            var count = parseInt(lightcount);
+            var max = parseInt(maxstr);
+            if (count === 0 || count > max) {
+                $("#lightcount").addClass("error");
+                $("#submitbtn").prop("disabled", true);
+            }
+            else {
+                $("#lightcount").removeClass("error");
+                $("#submitbtn").prop("disabled", false);
+            }
+        }
+        catch {
+            $("#lightcount").addClass("error");
+            $("#submitbtn").prop("disabled", true);
+        }
+    }
 </script>
 }
 @if (Model.HasError) {
@@ -38,15 +65,6 @@
             </div>
             <input asp-for="brightness" type="range" class="custom-range" id="brightness-slider" min="0" max="255" step="1" value="@Model.DefaultBrightness">
         </div>
-        <!--<button class="btn btn-primary btn-just-icon" type="button" data-toggle="collapse" data-target="#extra" aria-expanded="false" aria-controls="collapseExample">
-            <i class="nc-icon nc-simple-add"></i>
-        </button>
-        <div class="collapse" id="extra">
-            <div class="card card-body">
-                <label>Invert</label>
-                <input asp-for="invert" type="checkbox" />
-            </div>
-        </div>-->
         <br>
         <input type="submit" class="btn btn-primary" id="submitbtn" value="Submit" disabled="false" />
     </div>

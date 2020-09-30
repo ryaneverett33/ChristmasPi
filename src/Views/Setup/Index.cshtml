@@ -6,14 +6,22 @@
 }
 @section Scripts {
 <script type="text/javascript">
-
+    function StartSetup() {
+        var oReq = new XMLHttpRequest();
+        oReq.addEventListener("load", function () {
+            if (this.status !== 200) {
+                showErrorModal("Failed to start setup");
+            }
+            else {
+                location.href='/setup/next?current=start';
+            }
+        });
+        oReq.open("POST", "/setup/start");
+        oReq.setRequestHeader("Content-Type", "application/json");
+        oReq.send();
+    }
 </script>
 }
-
-<!--<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>-->
 <div class="jumbotron">
     <img src="~/img/christmastree.png" class="img-fluid" alt="logo" style="width: 200px; height: 250px;" />
     <h1 class="display-4">Welcome</h1>

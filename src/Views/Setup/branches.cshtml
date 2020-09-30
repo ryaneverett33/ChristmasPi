@@ -9,9 +9,162 @@
 @section Scripts {
     <script src="/js/branch.js"></script>
     <script type="text/javascript">
+        var maxLightCount = 0;
+        var branches = null;
+        var currentBranchIndex = 0;
+        var working = false;            // if talking to the server
+
         $(window).on("load", function () {
             branchSetupLoad();
         });
+        function validateLights() {
+            var start = branches[currentBranchIndex].start;
+            var end = branches[currentBranchIndex].end;
+            if (end <= start)
+                $("#minusBtn").prop('disabled', true);
+            else
+                $("#minusBtn").prop('disabled', false);
+            if (getCurrentLightCount() === maxLightCount) {
+                $("#addBtn").prop('disabled', true);
+                $("#newBtn").prop('disabled', true);
+                $("#submitBtn").prop('disabled', false);
+            }
+            else {
+                $("#addBtn").prop('disabled', false);
+                $("#newBtn").prop('disabled', false);
+                $("#submitBtn").prop('disabled', true);
+            }
+            // update light count
+            $("#lightcounter").text(`${getCurrentLightCount()}/${maxLightCount}`);
+        }
+        function minusLight() {
+            if (working)
+                return;
+            var oReq = new XMLHttpRequest();
+            oReq.addEventListener("load", function () {
+                if (this.status !== 200) {
+                    showErrorModal("Failed to remove light");
+                    working = false;
+                }
+                else {
+                    var branch = branches[currentBranchIndex];
+                    branch.remove();
+                    validateLights();
+                    working = false;
+                }
+            });
+            oReq.open("POST", "/setup/branches/light/remove");
+            working = true;
+            oReq.send();
+        }
+        function newBranch() {
+            if (working)
+                return;
+            var oReq = new XMLHttpRequest();
+            oReq.addEventListener("load", function () {
+                if (this.status !== 200) {
+                    showErrorModal("Failed to create branch");
+                    working = false;
+                }
+                else {
+                    working = false;
+                    var json = JSON.parse(this.response);
+                    // get end of current branch
+                    var end = branches[currentBranchIndex].end;
+                    branches.push(new branch(end + 1, branches.length, "branchlist", json["color"]));
+                    currentBranchIndex = currentBranchIndex + 1;
+                    branches[currentBranchIndex - 1].deactivate();
+                    branches[currentBranchIndex].activate();
+                    validateLights();
+                }
+            });
+            oReq.open("POST", "/setup/branches/branch/new");
+            working = true;
+            oReq.send();
+        }
+        function branchSetupLoad() {
+            if (working)
+                return;
+            var oReq = new XMLHttpRequest();
+            currentLightCount = 1;
+            oReq.addEventListener("load", function () {
+                if (this.status !== 200) {
+                    showErrorModal("Failed to add light");
+                    working = false;
+                }
+                else {
+                    var json = JSON.parse(this.response);
+                    branches = [];
+                    currentBranchIndex = 0;
+                    maxLightCount = parseInt($("#lightcount").val());
+                    branches.push(new branch(1, 0, "branchlist", json["color"]));
+                    validateLights();
+                    working = false;
+                }
+            });
+            oReq.open("POST", "/setup/branches/branch/new");
+            working = true;
+            oReq.send();
+        }
+        function addLight() {
+            if (working)
+                return;
+            var oReq = new XMLHttpRequest();
+            oReq.addEventListener("load", function () {
+                if (this.status !== 200) {
+                    showErrorModal("Failed to add light");
+                    working = false;
+                }
+                else {
+                    var branch = branches[currentBranchIndex];
+                    branch.add();
+                    validateLights();
+                    working = false;
+                }
+            });
+            oReq.open("POST", "/setup/branches/light/new");
+            working = true;
+            oReq.send();
+        }
+        function getCurrentLightCount() {
+            var lightCount = 0;
+            for (var i = 0; i < branches.length; i++) {
+                var branch = branches[i];
+                lightCount = lightCount + branch.lightCount;
+            }
+            return lightCount;
+        }
+        function submitBranches() {
+            if (working)
+                return;
+            if (getCurrentLightCount() !== maxLightCount) {
+                showErrorModal("Not all lights have been assigned to a branch");
+                return;
+            }
+            branchArray = [];
+            for (var i = 0; i < branches.length; i++) {
+                var branch = branches[i];
+                branchArray.push({
+                    start: branch.start,
+                    end: branch.end
+                });
+            }
+            var json = JSON.stringify(branches);
+            var oReq = new XMLHttpRequest();
+            oReq.addEventListener("load", function () {
+                if (this.status !== 200) {
+                    showErrorModal("Failed to submit branches");
+                    working = false;
+                }
+                else {
+                    location.href = '/setup/next?current=branches';
+                }
+            });
+            oReq.open("POST", "/setup/branches/submit");
+            oReq.setRequestHeader("Content-Type", "application/json");
+            working = true;
+            oReq.send(json);
+        }
     </script>
 }
 @if (Model.HasError) {
