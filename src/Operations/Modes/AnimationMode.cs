@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ChristmasPi.Operations.Interfaces;
+using ChristmasPi.Operations.Utils;
 using ChristmasPi.Animation;
 using ChristmasPi.Animation.Interfaces;
 using ChristmasPi.Data.Exceptions;
@@ -84,7 +85,8 @@ namespace ChristmasPi.Operations.Modes {
             }
         }
         public object GetProperty(string property) {
-            if (property.Equals(nameof(Name), StringComparison.CurrentCultureIgnoreCase))
+            return PropertyHelper.ResolveProperty(property, this, typeof(AnimationMode));
+            /*if (property.Equals(nameof(Name), StringComparison.CurrentCultureIgnoreCase))
                 return Name;
             else if (property.Equals(nameof(CurrentState), StringComparison.CurrentCultureIgnoreCase))
                 return CurrentState;
@@ -94,7 +96,7 @@ namespace ChristmasPi.Operations.Modes {
                 return Animating;
             else if (property.Equals(nameof(Paused), StringComparison.CurrentCultureIgnoreCase))
                 return Paused;
-            return null;
+            return null;*/
         }
 
         public int PauseAnimation() {

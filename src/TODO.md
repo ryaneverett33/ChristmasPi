@@ -12,9 +12,6 @@
 - [FRONTEND] Refactor site.js into Section Scripts
 - [BACKEND] Refactor other controllers to use RedirectHandler
 - [LOGGING] RedirectHandler should have it's own log
-- [BACKEND] Use reflection for OperatingMode.GetProperty?
-	- Type.getFields()
-		- https://docs.microsoft.com/en-us/dotnet/api/system.type.getfields?view=netcore-3.1
 - [GENERAL] Cleanup TODOs
 	- Implement Animator Dispose
 	- AnimationMode do Info()
@@ -38,6 +35,8 @@
 - [BACKEND] Implement ServiceInstaller::Dispose()
 - [BACKEND] RedirectHandler should try and catch 404 errors
 - [BACKEND] Refactor AnimationParameters to use Attributes
+- [BACKEND] Remove OperationMode::GetProperty()
+	- use interfaces instead
 - [FRONTEND] Add Settings tab
 - [FRONTEND] Implement main settings page
 - [BACKEND] Create a settings controller

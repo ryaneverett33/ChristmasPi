@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ChristmasPi.Operations.Interfaces;
+using ChristmasPi.Operations.Utils;
 using ChristmasPi.Hardware.Interfaces;
 using ChristmasPi.Hardware.Factories;
 using ChristmasPi.Data.Exceptions;
@@ -43,11 +44,12 @@ namespace ChristmasPi.Operations.Modes {
             };
         }
         public object GetProperty(string property) {
-            if (property.Equals(nameof(Name), StringComparison.CurrentCultureIgnoreCase))
+            return PropertyHelper.ResolveProperty(property, this, typeof(OffMode));
+            /*if (property.Equals(nameof(Name), StringComparison.CurrentCultureIgnoreCase))
                 return Name;
             if (property.Equals(nameof(TurnedOff), StringComparison.CurrentCultureIgnoreCase))
                 return Name;
-            return null;
+            return null;*/
         }
         #endregion
         #region Methods

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Drawing;
 using ChristmasPi.Operations.Interfaces;
+using ChristmasPi.Operations.Utils;
 using ChristmasPi.Hardware.Interfaces;
 using ChristmasPi.Hardware.Factories;
 using ChristmasPi.Data.Exceptions;
@@ -43,11 +44,12 @@ namespace ChristmasPi.Operations.Modes {
             };
         }
         public object GetProperty(string property) {
-            if (property.Equals(nameof(Name), StringComparison.CurrentCultureIgnoreCase))
+            return PropertyHelper.ResolveProperty(property, this, typeof(SolidColorMode));
+            /*if (property.Equals(nameof(Name), StringComparison.CurrentCultureIgnoreCase))
                 return Name;
             else if (property.Equals(nameof(CurrentColor), StringComparison.CurrentCultureIgnoreCase))
                 return CurrentColor;
-            return null;
+            return null;*/
         }
         #endregion
         #region Methods

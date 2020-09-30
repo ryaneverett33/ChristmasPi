@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ChristmasPi.Operations.Interfaces;
+using ChristmasPi.Operations.Utils;
 using ChristmasPi.Hardware.Interfaces;
 using ChristmasPi.Hardware.Factories;
 using ChristmasPi.Data.Exceptions;
@@ -106,7 +107,8 @@ namespace ChristmasPi.Operations.Modes {
             return new {};
         }
         public object GetProperty(string property) {
-            return null;
+            return PropertyHelper.ResolveProperty(property, this, typeof(SetupMode));
+            //return null;
         }
         #endregion
         #region Methods
