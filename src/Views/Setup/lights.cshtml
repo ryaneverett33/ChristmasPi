@@ -7,6 +7,11 @@
     @model ChristmasPi.Models.SetupLightsModel;
     ViewBag.StartPercent = String.Format("{0}%", Math.Floor((Model.DefaultBrightness / 255) * (double)100));
 }
+@section Scripts {
+<script type="text/javascript">
+
+</script>
+}
 @if (Model.HasError) {
     <div class="alert alert-danger" role="alert">
         @Model.ErrorMessage

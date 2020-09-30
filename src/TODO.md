@@ -12,6 +12,8 @@
 - [FRONTEND] Refactor site.js into Section Scripts
 - [BACKEND] Refactor other controllers to use RedirectHandler
 - [LOGGING] RedirectHandler should have it's own log
+- [BACKEND] Cleanup unnecessary views
+	- remove Privacy.cshmtl
 - [GENERAL] Cleanup TODOs
 	- Implement Animator Dispose
 	- AnimationMode do Info()

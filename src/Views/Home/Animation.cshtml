@@ -4,6 +4,68 @@
     @model ChristmasPi.Models.AnimationModel;
     ViewBag.TreeName = Model.TreeName;
 }
+@section Scripts {
+<script type="text/javascript">
+    function PlayAnimation(animation) {
+        // /api/animations/play?animation=Twinkle
+        var oReq = new XMLHttpRequest();
+        oReq.addEventListener("load", function () {
+            if (this.status !== 200) {
+                showErrorModal("Failed to play animation");
+            }
+            else {
+                location.reload();
+            }
+        });
+        // oReq.open("POST", "/api/animations/play?animation=" + animation);
+        oReq.open("POST", "/api/animations/play");
+        oReq.setRequestHeader("Content-Type", "application/json");
+        oReq.send(JSON.stringify({ animation: animation }));
+    }
+    function ResumeAnimation() {
+        // /api/animations/play
+        var oReq = new XMLHttpRequest();
+        oReq.addEventListener("load", function () {
+            if (this.status !== 200) {
+                showErrorModal("Failed to play animation");
+            }
+            else {
+                location.reload();
+            }
+        });
+        oReq.open("POST", "/api/animations/play");
+        oReq.send();
+    }
+    function PauseAnimation() {
+        // /api/animations/pause
+        var oReq = new XMLHttpRequest();
+        oReq.addEventListener("load", function () {
+            if (this.status !== 200) {
+                showErrorModal("Failed to pause animation");
+            }
+            else {
+                location.reload();
+            }
+        });
+        oReq.open("POST", "/api/animations/pause");
+        oReq.send();
+    }
+    function StopAnimation() {
+        // /api/animations/stop
+        var oReq = new XMLHttpRequest();
+        oReq.addEventListener("load", function () {
+            if (this.status !== 200) {
+                showErrorModal("Failed to stop animation");
+            }
+            else {
+                location.reload();
+            }
+        });
+        oReq.open("POST", "/api/animations/stop");
+        oReq.send();
+    }
+</script>
+}
 <ul class="list-group" @(Model.Disabled ? "disabled" : "")>
     @foreach (AnimationDataModel animation in Model.Animations) {
         @if (animation.CurrentAnimation) {

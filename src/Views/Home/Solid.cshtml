@@ -7,11 +7,55 @@
 @section Scripts {
 <script type="text/javascript">
     $(function () {
+        $('#cp2').colorpicker({
+            inline: true,
+            container: false,
+            format: "rgb",
+            useAlpha: false,
+            customClass: 'colorpicker-2x',
+            sliders: {
+                saturation: {
+                    maxLeft: 200,
+                    maxTop: 200
+                },
+                hue: {
+                    maxTop: 200
+                },
+                alpha: {
+                    maxTop: 200
+                }
+            }
+        });
+        $('#cp2').on('colorpickerChange colorpickerCreate', function (event) {
+            currentColor = event.color.toString();
+        });
         var test = document.getElementById('test');
         new SuperGif({gif: test, on_end: function(gif) {
             console.log("playback finished");
         }}).load();
     });
+    function SetColor(colorstring) {
+        $("#cp2").colorpicker('setValue', colorstring);
+    }
+    function SubmitColor() {
+        // get color
+        var color = currentColor;
+        console.log(color);
+        // /api/solid/update?color=db7b26
+        var oReq = new XMLHttpRequest();
+        oReq.addEventListener("load", function () {
+            if (this.status !== 200) {
+                showErrorModal("Failed to set color");
+            }
+            else {
+                location.reload();
+            }
+        });
+        //oReq.open("POST", "/api/solid/update?color=" + color);
+        oReq.open("POST", "/api/solid/update");
+        oReq.setRequestHeader("Content-Type", "application/json");
+        oReq.send(JSON.stringify({ color: color }));
+    }
 </script>
 }
 

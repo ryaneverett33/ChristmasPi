@@ -4,10 +4,45 @@
     @model ChristmasPi.Models.PowerModel;
     ViewBag.TreeName = Model.TreeName;
 }
-<!--@if (Model.PoweredOff) {
-    <button class="btn btn-primary" onclick="TurnOn()">Turn On</button>
+@section Scripts {
+<script type="text/javascript">
+    $(function () {
+        $("#power-checkbox").bootstrapSwitch();
+        $('#power-checkbox').on('switchChange.bootstrapSwitch', function (e, data) {
+            if (data)
+                TurnOn();
+            else
+                TurnOff();
+        });
+    });
+    function TurnOn() {
+        // /api/power/on
+        var oReq = new XMLHttpRequest();
+        oReq.addEventListener("load", function () {
+            if (this.status !== 200) {
+                showErrorModal("Failed to turn on");
+            }
+            else {
+                location.reload();
+            }
+        });
+        oReq.open("POST", "/api/power/on");
+        oReq.send();
+    }
+    function TurnOff() {
+        // /api/power/on
+        var oReq = new XMLHttpRequest();
+        oReq.addEventListener("load", function () {
+            if (this.status !== 200) {
+                showErrorModal("Failed to turn on");
+            }
+            else {
+                location.reload();
+            }
+        });
+        oReq.open("POST", "/api/power/off");
+        oReq.send();
+    }
+</script>
 }
-else {
-    <button class="btn btn-primary" onclick="TurnOff()">Turn Off</button>
-}-->
 <input type="checkbox" id="power-checkbox" @(Model.PoweredOff ? "" : "checked")>

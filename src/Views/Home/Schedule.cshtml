@@ -175,6 +175,21 @@
             repeat: repeat
         }));
     }
+    function validate(a, b) {
+        var start = $('#addrule-starttime').val();
+        var end = $('#addrule-endtime').val();
+        var monday = $("#monday-btn").val() === "true";
+        var tuesday = $("#tuesday-btn").val() === "true";
+        var wednesday = $("#wednesday-btn").val() === "true";
+        var thursday = $("#thursday-btn").val() === "true";
+        var friday = $("#friday-btn").val() === "true";
+        var saturday = $("#saturday-btn").val() === "true";
+        var sunday = $("#sunday-btn").val() === "true";
+        var enabled = start !== "" && end !== "" && start !== end && (
+            monday || tuesday || wednesday || thursday || friday || saturday || sunday
+        );
+        $("#scheduleAddRuleBtn").prop('disabled', !enabled);
+    }
 </script>
 }
 <div>
