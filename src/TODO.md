@@ -7,7 +7,6 @@
 	- Transition to checkmark/failure on service installation finish
 - [BACKEND] Implement services installation
 	- On successful ChristmasPi service installation, the server should restart gracefully
-- [FRONTEND] Replace hardware/unknown.png or give proper credit
 - [FRONTEND] Implement mobile version of schedule
 - [BACKEND] Refactor other controllers to use RedirectHandler
 - [LOGGING] RedirectHandler should have it's own log
