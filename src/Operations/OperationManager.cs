@@ -62,6 +62,7 @@ namespace ChristmasPi.Operations {
         /// <returns>List of classes</returns>
         private string[] getClasses() {
             /// TODO use reflection to get classes instead of a hardcoded list
+            // https://docs.microsoft.com/en-us/dotnet/api/system.type.isassignablefrom?view=netcore-3.1
             return new string[] {
                 typeof(SolidColorMode).FullName,
                 typeof(AnimationMode).FullName,
