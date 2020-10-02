@@ -4,6 +4,8 @@ using System.Threading;
 using System.IO;
 using System.Collections.Generic;
 using ChristmasPi.Data.Models;
+using ChristmasPi.Data;
+using ChristmasPi.Util;
 using Serilog;
 
 namespace ChristmasPi.Util {
@@ -94,6 +96,12 @@ namespace ChristmasPi.Util {
             writeline("Starting installation process");
             writeline("Info\t\tname: {0}, path: {1}", this.serviceName, this.servicePath);
             OnInstallProgress.Invoke(getState());
+            InitSystem initSystem = OSUtils.GetInitSystemType();
+            if (initSystem != InitSystem.systemd && !ConfigurationManager.Instance.RuntimeConfiguration.DebugServiceInstaller) {
+                writeline("Init System {0} is not supported.", initSystem);
+                OnInstallProgress.Invoke(getState());
+                return false;
+            }
             PIDFile.Save();
             writeline("Wrote PID file");
             Thread.Sleep(1500);

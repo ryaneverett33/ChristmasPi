@@ -20,6 +20,7 @@
 	- Select which animations should be debug animations
 - [GENERAL] Create installer package
 	- Maybe add bootstrapper script to start setup process
+	- Add builder for creating build packages (zip up the build directory) /
 
 ## General
 - [?] branch animation is the result of a basic animation
