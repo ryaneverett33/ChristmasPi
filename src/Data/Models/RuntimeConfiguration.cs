@@ -32,8 +32,8 @@ namespace ChristmasPi.Data.Models {
         public bool AllowDebugAnimations;
 
         [HelpSection("Debug")]
-        [Argument("debug-service-installer", "Allow debug behavior of the service installer", true)]
-        public bool DebugServiceInstaller;
+        [Argument("use-service-installer-stub", "Use a stub for the service installer", true)]
+        public bool UseServiceInstallerStub;
 
         [Argument("daemon", "Starts the server in a daemon configuration", true)]
         public bool DaemonMode;
@@ -47,7 +47,7 @@ namespace ChristmasPi.Data.Models {
             DaemonMode = false;
             DaemonLogToConsole = false;
             AllowDebugAnimations = false;
-            DebugServiceInstaller = false;
+            UseServiceInstallerStub = false;
         }
     }
 }

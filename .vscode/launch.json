@@ -16,7 +16,8 @@
                 "--debug",
                 "--daemon",
                 "--daemon-log-console",
-                "--ignore-restart"
+                "--ignore-restart",
+                "--use-service-installer-stub"
             ],
             "cwd": "${workspaceFolder}/build/bin/Debug/netcoreapp3.0/",
             "stopAtEntry": false,

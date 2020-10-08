@@ -36,7 +36,10 @@ function install_dotnet {
     wget $dotnet_installer
     chmod +x dotnet-install.sh
     ./dotnet-install.sh -c $dotnet_version --install-dir $dotnet_install_location
-    echo 'export PATH="$dotnet_install_location:$PATH"' >> /home/$USER/.bashrc
+    path_out=$(echo export PATH="$dotnet_install_location:\$PATH")
+    root_out=$(echo DOTNET_ROOT="$donet_install_location")
+    echo $path_out >> /home/$USER/.bashrc
+    echo $root_out >> /home/$USER/.bashrc
     source /home/$USER/.bashrc
 }
 

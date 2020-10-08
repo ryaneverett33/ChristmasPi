@@ -74,7 +74,8 @@ namespace ChristmasPi.Util {
         private void installerMonitor() {
             try {
                 startInstall();
-                if (installer()) {
+                bool installResult = ConfigurationManager.Instance.RuntimeConfiguration.UseServiceInstallerStub ? installerStub() : installer();
+                if (installResult) {
                     Log.ForContext("ClassName", "ServiceInstaller").Debug("Success");
                     finishInstall();
                     OnInstallSuccess.Invoke(getState());
@@ -92,16 +93,10 @@ namespace ChristmasPi.Util {
             }
         }
 
-        private bool installer() {
+        private bool installerStub() {
             writeline("Starting installation process");
             writeline("Info\t\tname: {0}, path: {1}", this.serviceName, this.servicePath);
             OnInstallProgress.Invoke(getState());
-            InitSystem initSystem = OSUtils.GetInitSystemType();
-            if (initSystem != InitSystem.systemd && !ConfigurationManager.Instance.RuntimeConfiguration.DebugServiceInstaller) {
-                writeline("Init System {0} is not supported.", initSystem);
-                OnInstallProgress.Invoke(getState());
-                return false;
-            }
             PIDFile.Save();
             writeline("Wrote PID file");
             Thread.Sleep(1500);
@@ -118,8 +113,60 @@ namespace ChristmasPi.Util {
             return true;
         }
 
+        private bool installer() {
+            writeline("Starting installation process");
+            writeline("Info\t\tname: {0}, path: {1}", this.serviceName, this.servicePath);
+            OnInstallProgress.Invoke(getState());
+            InitSystem initSystem = OSUtils.GetInitSystemType();
+            if (initSystem != InitSystem.systemd) {
+                writeline("Init System {0} is not supported.", initSystem);
+                OnInstallProgress.Invoke(getState());
+                return false;
+            }
+            if (isServiceInstalled()) {
+                writeline("Service already installed, exiting");
+                OnInstallProgress.Invoke(getState());
+                return true;
+            }
+            writeline("Copying service files");
+            if (!copyServiceFile()) {
+                writeline("Failed to copy service files");
+                OnInstallProgress.Invoke(getState());
+                return false;
+            }
+            writeline("Enabling service");
+            if (!enableService()) {
+                writeline("Failed to enable service");
+                OnInstallProgress.Invoke(getState());
+                return false;
+            }
+            writeline("Starting {0} service", this.serviceName);
+            if (!startService()) {
+                writeline("Failed to start service");
+                OnInstallProgress.Invoke(getState());
+                return false;
+            }
+            return true;
+        }
+
         private bool isServiceInstalled() {
             // systemctl list-units --full -all | grep "cron.service"
+            /* Success
+UNIT         LOAD   ACTIVE SUB     DESCRIPTION                                 
+cron.service loaded active running Regular background program processing daemon
+
+LOAD   = Reflects whether the unit definition was properly loaded.
+ACTIVE = The high-level unit activation state, i.e. generalization of SUB.
+SUB    = The low-level unit activation state, values depend on unit type.
+
+1 loaded units listed.
+To show all installed unit files use 'systemctl list-unit-files'.
+            */
+            /* Failure
+Running command systemctl with list-units --full -all | grep "cron2.service"
+0 loaded units listed.
+To show all installed unit files use 'systemctl list-unit-files'.
+            */
             return false;
         }
         private bool uninstallService() {
@@ -145,6 +192,7 @@ namespace ChristmasPi.Util {
         }
         private bool daemonReload() {
             // systemctl daemon-reload
+            // Success should be an empty output
             return false;
         }
 

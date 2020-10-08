@@ -94,6 +94,11 @@ Task("BuildSrc")
         else
             CopyFile("src/lib/libpidexists.so", $"build/bin/{configuration}/netcoreapp3.0/libpidexists.so");
     }
+    var files = GetFiles("src/Services/*");
+    foreach(var file in files)
+    {
+        CopyFile(file, $"build/bin/{configuration}/netcoreapp3.0/{file.GetFilename()}");
+    }
 });
 Task("BuildServer")
     .IsDependentOn("BuildSrc")
