@@ -39,7 +39,7 @@ function showErrorModal(errorMessage) {
     location.href=`/setup/next?current=${current}`;
 }*/
 
-/*function deleteBranch() {
+function deleteBranch() {
     if (working)
         return;
     if (branches.length === 1)
@@ -62,4 +62,4 @@ function showErrorModal(errorMessage) {
     oReq.open("POST", "/setup/branches/branch/remove");
     working = true;
     oReq.send();
-}*/
+}

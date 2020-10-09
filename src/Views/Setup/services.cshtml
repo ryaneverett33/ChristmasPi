@@ -15,6 +15,7 @@
         var successInstall = false;
         var doInstallScheduler = false;
         var servicePoller = null;
+        var servicesPollTime = 100;
 
         // set current text
         function updateText(text) {
@@ -142,7 +143,7 @@
                     }
                     $("#installprogress").show();
                     viewStartInstall("christmaspi");
-                    servicePoller = setInterval(servicesInstallPoller, 500);
+                    servicePoller = setInterval(servicesInstallPoller, servicesPollTime);
                 }
             });
             oReq.open("POST", "/setup/services/install");
@@ -190,7 +191,7 @@
                                 viewInstallSuccess("scheduler");
                             }
                             window.location.href = "/setup/aux/reboot";
-                        case "Failure":
+                        case "Failed":
                             clearInterval(servicePoller);
                             $("#continue-btn").show();
                             updateText(obj["output"]);

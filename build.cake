@@ -94,6 +94,7 @@ Task("BuildSrc")
         else
             CopyFile("src/lib/libpidexists.so", $"build/bin/{configuration}/netcoreapp3.0/libpidexists.so");
     }
+    CopyFile("src/lib/ws2811.so", $"build/bin/{configuration}/netcoreapp3.0/ws2811.so");
     var files = GetFiles("src/Services/*");
     foreach(var file in files)
     {

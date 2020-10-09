@@ -8,6 +8,7 @@ using ChristmasPi.Data.Models.Hardware;
 using ChristmasPi.Data.Exceptions;
 using ChristmasPi.Hardware.Interfaces;
 using ChristmasPi.Hardware.Renderers;
+using Serilog;
 
 namespace ChristmasPi.Hardware.Factories {
     public class RenderFactory : IDisposable {
@@ -59,6 +60,7 @@ namespace ChristmasPi.Hardware.Factories {
                     switch (rendererType) {
                         case RendererType.RPI_WS281x: {
                             var renderer = new WS281xRenderer(1, datapin, 1);
+                            Log.ForContext<RenderFactory>().Debug("TestRenderer successfully created renderer, disposing");
                             renderer.Dispose();
                             success = true;
                             break;
@@ -68,7 +70,8 @@ namespace ChristmasPi.Hardware.Factories {
                             break;
                     }
                 }
-                catch (Exception) {
+                catch (Exception e) {
+                    Log.ForContext<RenderFactory>().Debug(e, "Failed to test renderer");
                     success = false;
                 }
             }

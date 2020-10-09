@@ -149,6 +149,7 @@ namespace ChristmasPi.Operations.Modes {
                 return true;
             }
             else {
+                Log.ForContext<SetupMode>().Error("Setting hardware failed renderer test");
                 return false;
             }
         }
@@ -305,7 +306,7 @@ namespace ChristmasPi.Operations.Modes {
                 return false;
             this.installSchedulerService = installSchedulerService;
             Log.ForContext("ClassName", "AnimationMode").Debug("Install Scheduler Service? {installSchedulerService}", installSchedulerService);
-            currentServiceInstaller = new ServiceInstaller("ChristmasPi.service", "some path");
+            currentServiceInstaller = new ServiceInstaller("ChristmasPi.service");
             currentServiceInstaller.OnInstallFailure = serviceInstallHandler;
             currentServiceInstaller.OnInstallProgress = serviceInstallHandler;
             currentServiceInstaller.OnInstallSuccess = serviceInstallHandler;
@@ -357,7 +358,7 @@ namespace ChristmasPi.Operations.Modes {
                             }
                             // Start install for Scheduler.service
                             currentServiceInstaller.Dispose();
-                            currentServiceInstaller = new ServiceInstaller("Scheduler.service", "some path");
+                            currentServiceInstaller = new ServiceInstaller("Scheduler.service");
                             currentServiceInstaller.OnInstallFailure = serviceInstallHandler;
                             currentServiceInstaller.OnInstallProgress = serviceInstallHandler;
                             currentServiceInstaller.OnInstallSuccess = serviceInstallHandler;
@@ -399,8 +400,8 @@ namespace ChristmasPi.Operations.Modes {
                     // Clean up installer
                     lastStatusUpdate = new ServiceStatusModel(currentServiceInstaller.GetWriter(), currentServiceInstaller.GetStatus());
                     serviceHasUpdate = true;
-                    currentServiceInstaller.Dispose();
-                    currentServiceInstaller = null;
+                    //currentServiceInstaller.Dispose();
+                    //currentServiceInstaller = null;
                     break;
                 case InstallationStatus.Installing:
                     // Set service update info
@@ -417,7 +418,7 @@ namespace ChristmasPi.Operations.Modes {
         /// </summary>
         /// <returns></returns>
         public ServiceStatusModel GetServicesInstallProgress() {
-            if (currentServiceInstaller == null)
+            if (currentServiceInstaller == null && !serviceHasUpdate)
                 return null;
             if (serviceHasUpdate) {
                 serviceHasUpdate = false;

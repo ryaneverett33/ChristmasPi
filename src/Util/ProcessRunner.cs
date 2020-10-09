@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace ChristmasPi.Util {
     public static class ProcessRunner {
-        public static string Run(string command, string arguments) {
+        public static Process Popen(string command, string arguments) {
             Process process = new Process();
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.RedirectStandardOutput = true;
@@ -11,7 +11,10 @@ namespace ChristmasPi.Util {
             process.StartInfo.Arguments = arguments;
             process.Start();
             process.WaitForExit();
-            return process.StandardOutput.ReadToEnd();
+            return process;
+        }
+        public static string Run(string command, string arguments) {
+            return Popen(command, arguments).StandardOutput.ReadToEnd();
         }
     }
 }

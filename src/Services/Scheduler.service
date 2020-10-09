@@ -3,7 +3,8 @@ Description=Scheduler
 After=network.target
 
 [Service]
-ExecStart=
+ExecStart=/opt/dotnet/dotnet /opt/ChristmasPi/Scheduler.dll --daemon
+Environment="DOTNET_ROOT=/opt/dotnet"
 
 [Install]
 WantedBy=multi-user.target

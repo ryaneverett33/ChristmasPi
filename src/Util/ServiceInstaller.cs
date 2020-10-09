@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Threading;
+using System.Text.RegularExpressions;
 using System.IO;
 using System.Collections.Generic;
 using ChristmasPi.Data.Models;
@@ -40,12 +41,18 @@ namespace ChristmasPi.Util {
         private string servicePath;
         private bool isDisposed;
         public bool RebootRequired { get; private set;}
-        public ServiceInstaller(string name, string path) {
+
+        // Regexes
+        private Regex LoadedUnitsRegex = new Regex(@"([0-9]+) loaded units listed\.");
+        public ServiceInstaller(string service) {
+            if (!File.Exists(service)) {
+                throw new FileNotFoundException($"Unable to find {service} in the installation directory, cannot install");
+            }
             status = InstallationStatus.Waiting;
             locker = new object();
             output = new OutputWriter();
-            serviceName = name;
-            servicePath = path;
+            serviceName = Path.GetFileNameWithoutExtension(service);
+            servicePath = service;
             isDisposed = false;
             RebootRequired = false;
         }
@@ -76,11 +83,12 @@ namespace ChristmasPi.Util {
                 startInstall();
                 bool installResult = ConfigurationManager.Instance.RuntimeConfiguration.UseServiceInstallerStub ? installerStub() : installer();
                 if (installResult) {
-                    Log.ForContext("ClassName", "ServiceInstaller").Debug("Success");
+                    Log.ForContext<ServiceInstaller>().Debug("Success");
                     finishInstall();
                     OnInstallSuccess.Invoke(getState());
                 }
                 else {
+                    Log.ForContext<ServiceInstaller>().Debug("Failure");
                     failedInstall();
                     OnInstallFailure.Invoke(getState());
                 }
@@ -96,56 +104,44 @@ namespace ChristmasPi.Util {
         private bool installerStub() {
             writeline("Starting installation process");
             writeline("Info\t\tname: {0}, path: {1}", this.serviceName, this.servicePath);
-            OnInstallProgress.Invoke(getState());
             PIDFile.Save();
             writeline("Wrote PID file");
             Thread.Sleep(1500);
             for (int i = 0; i < 10; i++) {
                 writeline("Step {0}", i);
-                OnInstallProgress.Invoke(getState());
                 Thread.Sleep(750);
             }
             writeline("Finished installation process");
-            OnInstallProgress.Invoke(getState());
             RebootRequired = true;
             writeline("Reboot required");
-            OnInstallProgress.Invoke(getState());
             return true;
         }
 
         private bool installer() {
             writeline("Starting installation process");
             writeline("Info\t\tname: {0}, path: {1}", this.serviceName, this.servicePath);
-            OnInstallProgress.Invoke(getState());
             InitSystem initSystem = OSUtils.GetInitSystemType();
             if (initSystem != InitSystem.systemd) {
                 writeline("Init System {0} is not supported.", initSystem);
-                OnInstallProgress.Invoke(getState());
                 return false;
             }
             if (isServiceInstalled()) {
                 writeline("Service already installed, exiting");
-                OnInstallProgress.Invoke(getState());
                 return true;
             }
             writeline("Copying service files");
-            if (!copyServiceFile()) {
-                writeline("Failed to copy service files");
-                OnInstallProgress.Invoke(getState());
-                return false;
-            }
+            copyServiceFile();
             writeline("Enabling service");
             if (!enableService()) {
                 writeline("Failed to enable service");
-                OnInstallProgress.Invoke(getState());
                 return false;
             }
             writeline("Starting {0} service", this.serviceName);
             if (!startService()) {
                 writeline("Failed to start service");
-                OnInstallProgress.Invoke(getState());
                 return false;
             }
+            RebootRequired = true;
             return true;
         }
 
@@ -167,7 +163,16 @@ Running command systemctl with list-units --full -all | grep "cron2.service"
 0 loaded units listed.
 To show all installed unit files use 'systemctl list-unit-files'.
             */
-            return false;
+            writeline($"systemctl list-units --full -all | grep \"{servicePath}\"");
+            string output = ProcessRunner.Run("systemctl", $"list-units --full -all | grep \"{servicePath}\"");
+            writeline(output);
+            Match outputMatch = LoadedUnitsRegex.Match(output);
+            if (outputMatch.Success) {
+                int servicesInstalled = int.Parse(outputMatch.Groups[1].Value);
+                return servicesInstalled > 0;
+            }
+            else
+                throw new Exception("Unable to get program output");
         }
         private bool uninstallService() {
             // systemctl show -p FragmentPath cron.service
@@ -176,24 +181,32 @@ To show all installed unit files use 'systemctl list-unit-files'.
             // rm servicefile
             // disable service
             // daemon reload
-            return false;
+            throw new NotImplementedException();
         }
-        private bool copyServiceFile() {
+        private void copyServiceFile() {
             // copy service file to /etc/systemd/system/
-            return false;
+            if (File.Exists($"/etc/systemd/system/{servicePath}"))
+                throw new Exception("Service file already exists, cannot install new service file");
+            File.Copy(servicePath, $"/etc/systemd/system/{servicePath}");
+            writeline($"Copying {servicePath}");
         }
         private bool enableService() {
             // systemctl enable service.service
-            return false;
+            writeline($"systemctl enable {servicePath}");
+            Process process = ProcessRunner.Popen("systemctl", $"enable {servicePath}");
+            return process.ExitCode == 0;
         }
         private bool startService() {
             // systemctl start service.service
-            return false;
+            writeline($"systemctl start {servicePath}");
+            Process process = ProcessRunner.Popen("systemctl", $"start {servicePath}");
+            return process.ExitCode == 0;
         }
         private bool daemonReload() {
             // systemctl daemon-reload
-            // Success should be an empty output
-            return false;
+            writeline("systemctl daemon-reload");
+            Process process = ProcessRunner.Popen("systemctl", "daemon-reload");
+            return process.ExitCode == 0;
         }
 
         private void startInstall() {
@@ -214,21 +227,29 @@ To show all installed unit files use 'systemctl list-unit-files'.
         private void writeline(string format, params object[] args) {
             lock (locker) {
                 output.WriteLine(format, args);
+                Log.ForContext<ServiceInstaller>().Debug($"\t{String.Format(format, args)}");
+                OnInstallProgress.Invoke(getState());
             }
         }
         private void writeline(string line) {
             lock (locker) {
                 output.WriteLine(line);
+                Log.ForContext<ServiceInstaller>().Debug($"\t{line}");
+                OnInstallProgress.Invoke(getState());
             }
         }
         private void write(string format, params object[] args) {
             lock (locker) {
                 output.Write(format, args);
+                Log.ForContext<ServiceInstaller>().Debug($"\t{String.Format(format, args)}");
+                OnInstallProgress.Invoke(getState());
             }
         }
         private void write(string line) {
             lock (locker) {
                 output.Write(line);
+                Log.ForContext<ServiceInstaller>().Debug($"\t{line}");
+                OnInstallProgress.Invoke(getState());
             }
         }
 

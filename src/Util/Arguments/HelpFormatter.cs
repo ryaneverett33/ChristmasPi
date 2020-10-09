@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using ChristmasPi.Data;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace ChristmasPi.Util.Arguments {
     public class HelpFormatter {
         private ArgParser parser;
         private string dashstring;
-        private readonly int argumentColumnWidth = 30;
+        private readonly int argumentColumnWidth = 56;
 
         public HelpFormatter() {
             this.dashstring = new string('-', 15);
@@ -114,7 +115,7 @@ namespace ChristmasPi.Util.Arguments {
             if (Console.WindowWidth < argumentColumnWidth + 10)
                 return new string[] { message };
             List<string> lines = new List<string>(10);      // Max lines is 10
-            int maxWidth = (argumentColumnWidth + 3) - Console.WindowWidth;
+            int maxWidth = Console.WindowWidth + (argumentColumnWidth + 3);
             string[] wordStack = message.Split(' ');
             int stackPosition = 0;
             for (int i = 0; i < 10; i++) {

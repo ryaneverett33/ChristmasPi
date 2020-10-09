@@ -7,6 +7,7 @@
 	- Transition to checkmark/failure on service installation finish
 - [BACKEND] Implement services installation
 	- On successful ChristmasPi service installation, the server should restart gracefully
+		- Test reboot when not using installer stub
 - [FRONTEND] Implement mobile version of schedule
 - [BACKEND] Refactor other controllers to use RedirectHandler
 - [LOGGING] RedirectHandler should have it's own log
@@ -20,6 +21,8 @@
 	- Select which animations should be debug animations
 - [GENERAL] Create installer package
 	- Maybe add bootstrapper script to start setup process
+		- install dotnet to /opt/dotnet
+		- add to global path /etc/profile.d/dotnet.sh
 	- Add builder for creating build packages (zip up the build directory) /
 
 ## General
@@ -34,6 +37,7 @@
 - [BACKEND] Implement ServiceInstaller::Dispose()
 - [BACKEND] RedirectHandler should try and catch 404 errors
 - [BACKEND] Refactor AnimationParameters to use Attributes
+- [BACKEND] HelpFormatter should dynamically set `argumentColumnWidth` instead of being a constant
 - [BACKEND] Remove OperationMode::GetProperty()
 	- use interfaces instead
 - [FRONTEND] Add Settings tab
