@@ -59,6 +59,11 @@ namespace ChristmasPi.Util {
 
         // Starts the installation process with progress reported to Progress
         public void StartInstall() {
+            if (isDisposed || status != InstallationStatus.Waiting) {
+                Log.ForContext<ServiceInstaller>().Error("Can't start install for service {serviceName}, already ran", serviceName);
+                Log.ForContext<ServiceInstaller>().Debug("ServiceInstaller status: {status}, disposed? {isDisposed}", status, isDisposed);
+                throw new Exception("Can't install service, already installed");
+            }
             installerThread = new Thread(installerMonitor);
             installerThread.Start();
         }
@@ -123,6 +128,7 @@ namespace ChristmasPi.Util {
             InitSystem initSystem = OSUtils.GetInitSystemType();
             if (initSystem != InitSystem.systemd) {
                 writeline("Init System {0} is not supported.", initSystem);
+                RebootRequired = false;
                 return false;
             }
             if (isServiceInstalled()) {
@@ -253,10 +259,16 @@ To show all installed unit files use 'systemctl list-unit-files'.
             }
         }
 
-        /// TODO
         public void Dispose() {
             if (!isDisposed) {
                 isDisposed = true;
+                OnInstallFailure = null;
+                OnInstallProgress = null;
+                OnInstallSuccess = null;
+                status = InstallationStatus.Success | InstallationStatus.Failed;
+                output = null;
+                if (installerThread.IsAlive)
+                    installerThread.Abort();
             }
         }
     }

@@ -2,12 +2,9 @@
 
 ## Release 0.5
 - [FRONTEND] Services reindeer gif transition to checkmark
-	- Start reindeer when installing
+	- Start reindeer when installing /
 	- Add appropriate gifs, reindeer->checkmark gif and reindeer->failure gif
 	- Transition to checkmark/failure on service installation finish
-- [BACKEND] Implement services installation
-	- On successful ChristmasPi service installation, the server should restart gracefully
-		- Test reboot when not using installer stub
 - [FRONTEND] Implement mobile version of schedule
 - [BACKEND] Refactor other controllers to use RedirectHandler
 - [LOGGING] RedirectHandler should have it's own log
@@ -24,6 +21,7 @@
 		- install dotnet to /opt/dotnet
 		- add to global path /etc/profile.d/dotnet.sh
 	- Add builder for creating build packages (zip up the build directory) /
+- [FRONTEND] If a service fails to install with a restart pending, an alert should be raised before redirecting
 
 ## General
 - [?] branch animation is the result of a basic animation

@@ -133,6 +133,8 @@ namespace ChristmasPi.Operations.Modes {
             Configuration.setup.firstrun = false;
             ConfigurationManager.Instance.CurrentTreeConfig = Configuration;
             ConfigurationManager.Instance.SaveConfiguration();
+            if (currentServiceInstaller != null)
+                currentServiceInstaller.Dispose();
         }
 
         /// <summary>
