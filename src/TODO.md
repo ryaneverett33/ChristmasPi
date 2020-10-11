@@ -6,7 +6,6 @@
 	- Add appropriate gifs, reindeer->checkmark gif and reindeer->failure gif
 	- Transition to checkmark/failure on service installation finish
 - [FRONTEND] Implement mobile version of schedule
-- [BACKEND] Refactor other controllers to use RedirectHandler
 - [BACKEND] Cleanup animations
 	- Implement debug property for animations /
 	- Add debug configuration for allowing debug animations /
