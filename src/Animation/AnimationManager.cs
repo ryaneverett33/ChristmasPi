@@ -7,6 +7,7 @@ using ChristmasPi.Animation.BranchAnimations;
 using ChristmasPi.Data.Exceptions;
 using ChristmasPi.Data;
 using ChristmasPi.Data.Models;
+using Serilog;
 
 namespace ChristmasPi.Animation {
     public class AnimationManager {
@@ -21,8 +22,14 @@ namespace ChristmasPi.Animation {
             Animations = new Dictionary<string, IAnimatable>();
             string[] animationsClasses = getAnimationClasses();
             foreach (string classname in animationsClasses) {
-                /// TODO Handle if exception occurs when creating instance or casting
-                IAnimatable anim = (IAnimatable)Activator.CreateInstance(Type.GetType(classname));
+                IAnimatable anim = null;
+                try {
+                    anim = (IAnimatable)Activator.CreateInstance(Type.GetType(classname));
+                }
+                catch (Exception e) {
+                    Log.ForContext<AnimationManager>().Error(e, "An exception ocurred creating an instance of class {classname}", classname);
+                    Environment.Exit(Constants.EXIT_INIT_FAILURE);
+                }
                 if (anim.isBranchAnimation)
                     (anim as IBranchAnimation).Init(ConfigurationManager.Instance.CurrentTreeConfig.tree.branches.ToArray());
                 // resolve properties

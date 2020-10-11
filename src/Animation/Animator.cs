@@ -231,8 +231,16 @@ namespace ChristmasPi.Animation {
 
         public void Dispose() {
             if (!disposed) {
-                /// TODO implement
                 renderer.Dispose();
+                _currentState = 0;
+                if (workerThread.IsAlive)
+                    workerThread.Abort();
+                workerThread = null;
+                currentFrames = null;
+                nextFrames = null;
+                currentFrameIndex = -1;
+                evaluatedNextFrames = false;
+                currentToken = null;
                 disposed = true;
             }
         }

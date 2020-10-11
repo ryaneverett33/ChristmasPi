@@ -45,11 +45,6 @@ namespace ChristmasPi.Operations.Modes {
         }
         public object GetProperty(string property) {
             return PropertyHelper.ResolveProperty(property, this, typeof(OffMode));
-            /*if (property.Equals(nameof(Name), StringComparison.CurrentCultureIgnoreCase))
-                return Name;
-            if (property.Equals(nameof(TurnedOff), StringComparison.CurrentCultureIgnoreCase))
-                return Name;
-            return null;*/
         }
         #endregion
         #region Methods

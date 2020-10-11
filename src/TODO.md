@@ -8,9 +8,6 @@
 - [FRONTEND] Implement mobile version of schedule
 - [BACKEND] Refactor other controllers to use RedirectHandler
 - [LOGGING] RedirectHandler should have it's own log
-- [GENERAL] Cleanup TODOs
-	- Implement Animator Dispose
-	- AnimationMode do Info()
 - [BACKEND] Cleanup animations
 	- Implement debug property for animations /
 	- Add debug configuration for allowing debug animations /

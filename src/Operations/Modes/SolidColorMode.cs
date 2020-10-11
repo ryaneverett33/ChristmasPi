@@ -45,11 +45,6 @@ namespace ChristmasPi.Operations.Modes {
         }
         public object GetProperty(string property) {
             return PropertyHelper.ResolveProperty(property, this, typeof(SolidColorMode));
-            /*if (property.Equals(nameof(Name), StringComparison.CurrentCultureIgnoreCase))
-                return Name;
-            else if (property.Equals(nameof(CurrentColor), StringComparison.CurrentCultureIgnoreCase))
-                return CurrentColor;
-            return null;*/
         }
         #endregion
         #region Methods

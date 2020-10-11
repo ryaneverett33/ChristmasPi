@@ -45,12 +45,15 @@ namespace ChristmasPi.Data {
         public static readonly string SETUP_PROGRESS_FILE = "Setup.Progress.json";
         public static readonly string PID_FILE = "ChristmasPi.pid";
 
+        // Exit Codes
+        public static readonly int EXIT_REBOOT = 10;
+        public static readonly int EXIT_INIT_FAILURE = 15;
+
         // Networking
         public static readonly int PORT = 50808;                        // set in asp.net configuration
 
         // Misc
         public static readonly string USAGE_STRING = "Usage: dotnet ChristmasPi.dll [OPTION]";
         public static readonly string LOG_FORMAT = "{Timestamp:HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception} {Properties:j}";
-        public static readonly int EXIT_REBOOT = 10;
     }
 }

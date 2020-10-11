@@ -25,8 +25,14 @@ namespace ChristmasPi.Operations {
             operatingModes = new Dictionary<string, IOperationMode>();
             string[] classes = getClasses();
             foreach (string classname in classes) {
-                /// TODO Handle if exception occurs when creating instance or casting
-                IOperationMode operationMode = (IOperationMode)Activator.CreateInstance(Type.GetType(classname));
+                IOperationMode operationMode = null;
+                try {
+                    operationMode = (IOperationMode)Activator.CreateInstance(Type.GetType(classname));
+                }
+                catch (Exception e) {
+                    Log.ForContext<OperationManager>().Error(e, "An exception ocurred creating an instance of class {classname}", classname);
+                    Environment.Exit(Constants.EXIT_INIT_FAILURE);
+                }
                 operatingModes.Add(operationMode.Name, operationMode);
             }
             // Set Current Operating mode

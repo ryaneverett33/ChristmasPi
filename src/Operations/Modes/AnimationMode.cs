@@ -50,7 +50,6 @@ namespace ChristmasPi.Operations.Modes {
             Log.ForContext("ClassName", "AnimationMode").Information("Deactivated Animation Mode");
         }
         public object Info() {
-            /// TODO fill in with relevant info
             return new {
                 animating = Animating,
                 paused = Paused,
@@ -86,17 +85,6 @@ namespace ChristmasPi.Operations.Modes {
         }
         public object GetProperty(string property) {
             return PropertyHelper.ResolveProperty(property, this, typeof(AnimationMode));
-            /*if (property.Equals(nameof(Name), StringComparison.CurrentCultureIgnoreCase))
-                return Name;
-            else if (property.Equals(nameof(CurrentState), StringComparison.CurrentCultureIgnoreCase))
-                return CurrentState;
-            else if (property.Equals(nameof(CurrentAnimation), StringComparison.CurrentCultureIgnoreCase))
-                return CurrentAnimation;
-            else if (property.Equals(nameof(Animating), StringComparison.CurrentCultureIgnoreCase))
-                return Animating;
-            else if (property.Equals(nameof(Paused), StringComparison.CurrentCultureIgnoreCase))
-                return Paused;
-            return null;*/
         }
 
         public int PauseAnimation() {

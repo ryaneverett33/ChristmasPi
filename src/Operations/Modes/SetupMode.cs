@@ -108,7 +108,6 @@ namespace ChristmasPi.Operations.Modes {
         }
         public object GetProperty(string property) {
             return PropertyHelper.ResolveProperty(property, this, typeof(SetupMode));
-            //return null;
         }
         #endregion
         #region Methods
