@@ -7,7 +7,6 @@
 	- Transition to checkmark/failure on service installation finish
 - [FRONTEND] Implement mobile version of schedule
 - [BACKEND] Refactor other controllers to use RedirectHandler
-- [LOGGING] RedirectHandler should have it's own log
 - [BACKEND] Cleanup animations
 	- Implement debug property for animations /
 	- Add debug configuration for allowing debug animations /

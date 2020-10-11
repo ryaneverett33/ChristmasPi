@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Serilog;
 
 namespace ChristmasPi.Util {
-    public class ThreadHelpers {
+    public static class ThreadHelpers {
         /// <summary>
         /// Registers the thread to be able to wake up
         /// </summary>

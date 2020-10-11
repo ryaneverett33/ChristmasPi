@@ -13,10 +13,10 @@ namespace ChristmasPi.Operations.Modes {
         public bool CanBeDefault => false;
 
         public void Activate(bool defaultmode) {
-            Log.ForContext("ClassName", "AnimationMode").Information("Activated nothing mode");
+            Log.ForContext<NothingMode>().Information("Activated nothing mode");
         }
         public void Deactivate() {
-            Log.ForContext("ClassName", "AnimationMode").Information("Deactivated nothing mode");
+            Log.ForContext<NothingMode>().Information("Deactivated nothing mode");
         }
         public object Info() { return null; }
         public object GetProperty(string property) { return null; }

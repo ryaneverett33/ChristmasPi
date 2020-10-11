@@ -80,7 +80,7 @@ namespace ChristmasPi.Data.Models.Scheduler {
                 else if (rule.repeats.HasFlag(RepeatUsage.RepeatSunday))
                     days[6].Add(rule);
                 else {
-                    Log.ForContext("ClassName", "WeekSchedule").Error("INVALID Schedule Rule, no day set!");
+                    Log.ForContext<WeekSchedule>().Error("INVALID Schedule Rule, no day set!");
                 }
             }
             // sort each list
@@ -174,8 +174,8 @@ namespace ChristmasPi.Data.Models.Scheduler {
             if (error) {
                 // remove rules
                 if (!RemoveRule(start, end, repeats, true)) {
-                    Log.ForContext("ClassName", "WeekSchedule").Error("Failed to remove overlapping rule from scheduled.");
-                    Log.ForContext("ClassName", "WeekSchedule").Error("Schedule may be corrupted");
+                    Log.ForContext<WeekSchedule>().Error("Failed to remove overlapping rule from scheduled.");
+                    Log.ForContext<WeekSchedule>().Error("Schedule may be corrupted");
                     return false;
                 }
                 return false;
@@ -243,8 +243,8 @@ namespace ChristmasPi.Data.Models.Scheduler {
                     error = true;
             }
             if (error && !ignoreErrors) {
-                Log.ForContext("ClassName", "WeekSchedule").Error("An error occurred removing a rule from the schedule");
-                Log.ForContext("ClassName", "WeekSchedule").Error("Schedule may be corrupted");
+                Log.ForContext<WeekSchedule>().Error("An error occurred removing a rule from the schedule");
+                Log.ForContext<WeekSchedule>().Error("Schedule may be corrupted");
                 return false;
             }
             return removed;

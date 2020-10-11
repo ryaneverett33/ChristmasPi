@@ -20,6 +20,10 @@ namespace ChristmasPi.Data.Models {
         public bool NoASPLogging;
 
         [HelpSection("Debug")]
+        [Argument("no-redirect-logging", "Don't log RedirectHandler data", true)]
+        public bool NoRedirectLogging;
+
+        [HelpSection("Debug")]
         [Argument("ignore-restart", "Ignore any restart attempts", true)]
         public bool IgnoreRestarts;
 
@@ -38,16 +42,6 @@ namespace ChristmasPi.Data.Models {
         [Argument("daemon", "Starts the server in a daemon configuration", true)]
         public bool DaemonMode;
 
-        public RuntimeConfiguration() {
-            AllowTestRenderer = false;
-            IgnorePrivileges = false;
-            DebugLogging = false;
-            NoASPLogging = false;
-            IgnoreRestarts = false;
-            DaemonMode = false;
-            DaemonLogToConsole = false;
-            AllowDebugAnimations = false;
-            UseServiceInstallerStub = false;
-        }
+        public RuntimeConfiguration() {}
     }
 }

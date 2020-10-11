@@ -68,6 +68,16 @@ Defaults
             var model = new SetupHardwareModel();
             return View("hardware", model);
         }
+        [HttpGet("/setup/start")]
+        public IActionResult start() {
+            /*
+                We don't have a view for this step, it's logically the index page so redirect there.
+                Setup is started with a POST request so the GET request should be ignored.
+            */
+            if (RedirectHandler.ShouldRedirect(this.RouteData, "get") is IActionResult redirect)
+                return redirect;  
+            return new RedirectResult("/setup/");
+        }
         [HttpGet("/setup/lights")]
         public IActionResult SetupLights() {
             if (RedirectHandler.ShouldRedirect(this.RouteData, "get") is IActionResult redirect)
@@ -175,7 +185,7 @@ Defaults
         }
         [HttpPost("/setup/defaults/submit")]
         public IActionResult SubmitDefaults([FromForm]string mode, [FromForm]string animation, [FromForm]string color) {
-            Log.ForContext("ClassName", "SetupController").Information("Submitting new default color: {color}", color);
+            Log.ForContext<SetupController>().Information("Submitting new default color: {color}", color);
             if (RedirectHandler.ShouldRedirect(this.RouteData, "post") is IActionResult redirect)
                 return redirect;
             if ((OperationManager.Instance.CurrentOperatingMode as ISetupMode).SetDefaults(animation, mode, color)) {

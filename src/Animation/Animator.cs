@@ -148,7 +148,7 @@ namespace ChristmasPi.Animation {
                         renderer.Render(renderer);
                     }
                     catch (Exception e) {
-                        Log.ForContext("ClassName", "Animator").Error(e, "Render Thread exiting");
+                        Log.ForContext<Animator>().Error(e, "Render Thread exiting");
                         doRender = false;
                         _currentState = AnimationState.Error;
                         return;
@@ -156,8 +156,8 @@ namespace ChristmasPi.Animation {
                     TimeSpan renderTime = DateTime.Now - beforeRender;
                     int newWaitTime = waitTime;
                     if (renderTime.TotalMilliseconds > waitTime) {
-                        Log.ForContext("ClassName", "Animator").Error("Took long to render frame than fps waittime");
-                        Log.ForContext("ClassName", "Animator").Error("WaitTime: {waitTime}, renderTime: {renderTime}", waitTime, renderTime);
+                        Log.ForContext<Animator>().Error("Took long to render frame than fps waittime");
+                        Log.ForContext<Animator>().Error("WaitTime: {waitTime}, renderTime: {renderTime}", waitTime, renderTime);
                     }
                     else {
                         newWaitTime = waitTime - (int)renderTime.TotalMilliseconds;

@@ -56,7 +56,7 @@ namespace ChristmasPi.Operations.Modes {
                 "finished"
             };
             validActions = new Dictionary<string, string>() {
-                {"Index", "start"},
+                {"Index", "index"},
                 {"Start", "start"},
                 {"Next", "next"},
                 {"SetupHardware", "hardware"},
@@ -97,11 +97,11 @@ namespace ChristmasPi.Operations.Modes {
         }
         #region IOperationMode Methods
         public void Activate(bool defaultmode) {
-            Log.ForContext("ClassName", "AnimationMode").Information("Activated Setup Mode");
+            Log.ForContext<SetupMode>().Information("Activated Setup Mode");
             //currentProgress.StartSetup();
         }
         public void Deactivate() {
-            Log.ForContext("ClassName", "AnimationMode").Information("Deactivated Setup Mode");
+            Log.ForContext<SetupMode>().Information("Deactivated Setup Mode");
         }
         public object Info() {
             return new {};
@@ -206,7 +206,7 @@ namespace ChristmasPi.Operations.Modes {
                 defaultColor = Util.ColorConverter.Convert(color);
             }
             catch (Exception) {
-                Log.ForContext("ClassName", "SetupMode").Error("SetDefaults() could not convert color: {color}", color);
+                Log.ForContext<SetupMode>().Error("SetDefaults() could not convert color: {color}", color);
                 return false;
             }
             Configuration.tree.color.DefaultColor = defaultColor;
@@ -306,7 +306,7 @@ namespace ChristmasPi.Operations.Modes {
             if (currentServiceInstaller != null)
                 return false;
             this.installSchedulerService = installSchedulerService;
-            Log.ForContext("ClassName", "AnimationMode").Debug("Install Scheduler Service? {installSchedulerService}", installSchedulerService);
+            Log.ForContext<SetupMode>().Debug("Install Scheduler Service? {installSchedulerService}", installSchedulerService);
             currentServiceInstaller = new ServiceInstaller("ChristmasPi.service");
             currentServiceInstaller.OnInstallFailure = serviceInstallHandler;
             currentServiceInstaller.OnInstallProgress = serviceInstallHandler;
@@ -322,8 +322,8 @@ namespace ChristmasPi.Operations.Modes {
         /// <remarks>The method call is blocking</remarks>
         public string SaveSetupProgress() {
             if (currentProgress == null) {
-                Log.ForContext("ClassName", "SetupMode").Debug("Attempted to save setup progress but progress object has been created");
-                Log.ForContext("ClassName", "SetupMode").Error("Unable to Save Setup Progress");
+                Log.ForContext<SetupMode>().Debug("Attempted to save setup progress but progress object has been created");
+                Log.ForContext<SetupMode>().Error("Unable to Save Setup Progress");
                 return null;
             }
             try {
@@ -332,13 +332,13 @@ namespace ChristmasPi.Operations.Modes {
                 return Constants.SETUP_PROGRESS_FILE;
             }
             catch (JsonSerializationException jsonerr) {
-                Log.ForContext("ClassName", "SetupMode").Error(jsonerr, "Unable to serialize setup progress object");
+                Log.ForContext<SetupMode>().Error(jsonerr, "Unable to serialize setup progress object");
             }
             catch (IOException ioerr) {
-                Log.ForContext("ClassName", "SetupMode").Error(ioerr, "Unable to save progress file due to an IO error");
+                Log.ForContext<SetupMode>().Error(ioerr, "Unable to save progress file due to an IO error");
             }
             catch (Exception e) {
-                Log.ForContext("ClassName", "SetupMode").Error(e, "Unable to Save Setup Progress due to an error");
+                Log.ForContext<SetupMode>().Error(e, "Unable to Save Setup Progress due to an error");
             }
             return null;
         }
@@ -482,8 +482,8 @@ namespace ChristmasPi.Operations.Modes {
                 SetupProgressFile = Constants.SETUP_PROGRESS_FILE;
             if (SetupProgressFile != null) {
                 if (!File.Exists(SetupProgressFile)) {
-                    Log.ForContext("ClassName", "SetupMode").Information("Setup Progress file not found");
-                    Log.ForContext("ClassName", "SetupMode").Debug("Using a blank setup progress object");
+                    Log.ForContext<SetupMode>().Information("Setup Progress file not found");
+                    Log.ForContext<SetupMode>().Debug("Using a blank setup progress object");
                     currentProgress = new SetupProgress();
                 }
                 else {
@@ -493,15 +493,15 @@ namespace ChristmasPi.Operations.Modes {
                         currentProgress = JsonConvert.DeserializeObject<SetupProgress>(json);
                     }
                     catch (JsonSerializationException jsonerr) {
-                        Log.ForContext("ClassName", "SetupMode").Error(jsonerr, "Failed to deserialize progress file");
-                        Log.ForContext("ClassName", "SetupMode").Debug("Progress file contents: {json}", json);   
+                        Log.ForContext<SetupMode>().Error(jsonerr, "Failed to deserialize progress file");
+                        Log.ForContext<SetupMode>().Debug("Progress file contents: {json}", json);   
                     }
                     catch (Exception e) {
-                        Log.ForContext("ClassName", "SetupMode").Error(e, "Failed to load current progress");
+                        Log.ForContext<SetupMode>().Error(e, "Failed to load current progress");
                     }
                     finally {
                         if (currentProgress == null) {
-                            Log.ForContext("ClassName", "SetupMode").Debug("Using a blank setup progress object");
+                            Log.ForContext<SetupMode>().Debug("Using a blank setup progress object");
                             currentProgress = new SetupProgress();
                         }
                     }
@@ -514,7 +514,6 @@ namespace ChristmasPi.Operations.Modes {
         }
         #endregion
         public string ShouldRedirect(string controller, string action, string method) {
-            Log.ForContext("ClassName", "AnimationMode").Debug("Called SetupMode ShouldRedirect");
             if (!(OperationManager.Instance.CurrentOperatingMode is ISetupMode)) {
                 // If on the index page, don't redirect
                 // ignore these actions to allow the ability to start setupmode
@@ -526,12 +525,14 @@ namespace ChristmasPi.Operations.Modes {
                 
             // redirect to current page if setup has begun
             // ignore these actions
-            if ((action.ToLower() == "start" && !CurrentProgress.IsStepFinished("start")) 
+            if ((action.ToLower() == "index" && !CurrentProgress.IsStepFinished("start")) 
                 || action.ToLower() == "next"
                 || (action.ToLower() == "finished" && !CurrentProgress.IsStepFinished("finished")))
                 return null;
             if (method.ToUpper() == "POST") // don't redirect on POST requests
                 return null;
+            if (action.ToLower() == "start" && !CurrentProgress.IsStepFinished("start"))
+                return "/setup/";   // redirect to index for action start
             // redirect to current page
             // NOTE: SetCurrentPage is called after navigating to page, so redirect should account for going to the next page
             string nextPage = currentProgress.GetNextStep(CurrentStepName);
@@ -539,7 +540,7 @@ namespace ChristmasPi.Operations.Modes {
                 return null;
             if (nextPage == null) // there's no next page, but we're not on the right page so redirect
                 return $"/setup/{CurrentStepName}";
-            Log.ForContext("ClassName", "AnimationMode").Debug("nextPage: {nextPage}, currentStepName: {CurrentStepName}", nextPage, CurrentStepName);
+            Log.ForContext<ChristmasPi.Controllers.RedirectHandler>().Debug("nextPage: {nextPage}, currentStepName: {CurrentStepName}", nextPage, CurrentStepName);
             if (CurrentStepName == null)
                 return null;
             if (action.Contains("aux/")) // allow the frontend to control auxiliary navigation

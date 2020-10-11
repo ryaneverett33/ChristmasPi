@@ -70,7 +70,7 @@ namespace ChristmasPi.Controllers {
         }
 
         public static void RegisterActionLookup(string controller, Dictionary<string, string> lookupTable) {
-            Log.ForContext("ClassName", "RedirectHandler").Debug("Registering lookup for {controller}", controller);
+            Log.ForContext<RedirectHandler>().Debug("Registering lookup for {controller}", controller);
             if (controller == null || controller.Length == 0)
                 throw new ArgumentNullException("controller");
             if (lookupTable == null || lookupTable.Count == 0)
@@ -83,7 +83,7 @@ namespace ChristmasPi.Controllers {
         }
         
         public static void RegisterLookupRules(string controller, Func<string, string, string, string> ruleFunc) {
-            Log.ForContext("ClassName", "RedirectHandler").Debug("Registering rules for {controller}", controller);
+            Log.ForContext<RedirectHandler>().Debug("Registering rules for {controller}", controller);
             if (controller == null || controller.Length == 0)
                 throw new ArgumentNullException("controller");
             if (ruleFunc == null)
@@ -98,10 +98,16 @@ namespace ChristmasPi.Controllers {
         public static IActionResult ShouldRedirect(RouteData routeData, string method) {
             string controller = (string)routeData.Values["controller"];
             string action = (string)routeData.Values["action"];
-            if (Instance.shouldRedirectBuiltin(controller, action, method) is string url)
+            Log.ForContext<RedirectHandler>().Debug("ShouldRedirect for controller {controller}, action {action}, and method {method}",
+                                                        controller, action, method);
+            if (Instance.shouldRedirectBuiltin(controller, action, method) is string url) {
+                Log.ForContext<RedirectHandler>().Debug("Redirecting builtin to {url}", url);
                 return new RedirectResult(url);
-            if (Instance.shouldRedirectControllers(controller, action, method) is string urlControllers)
+            }
+            if (Instance.shouldRedirectControllers(controller, action, method) is string urlControllers) {
+                Log.ForContext<RedirectHandler>().Debug("Redirecting for controller to {urlControllers}", urlControllers);
                 return new RedirectResult(urlControllers);
+            }   
             return null;
         }
 
@@ -130,13 +136,15 @@ namespace ChristmasPi.Controllers {
                                                                         controller, action);
                     useAction = action;
                 }
-                else
+                else {
                     useAction = lookupTable[action];
+                    Log.ForContext<RedirectHandler>().Debug("Performed successful lookup for {action}, new action is {useAction}", action, useAction);
+                }
                 Func<string, string, string, string> ruleFunc = functionRuleTable[controller];
                 return ruleFunc(controller, useAction, method);
             }
             else {
-                Log.ForContext("ClassName", "RedirectHandler").Debug("Does not have a lookup table for controller: {controller}", controller);
+                Log.ForContext<RedirectHandler>().Debug("Does not have a lookup table for controller: {controller}", controller);
                 Func<string, string, string, string> ruleFunc = functionRuleTable[controller];
                 return ruleFunc(controller, action, method);
             }

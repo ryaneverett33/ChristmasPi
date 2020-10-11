@@ -18,7 +18,7 @@ namespace ChristmasPi.Hardware.Renderers {
         // write current value to file
         public override void Render(IRenderer renderer) {
             if (writer == null) {
-                Log.ForContext("ClassName", "TestRenderer").Error("Cannot render, failed to call Start method");
+                Log.ForContext<TestRenderer>().Error("Cannot render, failed to call Start method");
                 return;
             }
             if (BeforeRenderEvent != null)

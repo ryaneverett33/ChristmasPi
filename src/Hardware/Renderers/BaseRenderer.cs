@@ -33,7 +33,7 @@ namespace ChristmasPi.Hardware.Renderers {
         /// <param name="color">New color for the LED</param>
         public void SetLEDColor(int index, Color color) {
             if (index < 0 || index >= ledColors.Length) {
-                Log.ForContext("ClassName", "BaseRenderer").Debug("index: {index}, range [0, {LightCount}], ledColors length: {length}",
+                Log.ForContext<BaseRenderer>().Debug("index: {index}, range [0, {LightCount}], ledColors length: {length}",
                                                                     index, LightCount - 1, ledColors.Length);
                 throw new ArgumentOutOfRangeException("index");
             }

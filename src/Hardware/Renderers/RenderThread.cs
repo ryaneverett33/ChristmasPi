@@ -69,15 +69,15 @@ namespace ChristmasPi.Hardware.Renderers {
                         renderer.Render(renderer);
                     }
                     catch (Exception e) {
-                        Log.ForContext("ClassName", "RenderThread").Error(e, "Render Thread exiting");
+                        Log.ForContext<RenderThread>().Error(e, "Render Thread exiting");
                         Rendering = false;
                         return;
                     }
                     TimeSpan renderTime = DateTime.Now - beforeRender;
                     int newWaitTime = waitTime;
                     if (renderTime.TotalMilliseconds > waitTime) {
-                        Log.ForContext("ClassName", "RenderThread").Error("Took long to render frame than fps waittime");
-                        Log.ForContext("ClassName", "RenderThread").Error("WaitTime: {waitTime}, renderTime: {renderTime}", waitTime, renderTime);
+                        Log.ForContext<RenderThread>().Error("Took long to render frame than fps waittime");
+                        Log.ForContext<RenderThread>().Error("WaitTime: {waitTime}, renderTime: {renderTime}", waitTime, renderTime);
                     }
                     else {
                         newWaitTime = waitTime - (int)renderTime.TotalMilliseconds;

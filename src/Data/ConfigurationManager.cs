@@ -51,7 +51,7 @@ namespace ChristmasPi.Data {
             if (configuration == null)
                 configuration = Constants.CONFIGURATION_FILE;
             if (!File.Exists(configuration)) {
-                Log.ForContext("ClassName", "ConfigurationManager").Information("Tree Configuration file not found, using default values");
+                Log.ForContext<ConfigurationManager>().Information("Tree Configuration file not found, using default values");
                 StartupTreeConfig = TreeConfiguration.DefaultSettings();
             }
             else {
@@ -60,11 +60,11 @@ namespace ChristmasPi.Data {
                     StartupTreeConfig = JsonConvert.DeserializeObject<TreeConfiguration>(json);
                 }
                 catch (JsonSerializationException jsonerr) {
-                    Log.ForContext("ClassName", "ConfigurationManager").Debug(jsonerr, "Unable to deserialize configuration file");
-                    Log.ForContext("ClassName", "ConfigurationManager").Error("Unable to load configuration, file may be corrupted");
+                    Log.ForContext<ConfigurationManager>().Debug(jsonerr, "Unable to deserialize configuration file");
+                    Log.ForContext<ConfigurationManager>().Error("Unable to load configuration, file may be corrupted");
                 }
                 catch (Exception e) {
-                    Log.ForContext("ClassName", "ConfigurationManager").Error(e, "Failed to load configuration info");
+                    Log.ForContext<ConfigurationManager>().Error(e, "Failed to load configuration info");
                 }
             }
             CurrentTreeConfig = StartupTreeConfig;
@@ -82,11 +82,11 @@ namespace ChristmasPi.Data {
                     CurrentSchedule = JsonConvert.DeserializeObject<WeekSchedule>(json);
                 }
                 catch (JsonSerializationException jsonerr) {
-                    Log.ForContext("ClassName", "ConfigurationManager").Debug(jsonerr, "Unable to deserialize schedule file");
-                    Log.ForContext("ClassName", "ConfigurationManager").Error("Unable to load schedule, file may be corrupted");
+                    Log.ForContext<ConfigurationManager>().Debug(jsonerr, "Unable to deserialize schedule file");
+                    Log.ForContext<ConfigurationManager>().Error("Unable to load schedule, file may be corrupted");
                 }
                 catch (Exception e) {
-                    Log.ForContext("ClassName", "ConfigurationManager").Error(e, "Exception occurred when loading schedule");
+                    Log.ForContext<ConfigurationManager>().Error(e, "Exception occurred when loading schedule");
                 }
             }
         }
@@ -95,7 +95,7 @@ namespace ChristmasPi.Data {
         /// Saves the current tree configuration to a json file
         /// </summary>
         public void SaveConfiguration(string configuration = null) {
-            Log.ForContext("ClassName", "ConfigurationManager").Information("Saving configuration");
+            Log.ForContext<ConfigurationManager>().Information("Saving configuration");
             try {
                 if (configuration == null)
                     configuration = Constants.CONFIGURATION_FILE;
@@ -105,11 +105,11 @@ namespace ChristmasPi.Data {
                 File.WriteAllText(configuration, json);
             }
             catch (JsonSerializationException jsonerr) {
-                Log.ForContext("ClassName", "ConfigurationManager").Debug(jsonerr, "Unable to serialize configuration file");
-                Log.ForContext("ClassName", "ConfigurationManager").Error("Unable to save configuration, data may be corrupted");
+                Log.ForContext<ConfigurationManager>().Debug(jsonerr, "Unable to serialize configuration file");
+                Log.ForContext<ConfigurationManager>().Error("Unable to save configuration, data may be corrupted");
             }
             catch (Exception e) {
-                Log.ForContext("ClassName", "ConfigurationManager").Error(e, "Failed to save tree configuration");
+                Log.ForContext<ConfigurationManager>().Error(e, "Failed to save tree configuration");
             }
         }
 
@@ -117,7 +117,7 @@ namespace ChristmasPi.Data {
         /// Saves the current schedule to a json file
         /// </summary>
         public void SaveSchedule(string schedule = null) {
-            Log.ForContext("ClassName", "ConfigurationManager").Information("Saving schedule");
+            Log.ForContext<ConfigurationManager>().Information("Saving schedule");
             try {
                 if (schedule == null)
                     schedule = Constants.SCHEDULE_FILE;
@@ -127,11 +127,11 @@ namespace ChristmasPi.Data {
                 File.WriteAllText(schedule, json);
             }
             catch (JsonSerializationException jsonerr) {
-                Log.ForContext("ClassName", "ConfigurationManager").Debug(jsonerr, "Unable to serialize schedule file");
-                Log.ForContext("ClassName", "ConfigurationManager").Error("Unable to save schedule, data may be corrupted");
+                Log.ForContext<ConfigurationManager>().Debug(jsonerr, "Unable to serialize schedule file");
+                Log.ForContext<ConfigurationManager>().Error("Unable to save schedule, data may be corrupted");
             }
             catch (Exception e) {
-                Log.ForContext("ClassName", "ConfigurationManager").Error(e, "Failed to save schedule info");
+                Log.ForContext<ConfigurationManager>().Error(e, "Failed to save schedule info");
             }
         }
 
@@ -153,6 +153,7 @@ namespace ChristmasPi.Data {
         public void InitializeLogger() {
             var configuration = new LoggerConfiguration();
             var aspExp = "StartsWith(SourceContext, 'Microsoft') or SourceContext = 'Serilog.AspNetCore.RequestLoggingMiddleware'";
+            var redirectExp = "StartsWith(SourceContext, 'ChristmasPi.Controllers.RedirectHandler')";
             if (RuntimeConfiguration.DebugLogging)
                 configuration.MinimumLevel.Debug();
             else
@@ -168,7 +169,18 @@ namespace ChristmasPi.Data {
                         outputTemplate: Constants.LOG_FORMAT)
                 );
             }
+            if (!RuntimeConfiguration.NoRedirectLogging) {
+                configuration.WriteTo.Logger(lg => lg
+                    .Filter.ByIncludingOnly(redirectExp)
+                    .WriteTo.File(Constants.REDIRECT_LOG_FILE,
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        outputTemplate: Constants.LOG_FORMAT)
+                    //.WriteTo.Console(outputTemplate: Constants.LOG_FORMAT)
+                );
+            }
             configuration.Filter.ByExcluding(aspExp)
+            .Filter.ByExcluding(redirectExp)
             .WriteTo.File(Constants.LOG_FILE,
                 rollingInterval: RollingInterval.Day,
                 rollOnFileSizeLimit: true,

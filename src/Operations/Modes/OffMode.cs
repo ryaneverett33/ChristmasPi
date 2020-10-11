@@ -30,12 +30,12 @@ namespace ChristmasPi.Operations.Modes {
             renderer.Start();
             TurnOff();
             _active = true;
-            Log.ForContext("ClassName", "AnimationMode").Information("Activated Off Mode");
+            Log.ForContext<OffMode>().Information("Activated Off Mode");
         }
         public void Deactivate() {
             renderer.Stop();
             _active = false;
-            Log.ForContext("ClassName", "AnimationMode").Information("Deactivated Off Mode");
+            Log.ForContext<OffMode>().Information("Deactivated Off Mode");
             renderer = null;
         }
         public object Info() {
