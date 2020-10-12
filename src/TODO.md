@@ -6,6 +6,7 @@
 	- Add appropriate gifs, reindeer->checkmark gif and reindeer->failure gif
 	- Transition to checkmark/failure on service installation finish
 - [FRONTEND] Implement mobile version of schedule
+	- Example: https://demo.mobiscroll.com/v5/jquery/scheduler/mobile-week-view#
 - [BACKEND] Cleanup animations
 	- Implement debug property for animations /
 	- Add debug configuration for allowing debug animations /

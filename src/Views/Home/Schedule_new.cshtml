@@ -1,0 +1,51 @@
+@{
+    ViewData["Title"] = "Schedule";
+    ViewData["ActivePage"] = "Schedule";
+    @model ChristmasPi.Models.ScheduleModel;
+    ViewBag.TreeName = Model.TreeName;
+}
+@section Scripts {
+
+}
+<!--https://demo.mobiscroll.com/v5/fullscreen/scheduler/mobile-week-view#theme=windows-->
+<!--Create full width div for Day titles-->
+    <!--Titles should change to shortened version when resized-->
+<div class="container-fluid ">
+  <div class="row justify-content-md-center">
+    @for (int i = 0; i < 8; i++) {
+      if (i == 0) {
+        <div class="col day-header-space">
+          &nbsp;
+        </div>
+      }
+      else {
+        <div class="col day-header-item">
+          <p class="sidebar d-none d-lg-block">@Model.GetDay(i - 1)</p>
+          <p class="d-block d-lg-none">@Model.GetDayShort(i - 1)</p> 
+        </div>
+      }
+    }
+  </div>
+</div>
+<!--Create full width div for Day grids-->
+    <!--Create tall div for each day grid, overflow vertically -->
+<div id="schedule-scroll">
+  <div class="container-fluid">
+    @for (int i = 0; i < 24; i++) {
+    <div class="row justify-content-md-center">
+      @for (int j = 0; j < 8; j++) {
+        if (j == 0) {
+          <div class="col day-header-space">
+            @Model.GetTimePeriod(i)
+          </div>
+        }
+        else {
+          <div class="col day-header-item">
+            <div class="box"></div>
+          </div>
+        }
+      }
+    </div>
+    }
+  </div>
+</div>

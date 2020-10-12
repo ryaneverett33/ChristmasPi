@@ -85,6 +85,13 @@ namespace ChristmasPi.Controllers {
             var model = new ScheduleModel(ConfigurationManager.Instance.CurrentSchedule);
             return View(model);
         }
+        [HttpGet("schedule_new")]
+        public IActionResult ScheduleNew() {
+            if (RedirectHandler.ShouldRedirect(this.RouteData, "get") is IActionResult redirect)
+                return redirect;
+            var model = new ScheduleModel(ConfigurationManager.Instance.CurrentSchedule);
+            return View("Schedule_new", model);
+        }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error() {

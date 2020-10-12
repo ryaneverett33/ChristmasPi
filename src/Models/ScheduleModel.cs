@@ -29,8 +29,13 @@ namespace ChristmasPi.Models {
             Sunday = scheduleToColoredRule(schedule.Sunday, ref usedColors);
         }
 
-        public string GetDay(int i) {
-            switch (i) {
+        /// <summary>
+        /// Gets the day of the week from its numeric ID
+        /// </summary>
+        /// <param name="dayID">number from [0-6] for the day</param>
+        /// <returns>Monday[0] - Sunday[6]</returns>
+        public string GetDay(int dayID) {
+            switch (dayID) {
                 case 0:
                     return "Monday";
                 case 1:
@@ -47,12 +52,39 @@ namespace ChristmasPi.Models {
                     return "Sunday";
             }
         }
-        public string GetTimePeriod(int i) {
-            DateTime time1 = new DateTime(1, 1, 1, i, 0, 0);
-            // DateTime time2 = new DateTime(1, 1, 1, i, 59, 0);
-            string part1 = time1.ToString("t");
-            // string part2 = time2.ToString("t");
-            return String.Format("{0}", part1);
+        
+        /// <summary>
+        /// Gets the shortened form of the day of the week from its numeric ID
+        /// </summary>
+        /// <param name="dayID">number from [0-6] for the day</param>
+        /// <returns>M[0] - Su[6]</returns>
+        public string GetDayShort(int dayID) {
+            switch (dayID) {
+                case 0:
+                    return "M";
+                case 1:
+                    return "T";
+                case 2:
+                    return "W";
+                case 3:
+                    return "Th";
+                case 4:
+                    return "F";
+                case 5:
+                    return "Sa";
+                default:
+                    return "Su";
+            }
+        }
+        
+        /// <summary>
+        /// Converts the hour of the day to a time string
+        /// </summary>
+        /// <param name="index">The zero-based hour of the day, [0-23]</param>
+        /// <returns>1:00 AM for index=0, 1:00 Pm for index=13</returns>
+        public string GetTimePeriod(int index) {
+            DateTime time = new DateTime(1, 1, 1, index, 0, 0);
+            return time.ToString("h:mm tt");
         }
         public ColoredRule GetFirstRuleAt(int i, int j) {
             ColoredRule[] array = getRuleArrayByIndex(i);

@@ -30,10 +30,6 @@
         $('#cp2').on('colorpickerChange colorpickerCreate', function (event) {
             currentColor = event.color.toString();
         });
-        var test = document.getElementById('test');
-        new SuperGif({gif: test, on_end: function(gif) {
-            console.log("playback finished");
-        }}).load();
     });
     function SetColor(colorstring) {
         $("#cp2").colorpicker('setValue', colorstring);
@@ -66,6 +62,3 @@
     <i class="nc-icon nc-palette"></i>
 </button>
 <button class="btn btn-primary" onclick="SubmitColor()">Update</button>
-
-<img id="test" src="/img/gifs/testy.gif" rel:animated_src="/img/gifs/testy.gif"
-		rel:auto_play="1" />
