@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using ChristmasPi.Util;
 using ChristmasPi.Data.Models;
 using ChristmasPi.Data.Models.Scheduler;
@@ -84,7 +85,7 @@ namespace ChristmasPi.Models {
         /// <returns>1:00 AM for index=0, 1:00 Pm for index=13</returns>
         public string GetTimePeriod(int index) {
             DateTime time = new DateTime(1, 1, 1, index, 0, 0);
-            return time.ToString("h:mm tt");
+            return time.ToString("h tt");
         }
         public ColoredRule GetFirstRuleAt(int i, int j) {
             ColoredRule[] array = getRuleArrayByIndex(i);
@@ -110,6 +111,54 @@ namespace ChristmasPi.Models {
                     count++;
             }
             return count;
+        }
+
+        /// <summary>
+        /// Gets the styling info for a rule
+        /// </summary>
+        /// <param name="day">The integer representation of the day</param>
+        /// <param name="hour">The integer representation of the hour</param>
+        /// <returns>Info about how to style the rule</returns>
+        public RuleStyle? GetStyleFor(int day, int hour) {
+            ColoredRule[] array = getRuleArrayByIndex(day);
+            if (array == null)
+                return null;
+            ColoredRule rule = array.FirstOrDefault<ColoredRule>(rule => 
+               rule.StartTime.Hour == hour || 
+                   (rule.StartTime.Hour < hour && rule.EndTime.Hour > hour)
+            );
+            if (rule == null)
+                return null;
+            if (rule.StartTime.Hour == hour) {
+                if (rule.EndTime.Hour == hour)
+                    return RuleStyle.SingleRule;
+                return RuleStyle.RuleTop;
+            }
+            else if (rule.EndTime.Hour == hour + 1) {
+                return RuleStyle.RuleEnd;
+            }
+            else
+                return RuleStyle.RuleMiddle;
+        }
+
+        /// <summary>
+        /// Gets the CSS border styling for the style of a rule
+        /// </summary>
+        /// <param name="style">Styling info for the rule</param>
+        /// <returns>The CSS rule for the style of border to use, null if no rule exists</returns>
+        /// <example>If the hour is the start of the rule, then border-top-right-left will be returned. 
+        /// If the hour is the complete rule, then border-full will be returned.</example>
+        public string GetBorderStyleFor(RuleStyle? style) {
+            switch (style.Value) {
+                case RuleStyle.RuleEnd:
+                    return "border-bottom-right-left";
+                case RuleStyle.RuleMiddle:
+                    return "border-right-left";
+                case RuleStyle.RuleTop:
+                    return "border-top-right-left";
+                default:
+                    return "border-full";
+            }
         }
 
         private ColoredRule[] getRuleArrayByIndex(int i) {
@@ -166,5 +215,11 @@ namespace ChristmasPi.Models {
         public override string ToString() {
             return String.Format("{0} - {1}", StartTime.ToString("h:mm"), EndTime.ToString("h:mm"));
         }
+    }
+    public enum RuleStyle {
+        SingleRule,     // A rule that spans only an hour
+        RuleTop,        // The top of a multi-hour spanning rule
+        RuleMiddle,     // The middle of a multi-hour spanning rule
+        RuleEnd         // The end of a multi-hour spanning rule
     }
 }

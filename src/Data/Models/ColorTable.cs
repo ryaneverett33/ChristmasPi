@@ -68,6 +68,7 @@ namespace ChristmasPi.Data.Models {
         #region Premade ColorTables
         private static ColorTable _knownColorTable;
         private static ColorTable _christmasColors1;
+        private static ColorTable _uiColors;
 
         /// <summary>
         /// Creates a new ColorTable with the defined colors in the Color struct
@@ -110,6 +111,16 @@ namespace ChristmasPi.Data.Models {
                     _christmasColors1 = new ColorTable(colors.ToArray());
                 }
                 return _christmasColors1;
+            }
+        }
+        public static ColorTable UIColors {
+            get {
+                if (_uiColors == null) {
+                    List<Color> colors = new List<Color>();
+                    //colors.Add(Util.ColorConverter.Convert("#213496"));
+                    _uiColors = new ColorTable(colors.ToArray());
+                }
+                return _uiColors;
             }
         }
         #endregion

@@ -20,8 +20,8 @@
       }
       else {
         <div class="col day-header-item">
-          <p class="sidebar d-none d-lg-block">@Model.GetDay(i - 1)</p>
-          <p class="d-block d-lg-none">@Model.GetDayShort(i - 1)</p> 
+          <button class="day-button btn btn-outline-primary sidebar d-none d-lg-block">@Model.GetDay(i - 1)</button>
+          <button class="day-button btn btn-outline-primary d-block d-lg-none">@Model.GetDayShort(i - 1)</button> 
         </div>
       }
     }
@@ -29,23 +29,41 @@
 </div>
 <!--Create full width div for Day grids-->
     <!--Create tall div for each day grid, overflow vertically -->
-<div id="schedule-scroll">
-  <div class="container-fluid">
-    @for (int i = 0; i < 24; i++) {
-    <div class="row justify-content-md-center">
-      @for (int j = 0; j < 8; j++) {
-        if (j == 0) {
-          <div class="col day-header-space">
-            @Model.GetTimePeriod(i)
-          </div>
-        }
-        else {
-          <div class="col day-header-item">
-            <div class="box"></div>
-          </div>
-        }
+<div class="container-fluid">
+  @for (int i = 0; i < 24; i++) {
+  <div class="row justify-content-md-center">
+    @for (int j = 0; j < 8; j++) {
+      if (j == 0) {
+        <div class="col day-header-space time-period">
+          @Model.GetTimePeriod(i)
+        </div>
       }
-    </div>
+      else {
+        ColoredRule rule = Model.GetFirstRuleAt(j-1, i);
+        RuleStyle? style = Model.GetStyleFor(j-1, i);
+        <div class="col day-header-item @(rule == null ? "border-full" : Model.GetBorderStyleFor(style))">
+          <div>
+            @if (rule != null) {
+              int rulecount = Model.GetRuleCountAt(i-1, j);
+              <div class="rule-cell" style="background-color: @rule.GetColorCode()">
+                  <p class="schedule-rule-label">@rule.ToString()</p>
+                  <button class="btn btn-sm badge-danger btn-primary btn-just-icon schedule-rule-rmv-btn" onclick='ShowRemoveRuleModal(@String.Format("{0},{1}", i, j))'>
+                      <i class="nc-icon nc-simple-remove"></i>
+                  </button>
+                  @{
+                      if (rulecount > 1) {
+                          <span class="badge badge-info badge-pill schedule-rule-badge">@rulecount</span>
+                      }
+                  }
+                  <input type="hidden" id='@String.Format("rstart-{0}:{1}", i, j)' value='@rule.StartTime.ToShortTimeString()' />
+                  <input type="hidden" id='@String.Format("rend-{0}:{1}", i, j)' value='@rule.EndTime.ToShortTimeString()' />
+                  <input type="hidden" id='@String.Format("rday-{0}:{1}", i, j)' value='@Model.GetDay(i-1)' />
+              </div>
+            }
+          </div>
+        </div>
+      }
     }
   </div>
+  }
 </div>

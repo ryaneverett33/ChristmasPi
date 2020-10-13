@@ -81,21 +81,6 @@ namespace ChristmasPi.Data.Models {
         }
 
         /// <summary>
-        /// Generate a random table not used in a given table
-        /// </summary>
-        /// <param name="colors">List of previously used colors</param>
-        /// <returns>A newly generated color</returns>
-        public static Color RandomColorNotInTable(List<Color> colors, bool knownColor = false) {
-            if (colors == null)
-                throw new ArgumentNullException("colors");
-            Color color = knownColor ? RandomKnownColorGenerator() : MakeRandomColor();
-            while (colors.Contains(color)) {
-                color = knownColor ? RandomKnownColorGenerator() : MakeRandomColor();
-            }
-            return color;
-        }
-
-        /// <summary>
         /// Evaluates the current object and returns a primitive color
         /// </summary>
         /// <returns>A primitive color</returns>
@@ -134,6 +119,21 @@ namespace ChristmasPi.Data.Models {
         }
 
         /// <summary>
+        /// Generate a random table not used in a given table
+        /// </summary>
+        /// <param name="colors">List of previously used colors</param>
+        /// <returns>A newly generated color</returns>
+        public static Color RandomColorNotInTable(List<Color> colors, bool knownColor = false) {
+            if (colors == null)
+                throw new ArgumentNullException("colors");
+            Color color = knownColor ? RandomKnownColorGenerator() : MakeRandomColor();
+            while (colors.Contains(color)) {
+                color = knownColor ? RandomKnownColorGenerator() : MakeRandomColor();
+            }
+            return color;
+        }
+        
+        /// <summary>
         /// Generates a new random primitive color
         /// </summary>
         /// <returns>A filled in color object</returns>
@@ -158,6 +158,7 @@ namespace ChristmasPi.Data.Models {
         };
 
         public static Func<object, Color> RandomColorFromColorTable = (object stateObj) => {
+            // .NET doesn't like Func<Color, ColorTable> for some reason
             ColorTable table = (ColorTable)stateObj;
             return table[RandomGenerator.Instance.Number(0, table.Count)];
         };
