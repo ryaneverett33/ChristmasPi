@@ -102,10 +102,6 @@ body {
     border: 1px solid;
     border-radius: 16px;
 }
-.schedule-rule-label {
-    position: relative;
-    left: 16px;
-}
 .schedule-rule-rmv-btn {
     position: absolute;
     bottom: 0px;
@@ -249,4 +245,20 @@ body {
     width: 100%;
     height: 100%;
     position: absolute;
+    color: white;
+}
+.rule-cell-hovered {
+    box-shadow: 5px 5px #888888;
+}
+.rule-top {
+    margin: 0 5px 0;
+	position: absolute;
+    top: 0;
+    width: auto;
+}
+.rule-bottom {
+	margin: 0 5px 0;
+	position: absolute;
+    bottom: 0;
+    width: auto;
 }

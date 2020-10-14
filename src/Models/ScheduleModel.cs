@@ -33,10 +33,10 @@ namespace ChristmasPi.Models {
         /// <summary>
         /// Gets the day of the week from its numeric ID
         /// </summary>
-        /// <param name="dayID">number from [0-6] for the day</param>
+        /// <param name="day">number from [0-6] for the day</param>
         /// <returns>Monday[0] - Sunday[6]</returns>
-        public string GetDay(int dayID) {
-            switch (dayID) {
+        public string GetDay(int day) {
+            switch (day) {
                 case 0:
                     return "Monday";
                 case 1:
@@ -57,10 +57,10 @@ namespace ChristmasPi.Models {
         /// <summary>
         /// Gets the shortened form of the day of the week from its numeric ID
         /// </summary>
-        /// <param name="dayID">number from [0-6] for the day</param>
+        /// <param name="day">number from [0-6] for the day</param>
         /// <returns>M[0] - Su[6]</returns>
-        public string GetDayShort(int dayID) {
-            switch (dayID) {
+        public string GetDayShort(int day) {
+            switch (day) {
                 case 0:
                     return "M";
                 case 1:
@@ -81,33 +81,47 @@ namespace ChristmasPi.Models {
         /// <summary>
         /// Converts the hour of the day to a time string
         /// </summary>
-        /// <param name="index">The zero-based hour of the day, [0-23]</param>
+        /// <param name="hour">The zero-based hour of the day, [0-23]</param>
         /// <returns>1:00 AM for index=0, 1:00 Pm for index=13</returns>
-        public string GetTimePeriod(int index) {
-            DateTime time = new DateTime(1, 1, 1, index, 0, 0);
+        public string GetTimePeriod(int hour) {
+            DateTime time = new DateTime(1, 1, 1, hour, 0, 0);
             return time.ToString("h tt");
         }
-        public ColoredRule GetFirstRuleAt(int i, int j) {
-            ColoredRule[] array = getRuleArrayByIndex(i);
+
+        /// <summary>
+        /// Gets the first rule that occurs for a given hour of a given day
+        /// </summary>
+        /// <param name="day">The integer representation of the day</param>
+        /// <param name="hour">The integer representation of the hour</param>
+        /// <returns>The chronologically first rule that occurs in the hour</returns>
+        public ColoredRule GetFirstRuleAt(int day, int hour) {
+            ColoredRule[] array = getRuleArrayByIndex(day);
             if (array == null)
                 return null;
             foreach (ColoredRule rule in array) {
-                if (rule.StartTime.Hour == j)
+                if (rule.StartTime.Hour == hour)
                     return rule;
-                if (rule.StartTime.Hour < j && rule.EndTime.Hour > j)
+                if (rule.StartTime.Hour < hour && rule.EndTime.Hour > hour)
                     return rule;
             }
             return null;
         }
-        public int GetRuleCountAt(int i, int j) {
+
+        /// <summary>
+        /// Gets the number of rules that occur in a given hour of a given day
+        /// </summary>
+        /// <param name="day">The integer representation of the day</param>
+        /// <param name="hour">The integer representation of the hour</param>
+        /// <returns>0 if no rules exist, else the number of rules that start or occur in the hour</returns>
+        public int GetRuleCountAt(int day, int hour) {
             int count = 0;
-            ColoredRule[] array = getRuleArrayByIndex(i);
+            ColoredRule[] array = getRuleArrayByIndex(day);
             if (array == null)
                 return count;
             foreach (ColoredRule rule in array) {
-                if (rule.StartTime.Hour == j)
+                if (rule.StartTime.Hour == hour)
                     count++;
-                else if (rule.StartTime.Hour < j && rule.EndTime.Hour > j)
+                else if (rule.StartTime.Hour < hour && rule.EndTime.Hour > hour)
                     count++;
             }
             return count;
@@ -161,6 +175,52 @@ namespace ChristmasPi.Models {
             }
         }
 
+        /// <summary>
+        /// Checks if a hour is at the top of the rule span
+        /// </summary>
+        /// <param name="day">The integer representation of the day</param>
+        /// <param name="hour">The integer representation of the hour</param>
+        /// <returns>True if the hour is equal to the StartTime of the rule</returns>
+        public bool IsRuleTop(int day, int hour) {
+            ColoredRule rule = GetFirstRuleAt(day, hour);
+            return rule == null ? false : rule.StartTime.Hour == hour;
+        }
+
+        /// <summary>
+        /// Checks if a hour is at the bottom of the rule span
+        /// </summary>
+        /// <param name="day">The integer representation of the day</param>
+        /// <param name="hour">The integer representation of the hour</param>
+        /// <returns>True if the hour is equal to the EndTime* of the rule</returns>
+        public bool IsRuleBottom(int day, int hour) {
+            ColoredRule rule = GetFirstRuleAt(day, hour);
+            return rule == null ? false : rule.EndTime.Hour == hour + 1;
+        }
+
+        /// <summary>
+        /// Checks if a grid location is the middle of a given rule's span
+        /// </summary>
+        /// <param name="day">The integer representation of the day</param>
+        /// <param name="hour">The integer representation of the hour</param>
+        /// <returns>True if a rule exists and the location is it's middle, false otherwise</returns>
+        /// <example>If a rule spans from 1PM-4PM (starts on 1, ends at 4) then its' middle is 2.
+        /// If a rule spans from 1PM-2PM, then its' middle is 1.</example>
+        public bool IsRuleMiddle(int day, int hour) {
+            ColoredRule rule = GetFirstRuleAt(day, hour);
+            int middleHour = 0;
+            if (rule.StartTime.Hour == rule.EndTime.Hour)
+                middleHour = rule.StartTime.Hour;
+            else if (rule.StartTime.Hour == rule.EndTime.Hour - 1)
+                middleHour = rule.StartTime.Hour;
+            else {
+                // get the number of hours the rule spans
+                int spanMagnitude = rule.EndTime.Hour - rule.StartTime.Hour;
+                int half = spanMagnitude / 2;       // use integer division to round down
+                middleHour = rule.StartTime.Hour + half;
+            }
+            return middleHour == hour;
+        }
+
         private ColoredRule[] getRuleArrayByIndex(int i) {
             switch (i) {
                 case 0:
@@ -194,14 +254,7 @@ namespace ChristmasPi.Models {
             return newRules;
         }
         private Color getNewColor(ref List<Color> usedColors) {
-            bool contains = true;
-            Color color = Color.Aquamarine;
-            while (contains) {
-                color = RandomColor.RandomKnownColorGenerator();
-                contains = usedColors.Contains(color) || color == Color.White; 
-            }
-            usedColors.Add(color);
-            return color;
+            return RandomColor.RandomColorNotInTable(ref usedColors, ColorTable.UIColors);
         }
     }
     public class ColoredRule {
@@ -215,6 +268,9 @@ namespace ChristmasPi.Models {
         public override string ToString() {
             return String.Format("{0} - {1}", StartTime.ToString("h:mm"), EndTime.ToString("h:mm"));
         }
+        public string GetName(int day) => $"d{day}s{StartTime.Hour}e{EndTime.Hour}";
+        public string GetStartTime() => StartTime.ToString("h:mm");
+        public string GetEndTime() => EndTime.ToString("h:mm");
     }
     public enum RuleStyle {
         SingleRule,     // A rule that spans only an hour

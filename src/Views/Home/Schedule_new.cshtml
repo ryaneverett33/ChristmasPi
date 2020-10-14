@@ -5,23 +5,208 @@
     ViewBag.TreeName = Model.TreeName;
 }
 @section Scripts {
+<script type="text/javascript">
+    // seealso ChristmasPi.Data.Models.Scheduler.RepeatUsage
+    var REPEATMONDAY = 1;
+    var REPEATTUESDAY = 2;
+    var REPEATWEDNESDAY = 4;
+    var REPEATTHURSDAY = 8;
+    var REPEATFRIDAY = 16;
+    var REPEATSATURDAY = 32;
+    var REPEATSUNDAY = 64;
 
+    function getRepeatUsage() {
+        var monday = $("#monday-btn").val() === "true";
+        var tuesday = $("#tuesday-btn").val() === "true";
+        var wednesday = $("#wednesday-btn").val() === "true";
+        var thursday = $("#thursday-btn").val() === "true";
+        var friday = $("#friday-btn").val() === "true";
+        var saturday = $("#saturday-btn").val() === "true";
+        var sunday = $("#sunday-btn").val() === "true";
+
+        var mask = 0;
+        if (monday)
+            mask = mask | REPEATMONDAY;
+        if (tuesday)
+            mask = mask | REPEATTUESDAY;
+        if (wednesday)
+            mask = mask | REPEATWEDNESDAY;
+        if (thursday)
+            mask = mask | REPEATTHURSDAY;
+        if (friday)
+            mask = mask | REPEATFRIDAY;
+        if (saturday)
+            mask = mask | REPEATSATURDAY;
+        if (sunday)
+            mask = mask | REPEATSUNDAY;
+
+        return mask;
+    }
+    function addRuleBtnClick(day) {
+        var id = `${day}-btn`;
+        var element = document.getElementById(id);
+        if (element.value === "false") {
+            element.value = true;
+            element.classList.remove("addRuleBtnOff");
+            element.classList.add("addRuleBtnOn");
+        }
+        else {
+            element.value = false;
+            element.classList.remove("addRuleBtnOn");
+            element.classList.add("addRuleBtnOff");
+        }
+        validate();
+    }
+    function clearBtnValues() {
+        var clearFn = function(day) {
+            $(`#${day}-btn`).val("false");
+            if ($(`#${day}-btn`).hasClass("addRuleBtnOn")) {
+                $(`#${day}-btn`).removeClass("addRuleBtnOn");
+                $(`#${day}-btn`).addClass("addRuleBtnOff");
+            }
+        }
+        clearFn("sunday");
+        clearFn("monday");
+        clearFn("tuesday");
+        clearFn("wednesday");
+        clearFn("thursday");
+        clearFn("friday");
+        clearFn("saturday");
+        clearFn("sunday");
+    }
+    function closeAddRuleModal() {
+        $('#ScheduleAddModal').modal('hide');
+    }
+    function ShowRemoveRuleModal(i, j) {
+        $('#scheduleremove-i').val(i);
+        $('#scheduleremove-j').val(j);
+        $('#ScheduleRemoveModal').modal();
+    }
+    function closeRemoveRuleModal() {
+        $('#scheduleremove-i').val("");
+        $('#scheduleremove-j').val("");
+        $('#ScheduleRemoveModal').modal('hide');
+    }
+    function ShowAddRuleModal() {
+        $("#addrule-starttime").datetimepicker({
+            format: 'LT',
+            icons: {
+                time: "fa fa-clock-o",
+                date: "fa fa-calendar",
+                up: "fa fa-chevron-up",
+                down: "fa fa-chevron-down",
+                previous: 'fa fa-chevron-left',
+                next: 'fa fa-chevron-right',
+                today: 'fa fa-screenshot',
+                clear: 'fa fa-trash',
+                close: 'fa fa-remove'
+            }
+        });
+        $("#addrule-starttime").on("dp.change", validate);
+        $("#addrule-endtime").datetimepicker({
+            format: 'LT',
+            icons: {
+                time: "fa fa-clock-o",
+                date: "fa fa-calendar",
+                up: "fa fa-chevron-up",
+                down: "fa fa-chevron-down",
+                previous: 'fa fa-chevron-left',
+                next: 'fa fa-chevron-right',
+                today: 'fa fa-screenshot',
+                clear: 'fa fa-trash',
+                close: 'fa fa-remove'
+            }
+        });
+        $("#addrule-endtime").on("dp.change", validate);
+        $('#ScheduleAddModal').modal();
+        validate();
+    }
+    function RemoveRule() {
+        // /api/schedule/remove
+        var i = parseInt($("#scheduleremove-i").val());
+        var j = parseInt($("#scheduleremove-j").val());
+        closeRemoveRuleModal();
+        //var start = $(`#rstart-${i}:${j}`).val();
+        var start = document.getElementById(`rstart-${i}:${j}`).value;
+        //var end = $(`#rend-${i}:${j}`).val();
+        var end = document.getElementById(`rend-${i}:${j}`).value;
+        //var day = $(`#rday-${i}:${j}`).val();
+        var day = document.getElementById(`rday-${i}:${j}`).value;
+
+        var oReq = new XMLHttpRequest();
+        oReq.addEventListener("load", function () {
+            if (this.status !== 200) {
+                showErrorModal("Failed to remove rule");
+            }
+            else {
+                location.reload();
+            }
+        });
+        oReq.open("POST", "/api/schedule/remove");
+        oReq.setRequestHeader("Content-Type", "application/json");
+        oReq.send(JSON.stringify({
+            start: start,
+            end: end,
+            day: day
+        }));
+    }
+    function AddRule() {
+        // /api/schedule/add
+        var start = $('#addrule-starttime').data("DateTimePicker").viewDate().format("HH:mm");
+        var end = $('#addrule-endtime').data("DateTimePicker").viewDate().format("HH:mm");
+        var repeat = getRepeatUsage();
+        closeAddRuleModal();
+        clearBtnValues();
+
+        var oReq = new XMLHttpRequest();
+        oReq.addEventListener("load", function () {
+            if (this.status !== 200) {
+                showErrorModal("Failed to add rule");
+            }
+            else {
+                location.reload();
+            }
+        });
+        oReq.open("POST", "/api/schedule/add");
+        oReq.setRequestHeader("Content-Type", "application/json");
+        oReq.send(JSON.stringify({
+            start: start,
+            end: end,
+            repeat: repeat
+        }));
+    }
+    function validate(a, b) {
+        var start = $('#addrule-starttime').val();
+        var end = $('#addrule-endtime').val();
+        var monday = $("#monday-btn").val() === "true";
+        var tuesday = $("#tuesday-btn").val() === "true";
+        var wednesday = $("#wednesday-btn").val() === "true";
+        var thursday = $("#thursday-btn").val() === "true";
+        var friday = $("#friday-btn").val() === "true";
+        var saturday = $("#saturday-btn").val() === "true";
+        var sunday = $("#sunday-btn").val() === "true";
+        var enabled = start !== "" && end !== "" && start !== end && (
+            monday || tuesday || wednesday || thursday || friday || saturday || sunday
+        );
+        $("#scheduleAddRuleBtn").prop('disabled', !enabled);
+    }
+</script>
 }
 <!--https://demo.mobiscroll.com/v5/fullscreen/scheduler/mobile-week-view#theme=windows-->
 <!--Create full width div for Day titles-->
     <!--Titles should change to shortened version when resized-->
 <div class="container-fluid ">
-  <div class="row justify-content-md-center">
-    @for (int i = 0; i < 8; i++) {
-      if (i == 0) {
+  <div class="row justify-content-md-center" onmouseover="updateMouseHover('none')">
+    @for (int day = 0; day < 8; day++) {
+      if (day == 0) {
         <div class="col day-header-space">
           &nbsp;
         </div>
       }
       else {
         <div class="col day-header-item">
-          <button class="day-button btn btn-outline-primary sidebar d-none d-lg-block">@Model.GetDay(i - 1)</button>
-          <button class="day-button btn btn-outline-primary d-block d-lg-none">@Model.GetDayShort(i - 1)</button> 
+          <button onclick="ShowAddRuleModal()" class="day-button btn btn-outline-default sidebar d-none d-lg-block">@Model.GetDay(day - 1)</button>
+          <button onclick="ShowAddRuleModal()" class="day-button btn btn-outline-default d-block d-lg-none">@Model.GetDayShort(day - 1)</button> 
         </div>
       }
     }
@@ -30,35 +215,42 @@
 <!--Create full width div for Day grids-->
     <!--Create tall div for each day grid, overflow vertically -->
 <div class="container-fluid">
-  @for (int i = 0; i < 24; i++) {
+  @for (int hour = 0; hour < 24; hour++) {
   <div class="row justify-content-md-center">
-    @for (int j = 0; j < 8; j++) {
-      if (j == 0) {
-        <div class="col day-header-space time-period">
-          @Model.GetTimePeriod(i)
+    @for (int day = 0; day < 8; day++) {
+      if (day == 0) {
+        <div class="col day-header-space time-period" onmouseover="updateMouseHover('none')">
+          @Model.GetTimePeriod(hour)
         </div>
       }
       else {
-        ColoredRule rule = Model.GetFirstRuleAt(j-1, i);
-        RuleStyle? style = Model.GetStyleFor(j-1, i);
+        ColoredRule rule = Model.GetFirstRuleAt(day - 1, hour);
+        RuleStyle? style = Model.GetStyleFor(day - 1, hour);
         <div class="col day-header-item @(rule == null ? "border-full" : Model.GetBorderStyleFor(style))">
           <div>
             @if (rule != null) {
-              int rulecount = Model.GetRuleCountAt(i-1, j);
-              <div class="rule-cell" style="background-color: @rule.GetColorCode()">
-                  <p class="schedule-rule-label">@rule.ToString()</p>
-                  <button class="btn btn-sm badge-danger btn-primary btn-just-icon schedule-rule-rmv-btn" onclick='ShowRemoveRuleModal(@String.Format("{0},{1}", i, j))'>
-                      <i class="nc-icon nc-simple-remove"></i>
-                  </button>
-                  @{
-                      if (rulecount > 1) {
-                          <span class="badge badge-info badge-pill schedule-rule-badge">@rulecount</span>
-                      }
+              int rulecount = Model.GetRuleCountAt(hour - 1, day);
+              <div class="rule-cell @rule.GetName(day - 1)" style="background-color: @rule.GetColorCode()" onmouseover="updateMouseHover('@rule.GetName(day - 1)')" onclick="click()">
+                  @if (Model.IsRuleTop(day - 1, hour)) {
+                    <div>
+                      <h3 class="rule-top">@rule.GetStartTime()</h3>
+                    </div>
                   }
-                  <input type="hidden" id='@String.Format("rstart-{0}:{1}", i, j)' value='@rule.StartTime.ToShortTimeString()' />
-                  <input type="hidden" id='@String.Format("rend-{0}:{1}", i, j)' value='@rule.EndTime.ToShortTimeString()' />
-                  <input type="hidden" id='@String.Format("rday-{0}:{1}", i, j)' value='@Model.GetDay(i-1)' />
+                  @if (Model.IsRuleBottom(day - 1, hour)) {
+                    <div>
+                      <h3 class="rule-bottom">@rule.GetEndTime()</h3>
+                    </div>
+                  }
+                  @if (rulecount > 1) {
+                      <span class="badge badge-info badge-pill schedule-rule-badge">@rulecount</span>
+                  }
+                  <input type="hidden" id='@String.Format("rstart-{0}:{1}", hour, day)' value='@rule.StartTime.ToShortTimeString()' />
+                  <input type="hidden" id='@String.Format("rend-{0}:{1}", hour, day)' value='@rule.EndTime.ToShortTimeString()' />
+                  <input type="hidden" id='@String.Format("rday-{0}:{1}", hour, day)' value='@Model.GetDay(day - 1)' />
               </div>
+            }
+            else {
+              <div style="position: absolute; width: 100%; height: 100%" onmouseover="updateMouseHover('none')"></div>
             }
           </div>
         </div>
@@ -66,4 +258,64 @@
     }
   </div>
   }
+</div>
+<!--Modals-->
+<div class="modal fade" id="ScheduleAddModal" tabindex="-1" role="dialog" aria-labelledby="SchedueAddModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title h-no-newline" id="SchedueAddModalLabel">Add Rule</h6>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Start Time</label>
+                    <input id="addrule-starttime" type="text" class="form-control datetimepicker" />
+                </div>
+                <div class="form-group">
+                    <label>End Time</label>
+                    <input id="addrule-endtime" type="text" class="form-control datetimepicker" />
+                </div>
+                <!--Add display: flex; justify-content: center; to center justify div-->
+                <div class="form-group">
+                    <button class="btn addRuleBtnOff addRuleBtn" value="false" onclick="addRuleBtnClick('sunday')" id="sunday-btn">S</button>
+                    <button class="btn addRuleBtnOff addRuleBtn" value="false" onclick="addRuleBtnClick('monday')" id="monday-btn">M</button>
+                    <button class="btn addRuleBtnOff addRuleBtn" value="false" onclick="addRuleBtnClick('tuesday')" id="tuesday-btn">T</button>
+                    <button class="btn addRuleBtnOff addRuleBtn" value="false" onclick="addRuleBtnClick('wednesday')" id="wednesday-btn">W</button>
+                    <button class="btn addRuleBtnOff addRuleBtn" value="false" onclick="addRuleBtnClick('thursday')" id="thursday-btn">Th</button>
+                    <button class="btn addRuleBtnOff addRuleBtn" value="false" onclick="addRuleBtnClick('friday')" id="friday-btn">F</button>
+                    <button class="btn addRuleBtnOff addRuleBtn" value="false" onclick="addRuleBtnClick('saturday')" id="saturday-btn">S</button>
+                </div>
+                <button class="btn btn-block btn-round" id="scheduleAddRuleBtn" onclick="AddRule()" disabled>Add Rule</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="ScheduleRemoveModal" tabindex="-1" role="dialog" aria-labelledby="SchedueRemoveModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="SchedueRemoveModalLabel">Remove Rule - Confirmation</h6>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="scheduleremove-i" value="" />
+                <input type="hidden" id="scheduleremove-j" value="" />
+                <h5>Are you sure you want to remove the rule?</h5>
+            </div>
+            <div class="modal-footer">
+                <div class="left-side">
+                    <button type="button" class="btn btn-default btn-link" data-dismiss="modal">Cancel</button>
+                </div>
+                <div class="divider"></div>
+                <div class="right-side">
+                    <button type="button" class="btn btn-danger btn-link" onclick="RemoveRule()">Remove</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

@@ -113,11 +113,33 @@ namespace ChristmasPi.Data.Models {
                 return _christmasColors1;
             }
         }
+        /// <summary>
+        /// Acceptable UI Colors
+        /// </summary>
+        /// <seealso href="https://flatuicolors.com/palette/defo" />
+        /// <remarks>All colors come from the linked palette</remarks>
         public static ColorTable UIColors {
             get {
                 if (_uiColors == null) {
                     List<Color> colors = new List<Color>();
-                    //colors.Add(Util.ColorConverter.Convert("#213496"));
+                    colors.Add(Util.ColorConverter.Convert("#1abc9c"));
+                    colors.Add(Util.ColorConverter.Convert("#2ecc71"));
+                    colors.Add(Util.ColorConverter.Convert("#3498db"));
+                    colors.Add(Util.ColorConverter.Convert("#9b59b6"));
+                    colors.Add(Util.ColorConverter.Convert("#34495e"));
+                    colors.Add(Util.ColorConverter.Convert("#16a085"));
+                    colors.Add(Util.ColorConverter.Convert("#27ae60"));
+                    colors.Add(Util.ColorConverter.Convert("#2980b9"));
+                    colors.Add(Util.ColorConverter.Convert("#8e44ad"));
+                    colors.Add(Util.ColorConverter.Convert("#2c3e50"));
+                    colors.Add(Util.ColorConverter.Convert("#f1c40f"));
+                    colors.Add(Util.ColorConverter.Convert("#e67e22"));
+                    colors.Add(Util.ColorConverter.Convert("#e74c3c"));
+                    colors.Add(Util.ColorConverter.Convert("#95a5a6"));
+                    colors.Add(Util.ColorConverter.Convert("#f39c12"));
+                    colors.Add(Util.ColorConverter.Convert("#d35400"));
+                    colors.Add(Util.ColorConverter.Convert("#c0392b"));
+                    colors.Add(Util.ColorConverter.Convert("#7f8c8d"));
                     _uiColors = new ColorTable(colors.ToArray());
                 }
                 return _uiColors;

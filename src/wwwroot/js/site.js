@@ -63,3 +63,35 @@ function deleteBranch() {
     working = true;
     oReq.send();
 }
+
+var activeHoverClass = "";
+var lastHoverClass = "";
+// Used by schedule to draw shadows
+function updateMouseHover(className) {
+    // className should either be none or a rule-cell class
+    lastHoverClass = activeHoverClass;
+    activeHoverClass = className === "none" ? "" : className;
+    updateShadows(); 
+}
+function updateShadows() {
+    // deactivate lastHoverClass
+    if (lastHoverClass !== "") {
+        var elements = document.getElementsByClassName(lastHoverClass);
+        for (var i = 0; i < elements.length; i++) {
+            var element = elements[i];
+            element.classList.remove("rule-cell-hovered");
+        }
+    }
+    // activateHoverClass
+    if (activeHoverClass !== "") {
+        var elements = document.getElementsByClassName(activeHoverClass);
+        for (var i = 0; i < elements.length; i++) {
+            var element = elements[i];
+            if (!element.classList.contains("rule-cell-hovered"))
+                element.classList.add("rule-cell-hovered");
+        }
+    }
+}
+function click() {
+    console.log("delete");
+}

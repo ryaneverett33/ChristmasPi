@@ -122,17 +122,20 @@ namespace ChristmasPi.Data.Models {
         /// Generate a random table not used in a given table
         /// </summary>
         /// <param name="colors">List of previously used colors</param>
+        /// <param name="useTable">Optional argument for specifying which color table to generate colors from</param>
         /// <returns>A newly generated color</returns>
-        public static Color RandomColorNotInTable(List<Color> colors, bool knownColor = false) {
+        /// <remarks>After generating a color, the used color is automatically added to the color list</remarks>
+        public static Color RandomColorNotInTable(ref List<Color> colors, ColorTable useTable = null) {
             if (colors == null)
                 throw new ArgumentNullException("colors");
-            Color color = knownColor ? RandomKnownColorGenerator() : MakeRandomColor();
+            Color color = useTable == null ? MakeRandomColor() : RandomColorFromColorTable(useTable);
             while (colors.Contains(color)) {
-                color = knownColor ? RandomKnownColorGenerator() : MakeRandomColor();
+                color = useTable == null ? MakeRandomColor() : RandomColorFromColorTable(useTable);
             }
+            colors.Add(color);
             return color;
         }
-        
+
         /// <summary>
         /// Generates a new random primitive color
         /// </summary>

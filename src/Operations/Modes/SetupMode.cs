@@ -247,8 +247,7 @@ namespace ChristmasPi.Operations.Modes {
         public Color? NewBranch() {
             if (lightCount >= Configuration.hardware.lightcount)
                 return null;
-            Color newColor = RandomColor.RandomColorNotInTable(usedColors);
-            usedColors.Add(newColor);
+            Color newColor = RandomColor.RandomColorNotInTable(ref usedColors);
             Branch branch;
             if (branches == null || branches.Count == 0)
                 branch = new Branch() { start = 1, end = 1 };
