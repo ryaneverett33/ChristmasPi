@@ -72,8 +72,24 @@
             oReq.open("POST", "/setup/services/finish");
             oReq.send();
         }
-        function viewGifPlaybackFinished(service) {
+        function viewGifPlaybackFinished(service, success) {
             console.log(`playback finished for ${service}`);
+            var gif = service == "christmaspi" ? pi_reindeer_gif : scheduler_reindeer_gif;
+            gif.loop_mode = false;
+            if (success) {
+                gif.stop_loop();
+                gif.set_on_end(null);
+                gif.load_url("/img/gifs/reindeer-checkmark-transition.gif", function() {
+                    gif.play();
+                });
+            }
+            else {
+                gif.stop_loop();
+                gif.set_on_end(null);
+                gif.load_url("/img/gifs/reindeer-x-transition.gif", function() {
+                    gif.play();
+                });
+            }     
         }
         function viewStartInstall(service) {
             console.log(`start install ${service}`);
@@ -93,7 +109,7 @@
                     servicesStatus[0] = "success";
                     pi_reindeer_gif.stop_loop();
                     pi_reindeer_gif.set_on_end(function(gif) {
-                        viewGifPlaybackFinished("christmaspi");
+                        viewGifPlaybackFinished("christmaspi", true);
                     });
                 }
             }
@@ -102,13 +118,27 @@
                     servicesStatus[1] = "success";
                     scheduler_reindeer_gif.stop_loop();
                     scheduler_reindeer_gif.set_on_end(function(gif) {
-                        viewGifPlaybackFinished("scheduler");
+                        viewGifPlaybackFinished("scheduler", true);
                     });
                 }
             }
         }
         function viewInstallFailure() {
             console.log(`install failure`);
+            if (servicesStatus[0] == "installing") {
+                servicesStatus[0] = "failure";
+                pi_reindeer_gif.stop_loop();
+                pi_reindeer_gif.set_on_end(function(gif) {
+                    viewGifPlaybackFinished("christmaspi", false, "pi");
+                });
+            }
+            if (servicesStatus[1] == "installing") {
+                servicesStatus[1] = "failure";
+                scheduler_reindeer_gif.stop_loop();
+                scheduler_reindeer_gif.set_on_end(function(gif) {
+                    viewGifPlaybackFinished("scheduler", false, "schedule");
+                });
+            }
         }
         function viewDisableService(service) {
             console.log(`disable service ${service}`);

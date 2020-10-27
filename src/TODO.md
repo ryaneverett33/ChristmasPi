@@ -1,10 +1,6 @@
 ﻿# TODO
 
 ## Release 0.5
-- [FRONTEND] Services reindeer gif transition to checkmark
-	- Start reindeer when installing /
-	- Add appropriate gifs, reindeer->checkmark gif and reindeer->failure gif
-	- Transition to checkmark/failure on service installation finish
 - [FRONTEND] Implement mobile version of schedule
 	- Example: https://demo.mobiscroll.com/v5/jquery/scheduler/mobile-week-view#
 - [BACKEND] Cleanup animations
