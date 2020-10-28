@@ -77,9 +77,10 @@
     function closeAddRuleModal() {
         $('#ScheduleAddModal').modal('hide');
     }
-    function ShowRemoveRuleModal(i, j) {
-        $('#scheduleremove-i').val(i);
-        $('#scheduleremove-j').val(j);
+    function ShowRemoveRuleModal(day, hour) {
+        // i is hour, day is j
+        $('#scheduleremove-i').val(hour);
+        $('#scheduleremove-j').val(day);
         $('#ScheduleRemoveModal').modal();
     }
     function closeRemoveRuleModal() {
@@ -230,7 +231,7 @@
           <div>
             @if (rule != null) {
               int rulecount = Model.GetRuleCountAt(hour - 1, day);
-              <div class="rule-cell @rule.GetName(day - 1)" style="background-color: @rule.GetColorCode()" onmouseover="updateMouseHover('@rule.GetName(day - 1)')" onclick="click()">
+              <div class="rule-cell @rule.GetName(day - 1)" style="background-color: @rule.GetColorCode()" onmouseover="updateMouseHover('@rule.GetName(day - 1)')">
                   @if (Model.IsRuleTop(day - 1, hour)) {
                     <div>
                       <h3 class="rule-top">@rule.GetStartTime()</h3>
@@ -244,9 +245,9 @@
                   @if (rulecount > 1) {
                       <span class="badge badge-info badge-pill schedule-rule-badge">@rulecount</span>
                   }
-                  <input type="hidden" id='@String.Format("rstart-{0}:{1}", hour, day)' value='@rule.StartTime.ToShortTimeString()' />
-                  <input type="hidden" id='@String.Format("rend-{0}:{1}", hour, day)' value='@rule.EndTime.ToShortTimeString()' />
-                  <input type="hidden" id='@String.Format("rday-{0}:{1}", hour, day)' value='@Model.GetDay(day - 1)' />
+                  <input type="hidden" id='@String.Format("rstart-{0}:{1}", hour, day - 1)' value='@rule.StartTime.ToShortTimeString()' />
+                  <input type="hidden" id='@String.Format("rend-{0}:{1}", hour, day - 1)' value='@rule.EndTime.ToShortTimeString()' />
+                  <input type="hidden" id='@String.Format("rday-{0}:{1}", hour, day - 1)' value='@Model.GetDay(day - 1)' />
               </div>
             }
             else {
