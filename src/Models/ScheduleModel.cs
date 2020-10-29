@@ -268,7 +268,8 @@ namespace ChristmasPi.Models {
         public override string ToString() {
             return String.Format("{0} - {1}", StartTime.ToString("h:mm"), EndTime.ToString("h:mm"));
         }
-        public string GetName(int day) => $"d{day}s{StartTime.Hour}e{EndTime.Hour}";
+        public string GetName(int day, int hour) => $"d{day}h{hour}e{EndTime.Hour}";
+        public string GetCommonName(int day) => $"d{day}s{StartTime.Hour}e{EndTime.Hour}";
         public string GetStartTime() => StartTime.ToString("h:mm");
         public string GetEndTime() => EndTime.ToString("h:mm");
     }

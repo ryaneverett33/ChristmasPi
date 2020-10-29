@@ -1,12 +1,6 @@
 ﻿# TODO
 
 ## Release 0.5
-- [FRONTEND] Implement mobile version of schedule
-	- Example: https://demo.mobiscroll.com/v5/jquery/scheduler/mobile-week-view#
-	- ColoredRule.GetName should account for hour
-	- @rule.GetName should be the id and should be unique for each hour/day location
-	- Clean up i/j usage
-	- Clicking a day button to add a rule should have that day be automatically selected
 - [BACKEND] Cleanup animations
 	- Implement debug property for animations /
 	- Add debug configuration for allowing debug animations /
@@ -36,6 +30,8 @@
 	- use interfaces instead
 - [FRONTEND] Add Settings tab
 - [FRONTEND] Implement main settings page
+- [FRONTEND] Handle overlapping times
+	- EX: 5:00-6:55
 - [BACKEND] Create a settings controller
 - [BACKEND] Allow updating various settings of the tree
 - [BACKEND] Allow monitoring of services
