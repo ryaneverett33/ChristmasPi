@@ -30,6 +30,8 @@
 	- use interfaces instead
 - [FRONTEND] Add Settings tab
 - [FRONTEND] Implement main settings page
+- [FRONTEND] Add support for Partial Views
+	- https://docs.microsoft.com/en-us/aspnet/core/mvc/views/partial?view=aspnetcore-3.1
 - [FRONTEND] Handle overlapping times
 	- EX: 5:00-6:55
 - [BACKEND] Create a settings controller
