@@ -7,6 +7,7 @@ using ChristmasPi.Data.Models;
 namespace ChristmasPi.Animation.Animations {
     public class random : BasicAnimation {
         public override string Name => "Random";
+        public override bool isDebugAnimation => true; 
 
         private float sleeptime;
 

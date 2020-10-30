@@ -1,11 +1,6 @@
 ﻿# TODO
 
 ## Release 0.5
-- [BACKEND] Cleanup animations
-	- Implement debug property for animations /
-	- Add debug configuration for allowing debug animations /
-	- Implement controller logic for filtering out debug animations /
-	- Select which animations should be debug animations
 - [GENERAL] Create installer package
 	- Maybe add bootstrapper script to start setup process
 		- install dotnet to /opt/dotnet
