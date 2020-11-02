@@ -9,7 +9,10 @@ namespace ChristmasPi.Models {
         public ServiceStatusModel() {}
 
         public ServiceStatusModel(OutputWriter writer, InstallationStatus status) {
-            Output = writer.ToString();
+            if (writer == null)
+                Output = "";
+            else
+                Output = writer.ToString();
             Status = Enum.GetName(typeof(InstallationStatus), status);
         }
 
@@ -20,14 +23,12 @@ namespace ChristmasPi.Models {
             return model;
         }
 
-        public ServiceStatusModel AllDone() {
-            this.Status = "AllDone";
-            return this;
+        public static ServiceStatusModel Finished() {
+            return new ServiceStatusModel(null, InstallationStatus.Finished);
         }
 
-        public ServiceStatusModel Reboot() {
-            this.Status = "Reboot";
-            return this;
+        public static ServiceStatusModel Rebooting() {
+            return new ServiceStatusModel(null, InstallationStatus.Rebooting);
         }
     }
 }

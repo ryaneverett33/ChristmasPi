@@ -39,10 +39,10 @@ namespace ChristmasPi.Operations.Modes {
         private int lightCount;
         private ServiceInstaller currentServiceInstaller;
         private bool installSchedulerService;
-        private bool serviceHasUpdate;
         private bool servicesInstalled;
         private bool servicesRebootRequired;
-        private ServiceStatusModel lastStatusUpdate;
+        private bool aServiceFailed = false;
+        private Queue<ServiceStatusModel> serviceUpdates;
         private SetupProgress currentProgress;
         #endregion
         public SetupMode() {
@@ -291,14 +291,14 @@ namespace ChristmasPi.Operations.Modes {
         }
 
         public bool StartServicesInstall(bool installSchedulerService) {
+            serviceUpdates = new Queue<ServiceStatusModel>();
             // If the user hits reload instead of hitting continue
             if (servicesInstalled) {
-                lastStatusUpdate = new ServiceStatusModel().AllDone();
-                lastStatusUpdate.Output = "ChristmasPi.service already installed";
+                ServiceStatusModel model = ServiceStatusModel.Finished();
+                model.Output = "ChristmasPi.service already installed";
                 if (installSchedulerService)
-                    lastStatusUpdate.Output += "\nScheduler.service already installed";
-                serviceHasUpdate = true;
-                servicesInstalled = true;
+                    model.Output += "\nScheduler.service already installed";
+                queueServiceUpdate(model);
                 return true;
             }
             // If two different browsers attempt to install at the same time
@@ -346,16 +346,11 @@ namespace ChristmasPi.Operations.Modes {
                 case InstallationStatus.Success:
                     // Wait until serviceHasUpdate has been toggled before installing next service
                     if (installSchedulerService) {
-                        lastStatusUpdate = new ServiceStatusModel(currentServiceInstaller.GetWriter(), currentServiceInstaller.GetStatus());
-                        serviceHasUpdate = true;
+                        queueServiceUpdate(new ServiceStatusModel(currentServiceInstaller.GetWriter(), currentServiceInstaller.GetStatus()));
                         if (currentServiceInstaller.RebootRequired)
                             servicesRebootRequired = true;
                         Task t = new Task(() => {
                             installSchedulerService = false;
-                            while (serviceHasUpdate) {
-                                // Slow Spin Lock
-                                Task.Delay(25);
-                            }
                             // Start install for Scheduler.service
                             currentServiceInstaller.Dispose();
                             currentServiceInstaller = new ServiceInstaller("Scheduler.service");
@@ -370,63 +365,76 @@ namespace ChristmasPi.Operations.Modes {
                         servicesInstalled = true;
                         if (currentServiceInstaller.RebootRequired)
                             servicesRebootRequired = true;
-                        if (servicesRebootRequired) {
-                            lastStatusUpdate = lastStatusUpdate.Reboot();
-                            serviceHasUpdate = true;
-                            servicesInstalled = true;
-                            // Start reboot process
-                            /*
-                                Allow the frontend to process the reboot request but don't actually reboot on the backend.
-                                The frontend processes the reboot by waiting for the application to become alive again,
-                                so if the application never dies then the frontend will continue to work normally.
-                            */
-                            if (!ConfigurationManager.Instance.RuntimeConfiguration.IgnoreRestarts) {
-                                Task.Run(async () => {
-                                    await Task.Delay(Constants.REBOOT_DELAY_SLEEP);
-                                    Log.ForContext<SetupMode>().Information("Rebooting");
-                                    SaveSetupProgress();
-                                    await Task.Delay(Constants.REBOOT_DELAY_SLEEP);
-                                    Environment.Exit(Constants.EXIT_REBOOT);
-                                });
-                            }
-                        }
-                        else {
-                            lastStatusUpdate = lastStatusUpdate.AllDone();
-                            serviceHasUpdate = true;
-                        }
+                        queueServiceUpdate(new ServiceStatusModel(currentServiceInstaller.GetWriter(), currentServiceInstaller.GetStatus()));
+                        servicesInstalled = true;
+                        if (servicesRebootRequired)
+                            queueServiceUpdate(ServiceStatusModel.Rebooting());
+                        else
+                            queueServiceUpdate(ServiceStatusModel.Finished());
                     }
                     break;
                 case InstallationStatus.Failed:
-                    // Clean up installer
-                    lastStatusUpdate = new ServiceStatusModel(currentServiceInstaller.GetWriter(), currentServiceInstaller.GetStatus());
-                    serviceHasUpdate = true;
+                    // check if a partial reboot is required
+                    aServiceFailed = true;
+                    queueServiceUpdate(new ServiceStatusModel(currentServiceInstaller.GetWriter(), currentServiceInstaller.GetStatus()));
+                    servicesInstalled = true;
+                    if (servicesRebootRequired)
+                        queueServiceUpdate(ServiceStatusModel.Rebooting());
+                    else
+                        queueServiceUpdate(ServiceStatusModel.Finished());
                     //currentServiceInstaller.Dispose();
                     //currentServiceInstaller = null;
                     break;
                 case InstallationStatus.Installing:
                     // Set service update info
-                    lastStatusUpdate = new ServiceStatusModel(currentServiceInstaller.GetWriter(), currentServiceInstaller.GetStatus());
-                    serviceHasUpdate = true;
+                    queueServiceUpdate(new ServiceStatusModel(currentServiceInstaller.GetWriter(), currentServiceInstaller.GetStatus()));
                     break;
                 default:
                     break;
+            }
+        }
+        private void servicesReboot() {
+            //lastStatusUpdate = lastStatusUpdate.Reboot();
+            //serviceHasUpdate = true;
+            //servicesInstalled = true;
+            // Start reboot process
+            /*
+                Allow the frontend to process the reboot request but don't actually reboot on the backend.
+                The frontend processes the reboot by waiting for the application to become alive again,
+                so if the application never dies then the frontend will continue to work normally.
+            */
+            if (!ConfigurationManager.Instance.RuntimeConfiguration.IgnoreRestarts) {
+                Task.Run(async () => {
+                    await Task.Delay(Constants.REBOOT_DELAY_SLEEP);
+                    Log.ForContext<SetupMode>().Information("Rebooting");
+                    SaveSetupProgress();
+                    if (aServiceFailed) // Handle frontend showing alert for partial reboot
+                        await Task.Delay(Constants.REBOOT_PARTIAL_DELAY_SLEEP);
+                    else
+                        await Task.Delay(Constants.REBOOT_DELAY_SLEEP);
+                    Environment.Exit(Constants.EXIT_REBOOT);
+                });
             }
         }
 
         /// <summary>
         /// 
         /// </summary>
+        /// <remarks>If a reboot state is queued, upon dequeue the reboot will begin</remarks>
         /// <returns></returns>
         public ServiceStatusModel GetServicesInstallProgress() {
-            if (currentServiceInstaller == null && !serviceHasUpdate)
-                return null;
-            if (serviceHasUpdate) {
-                serviceHasUpdate = false;
-                return lastStatusUpdate;
+            if (serviceUpdates == null) {
+                Log.ForContext<SetupMode>().Debug("Tried to get services install progress but queue is null");
+                throw new InvalidSetupActionException("Can't get install progress, no services have started installing");
             }
-            else {
+            if (serviceUpdates.Count > 0) {
+                ServiceStatusModel status = serviceUpdates.Dequeue();
+                if (status.Status.Equals(Enum.GetName(typeof(InstallationStatus), InstallationStatus.Rebooting)))
+                    servicesReboot();
+                return status;
+            }
+            else
                 return ServiceStatusModel.Stale();
-            }
         }
 
         /// <summary>
@@ -445,6 +453,14 @@ namespace ChristmasPi.Operations.Modes {
         public bool Reboot() {
             // mark reboot step as complete and exit
             throw new NotImplementedException();
+        }
+
+        private void queueServiceUpdate(ServiceStatusModel update) {
+            if (serviceUpdates == null) {
+                Log.ForContext<SetupMode>().Debug("Tried to queue update {state} but queue hasn't been constructed yet", update.Status);
+                throw new Exception("Can't queue service update, queue hasn't been constructed");
+            }
+            serviceUpdates.Enqueue(update);
         }
 
         private void renderLight(Color color, bool increment) {

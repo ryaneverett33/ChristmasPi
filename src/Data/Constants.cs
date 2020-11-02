@@ -27,6 +27,7 @@ namespace ChristmasPi.Data {
         public static readonly TimeSpan SCHEDULER_LONG_SLEEP = new TimeSpan(1, 0, 0);
         public static readonly TimeSpan REBOOT_POLL_SLEEP = new TimeSpan(0, 0, 0, 0, 100);      // 100 ms
         public static readonly TimeSpan REBOOT_DELAY_SLEEP = new TimeSpan(0, 0, 1);
+        public static readonly TimeSpan REBOOT_PARTIAL_DELAY_SLEEP = new TimeSpan(0, 0, 11);
 
         // Colors
         public static readonly int RANDOM_DEFAULT = 255;

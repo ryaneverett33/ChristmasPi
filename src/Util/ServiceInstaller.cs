@@ -80,7 +80,6 @@ namespace ChristmasPi.Util {
                 return output;
             }
         }
-
         protected ServiceInstallState getState() => new ServiceInstallState() { ServiceName = serviceName, Status = status };
 
         private void installerMonitor() {

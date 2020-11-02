@@ -6,7 +6,6 @@
 		- install dotnet to /opt/dotnet
 		- add to global path /etc/profile.d/dotnet.sh
 	- Add builder for creating build packages (zip up the build directory) /
-- [FRONTEND] If a service fails to install with a restart pending, an alert should be raised before redirecting
 
 ## General
 - [?] branch animation is the result of a basic animation

@@ -11,11 +11,15 @@
         var pi_reindeer_gif = null;
         var scheduler_reindeer_gif = null;
         var servicesStatus = ["waiting", "waiting"]
+        var currentService = "christmaspi";
         var savedText = null;
-        var successInstall = false;
         var doInstallScheduler = false;
         var servicePoller = null;
         var servicesPollTime = 100;
+        var buttonActive = $("#toggle-icon").hasClass("nc-minimal-down");
+        var rebootDelay = 10;           // time to wait before rebooting
+        var timerCount = 0;
+        var timerInterval = null;
 
         // set current text
         function updateText(text) {
@@ -28,6 +32,7 @@
         function saveText(text) {
             savedText = text;
         }
+        // initialization function
         $(window).on("load", function () {
             $("#continue-btn").hide();
             $("#installprogress").hide();
@@ -44,7 +49,7 @@
                         })
             scheduler_reindeer_gif.load();
         });
-        var buttonActive = $("#toggle-icon").hasClass("nc-minimal-down");
+        // handler function to show console output
         function toggleOutput() {
             if (buttonActive) {
                 $("#toggle-icon").removeClass("nc-minimal-up");
@@ -59,6 +64,7 @@
                 buttonActive = true;
             }
         }
+        // handler function for the continue button
         function continueBtn() {
             var oReq = new XMLHttpRequest();
             oReq.addEventListener("load", function () {
@@ -72,8 +78,8 @@
             oReq.open("POST", "/setup/services/finish");
             oReq.send();
         }
+        // callback function for transitioning gifs on success/failure for a given service
         function viewGifPlaybackFinished(service, success) {
-            console.log(`playback finished for ${service}`);
             var gif = service == "christmaspi" ? pi_reindeer_gif : scheduler_reindeer_gif;
             gif.loop_mode = false;
             if (success) {
@@ -91,74 +97,83 @@
                 });
             }     
         }
+        // indicates that a process is being installed
         function viewStartInstall(service) {
-            console.log(`start install ${service}`);
-            if (service == "christmaspi") {
+            if (service === "christmaspi" && servicesStatus[0] === "waiting") {
+                currentService = "christmaspi";
                 servicesStatus[0] = "installing";
+                setServiceTitle("Installing", "christmaspi");
                 pi_reindeer_gif.play();
             }
-            else {
+            else if (service === "scheduler" && servicesStatus[1] === "waiting") {
+                currentService = "scheduler";
                 servicesStatus[1] = "installing";
+                setServiceTitle("Installing", "scheduler");
                 scheduler_reindeer_gif.play();
             }
         }
+        // indicates that a given service installed successfully
         function viewInstallSuccess(service) {
-            console.log(`install success ${service}`);
-            if (service == "christmaspi") {
-                if (servicesStatus[0] == "installing") {
-                    servicesStatus[0] = "success";
-                    pi_reindeer_gif.stop_loop();
-                    pi_reindeer_gif.set_on_end(function(gif) {
-                        viewGifPlaybackFinished("christmaspi", true);
-                    });
-                }
+            if (service == "christmaspi" && servicesStatus[0] === "installing") {
+                servicesStatus[0] = "success";
+                setServiceTitle("Installed", "christmaspi");
+                pi_reindeer_gif.stop_loop();
+                pi_reindeer_gif.set_on_end(function(gif) {
+                    viewGifPlaybackFinished("christmaspi", true);
+                });
             }
-            else {
-                if (servicesStatus[1] == "installing") {
-                    servicesStatus[1] = "success";
-                    scheduler_reindeer_gif.stop_loop();
-                    scheduler_reindeer_gif.set_on_end(function(gif) {
-                        viewGifPlaybackFinished("scheduler", true);
-                    });
-                }
+            else if (service == "scheduler" && servicesStatus[1] === "installing") {
+                servicesStatus[1] = "success";
+                setServiceTitle("Installed", "scheduler");
+                scheduler_reindeer_gif.stop_loop();
+                scheduler_reindeer_gif.set_on_end(function(gif) {
+                    viewGifPlaybackFinished("scheduler", true);
+                });
             }
         }
-        function viewInstallFailure() {
-            console.log(`install failure`);
-            if (servicesStatus[0] == "installing") {
+        // indiciates that a given service failed to install
+        function viewInstallFailure(service) {
+            if (service == "christmaspi" && servicesStatus[0] === "installing") {
                 servicesStatus[0] = "failure";
+                setServiceTitle("Failure", "christmaspi");
                 pi_reindeer_gif.stop_loop();
                 pi_reindeer_gif.set_on_end(function(gif) {
                     viewGifPlaybackFinished("christmaspi", false, "pi");
                 });
             }
-            if (servicesStatus[1] == "installing") {
+            else if (service == "scheduler" && servicesStatus[1] === "installing") {
                 servicesStatus[1] = "failure";
+                setServiceTitle("Failure", "scheduler");
                 scheduler_reindeer_gif.stop_loop();
                 scheduler_reindeer_gif.set_on_end(function(gif) {
                     viewGifPlaybackFinished("scheduler", false, "schedule");
                 });
             }
         }
+        // marks a given service has disabled (won't be installed)
         function viewDisableService(service) {
-            console.log(`disable service ${service}`);
-            if (service == "christmaspi") {
+            if (service === "christmaspi" && servicesStatus[0] === "waiting") {
+                setServiceTitle("Not Installing", "christmaspi");
                 servicesStatus[0] = "disabled";
             }
-            else {
+            else if (service === "scheduler" && servicesStatus[1] === "waiting") {
+                setServiceTitle("Not Installing", "scheduler");
                 servicesStatus[1] = "disabled";
-            }       
+            }
         }
-        function setServiceTitle(isMainService, status) {
-            if (isMainService) {
+        // Sets the title for the current, or specified, service
+        function setServiceTitle(status, service = null) {
+            useService = service == null ? currentService : service;
+            if (useService === "christmaspi") {
                 var title = `ChristmasPi Service - ${status}`
                 $("#main-service-status").text(title);
             }
-            else {
+            else if (useService == "scheduler") {
                 var title = `Scheduler Service - ${status}`
                 $("#scheduler-service-status").text(title);
             }
         }
+        // Starts the installation process
         function installService(installScheduler) {
             doInstallScheduler = installScheduler;
             var oReq = new XMLHttpRequest();
@@ -168,11 +183,10 @@
                 }
                 else {
                     if (!installScheduler) {
-                        setServiceTitle(false, "Not Installing");
                         viewDisableService("scheduler");
                     }
                     $("#installprogress").show();
-                    viewStartInstall("christmaspi");
+                    //viewStartInstall("christmaspi");
                     servicePoller = setInterval(servicesInstallPoller, servicesPollTime);
                 }
             });
@@ -183,6 +197,32 @@
             };
             var json = JSON.stringify(data);
             oReq.send(json);
+        }
+        // navigates to the reboot page
+        function navigateToReboot() {
+            window.location.href = "/setup/aux/reboot";
+        }
+        // populates the failed services list in the partial reboot modal
+        function populateFailedServices() {
+            var failedServices = [];
+            if (servicesStatus[0] === "failure")
+                failedServices.push("ChristmasPi");
+            if (servicesStatus[1] === "failure")
+                failedServices.push("Scheduler");
+            var listElement = document.getElementById("failed-services-list");
+            for (var i = 0; i < failedServices.length; i++) {
+                var service = failedServices[i];
+                var li = document.createElement("LI");
+                li.textContent = service;
+                listElement.appendChild(li);
+            }
+        }
+        // handler function for updating the reboot timer
+        function rebootTimer() {
+            $("#timer-text").text(`${rebootDelay - timerCount}s`);
+            timerCount = timerCount + 1;
+            if (timerCount == rebootDelay)
+                clearInterval(timerInterval);
         }
         function servicesInstallPoller() {
             var oReq = new XMLHttpRequest();
@@ -195,47 +235,54 @@
                     var obj = JSON.parse(this.responseText);
                     switch (obj["status"]) {
                         case "Stale":
+                            // no updates are available
                             break;
                         case "Installing":
+                            // actively installing current service
                             updateText(obj["output"]);
+                            if (currentService === "christmaspi" && servicesStatus[0] === "waiting")
+                                viewStartInstall("christmaspi")
+                            else if (currentService === "scheduler" && servicesStatus[1] === "waiting")
+                                viewStartInstall("scheduler")
                             break;
                         case "Success":
+                            // successfully installed current service
                             saveText(obj["output"]);
                             updateText(obj["output"]);
-                            successInstall = true;
-                            setServiceTitle(true, "Installed");
-                            if (doInstallScheduler) {
-                                setServiceTitle(false, "Installing");
-                                viewStartInstall("scheduler");
-                                viewInstallSuccess("christmaspi");
+                            viewInstallSuccess(currentService);
+                            // increment currentService
+                            if (currentService === "christmaspi") {
+                                currentService = "scheduler";
                             }
                             break;
-                        case "Reboot":
-                            saveText(obj["output"]);
-                            updateText(obj["output"]);
-                            successInstall = true;
-                            setServiceTitle(true, "Installed");
-                            viewInstallSuccess("christmaspi");
-                            if (doInstallScheduler) {
-                                setServiceTitle(false, "Installed");
-                                viewInstallSuccess("scheduler");
-                            }
-                            window.location.href = "/setup/aux/reboot";
                         case "Failed":
-                            clearInterval(servicePoller);
+                            // failed to install current service, will continue to install other services
                             $("#continue-btn").show();
                             updateText(obj["output"]);
-                            setServiceTitle(!successInstall, "Failed");
-                            viewInstallFailure();
+                            viewInstallFailure(currentService);
                             break;
-                        case "AllDone":
+                        case "Rebooting":
+                            // A reboot is required to continue the installation
+                            console.log("reboot required");
                             clearInterval(servicePoller);
-                            setServiceTitle(true, "Installed");
-                            viewInstallSuccess("christmaspi");
-                            if (doInstallScheduler) {
-                                setServiceTitle(false, "Installed");
-                                viewInstallSuccess("scheduler");
+                            saveText(obj["output"]);
+                            updateText(obj["output"]);
+                            var partialReboot = servicesStatus[0] == "failure" || servicesStatus[1] == "failure";
+                            console.log(`partialReboot: ${partialReboot}`);
+                            if (partialReboot) {
+                                // show alert for partial reboot
+                                populateFailedServices();
+                                $("#partialRebootModal").modal();
+                                setTimeout(navigateToReboot, rebootDelay * 1000);
+                                timerInterval = setInterval(rebootTimer, 1000);
                             }
+                            else {
+                                //navigateToReboot();
+                            }
+                            break;
+                        case "Finished":
+                            // the services installation was completed, no reboot required
+                            clearInterval(servicePoller);
                             $("#continue-btn").show();
                             break;
                     }
@@ -243,7 +290,6 @@
             });
             oReq.open("GET", "/setup/services/progress");
             oReq.send();
-            // clearInterval(servicePoller);
         }
     </script>
 }
@@ -282,5 +328,23 @@
         </ul>
     </div>
 </div>
+<div class="modal fade" id="partialRebootModal" tabindex="-1" role="dialog" aria-labelledby="partialRebootModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title" id="partialRebootModalLabel">Redirecting to Reboot <p id="timer-text" class="h-no-newline">10s</p></h6>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>One of the services failed to install but another succeeded and requires a reboot. Please manually fix the affending service after the installation has succeeded.</p>
+                    <h3>Services that failed to install:</h3>
+                    <ul id="failed-services-list">
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 
 <button id="continue-btn" class="btn btn-info" onclick="continueBtn()">Continue</button>
