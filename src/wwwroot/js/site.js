@@ -28,6 +28,20 @@ function setActivePage(active) {
             break;
     }
 }
+function getRuleNameParts(rulename) {
+    if (rulename == null || rulename == undefined)
+        return null;
+    if (rulename.match(/d[0-9]{1,2}h[1-9]{1,2}e[1-9]{1,2}/) == null)
+        return null;
+    var day = rulename.match(/d[1-9]{1,2}/)[0].substring(1);
+    var hour = rulename.match(/h[0-9]{1,2}/)[0].substring(1);
+    var end = rulename.match(/e[0-9]{1,2}/)[0].substring(1);
+    return {
+        day: day,
+        hour: hour,
+        end: end
+    }
+}
 function showErrorModal(errorMessage) {
     $("#genericErrorModalMessage").text(errorMessage);
     $('#genericErrorModal').modal();
@@ -64,14 +78,35 @@ function deleteBranch() {
     oReq.send();
 }
 
+var activeHoverId = "";
+var lastHoverId = "";
 var activeHoverClass = "";
 var lastHoverClass = "";
 // Used by schedule to draw shadows
-function updateMouseHover(className) {
+function updateMouseHover(idName, className) {
     // className should either be none or a rule-cell class
+    lastHoverId = activeHoverId;
+    activeHoverId = idName === "none" ? "" : idName;
     lastHoverClass = activeHoverClass;
     activeHoverClass = className === "none" ? "" : className;
+    addEventListener();
     updateShadows(); 
+}
+function addEventListener() {
+    // rule-cell divs aren't responding to onclick for some reason so register the event listener if it's not already registered
+    if (activeHoverId === "")
+        return;
+    var element = document.getElementById(activeHoverId);
+    if (element.onclick == null) {
+        element.onclick = function() {
+            var idName = activeHoverId;          // TODO would very much like to "hardcode" this value into the function 
+            // example d1s2e3 and d1s17e23
+            var partObjs = getRuleNameParts(idName);
+            if (partObjs == null)
+                return;
+            ShowRemoveRuleModal(partObjs.day, partObjs.hour);
+        };
+    }
 }
 function updateShadows() {
     // deactivate lastHoverClass
@@ -91,7 +126,4 @@ function updateShadows() {
                 element.classList.add("rule-cell-hovered");
         }
     }
-}
-function click() {
-    console.log("delete");
 }

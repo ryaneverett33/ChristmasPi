@@ -1,4 +1,4 @@
-@{
+﻿@{
     ViewData["Title"] = "Schedule";
     ViewData["ActivePage"] = "Schedule";
     @model ChristmasPi.Models.ScheduleModel;
@@ -192,74 +192,61 @@
     }
 </script>
 }
-<!--https://demo.mobiscroll.com/v5/fullscreen/scheduler/mobile-week-view#theme=windows-->
-<!--Create full width div for Day titles-->
-    <!--Titles should change to shortened version when resized-->
-<div class="container-fluid ">
-  <div class="row justify-content-md-center" onmouseover="updateMouseHover('none')">
-    @for (int day = 0; day < 8; day++) {
-      if (day == 0) {
-        <div class="col day-header-space">
-          &nbsp;
-        </div>
-      }
-      else {
-        <div class="col day-header-item">
-          <button onclick="ShowAddRuleModal()" class="day-button btn btn-outline-default sidebar d-none d-lg-block">@Model.GetDay(day - 1)</button>
-          <button onclick="ShowAddRuleModal()" class="day-button btn btn-outline-default d-block d-lg-none">@Model.GetDayShort(day - 1)</button> 
-        </div>
-      }
-    }
-  </div>
-</div>
-<!--Create full width div for Day grids-->
-    <!--Create tall div for each day grid, overflow vertically -->
-<div class="container-fluid">
-  @for (int hour = 0; hour < 24; hour++) {
-  <div class="row justify-content-md-center">
-    @for (int day = 0; day < 8; day++) {
-      if (day == 0) {
-        <div class="col day-header-space time-period" onmouseover="updateMouseHover('none')">
-          @Model.GetTimePeriod(hour)
-        </div>
-      }
-      else {
-        ColoredRule rule = Model.GetFirstRuleAt(day - 1, hour);
-        RuleStyle? style = Model.GetStyleFor(day - 1, hour);
-        <div class="col day-header-item @(rule == null ? "border-full" : Model.GetBorderStyleFor(style))">
-          <div>
-            @if (rule != null) {
-              int rulecount = Model.GetRuleCountAt(hour - 1, day);
-              <div class="rule-cell @rule.GetName(day - 1)" style="background-color: @rule.GetColorCode()" onmouseover="updateMouseHover('@rule.GetName(day - 1)')" onclick="click()">
-                  @if (Model.IsRuleTop(day - 1, hour)) {
-                    <div>
-                      <h3 class="rule-top">@rule.GetStartTime()</h3>
+<div>
+    <ul class="list-group list-group-horizontal">
+        @for (int i = 0; i < 8; i++) {
+            <!--Header-->
+            <li class="list-group-item schedule-cell">
+                @if (i > 0) {
+                    <!--Days-->
+                    <h3>@Model.GetDay(i - 1)</h3>
+                }
+                else {
+                    <!--Blank Space for left side-->
+                    <h3>&nbsp;</h3>
+                }
+                <ul class="list-group list-group-flush">
+                    @for (int j = 0; j < 24; j++) {
+                        if (i > 0) {
+                            <!--Rule Cells-->
+                            ColoredRule rule = Model.GetFirstRuleAt(i-1, j);
+                            @if (rule != null) {
+                                <!--Show rule-->
+                    <div class="schedule-rule schedule-cell" style="border-color: @rule.GetColorCode()">
+                        <p class="schedule-rule-label">@rule.ToString()</p>
+                        <button class="btn btn-sm badge-danger btn-primary btn-just-icon schedule-rule-rmv-btn" onclick='ShowRemoveRuleModal(@String.Format("{0},{1}", i, j))'>
+                            <i class="nc-icon nc-simple-remove"></i>
+                        </button>
+
+                        @{
+                            int rulecount = Model.GetRuleCountAt(i-1, j);
+                            if (rulecount > 1) {
+                                <span class="badge badge-info badge-pill schedule-rule-badge">@rulecount</span>
+                            }
+                        }
+                        <input type="hidden" id='@String.Format("rstart-{0}:{1}", i, j)' value='@rule.StartTime.ToShortTimeString()' />
+                        <input type="hidden" id='@String.Format("rend-{0}:{1}", i, j)' value='@rule.EndTime.ToShortTimeString()' />
+                        <input type="hidden" id='@String.Format("rday-{0}:{1}", i, j)' value='@Model.GetDay(i-1)' />
                     </div>
-                  }
-                  @if (Model.IsRuleBottom(day - 1, hour)) {
-                    <div>
-                      <h3 class="rule-bottom">@rule.GetEndTime()</h3>
-                    </div>
-                  }
-                  @if (rulecount > 1) {
-                      <span class="badge badge-info badge-pill schedule-rule-badge">@rulecount</span>
-                  }
-                  <input type="hidden" id='@String.Format("rstart-{0}:{1}", hour, day)' value='@rule.StartTime.ToShortTimeString()' />
-                  <input type="hidden" id='@String.Format("rend-{0}:{1}", hour, day)' value='@rule.EndTime.ToShortTimeString()' />
-                  <input type="hidden" id='@String.Format("rday-{0}:{1}", hour, day)' value='@Model.GetDay(day - 1)' />
-              </div>
-            }
-            else {
-              <div style="position: absolute; width: 100%; height: 100%" onmouseover="updateMouseHover('none')"></div>
-            }
-          </div>
-        </div>
-      }
-    }
-  </div>
-  }
+                            }
+                            else {
+                                <li class="list-group-item schedule-cell">
+                                <button class="btn btn-primary btn-just-icon" onclick="ShowAddRuleModal()">
+                                    <i class="nc-icon nc-simple-add"></i>
+                                </button>
+                            </li>
+                            }
+                        }
+                        else {
+                            <!--Time periods-->
+                            <li class="list-group-item schedule-cell"><p>@Model.GetTimePeriod(j)</p></li>
+                        }
+                    }
+                </ul>
+            </li>
+        }
+    </ul>
 </div>
-<!--Modals-->
 <div class="modal fade" id="ScheduleAddModal" tabindex="-1" role="dialog" aria-labelledby="SchedueAddModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">

@@ -1,17 +1,6 @@
 ﻿# TODO
 
 ## Release 0.5
-- [FRONTEND] Services reindeer gif transition to checkmark
-	- Start reindeer when installing /
-	- Add appropriate gifs, reindeer->checkmark gif and reindeer->failure gif
-	- Transition to checkmark/failure on service installation finish
-- [FRONTEND] Implement mobile version of schedule
-	- Example: https://demo.mobiscroll.com/v5/jquery/scheduler/mobile-week-view#
-- [BACKEND] Cleanup animations
-	- Implement debug property for animations /
-	- Add debug configuration for allowing debug animations /
-	- Implement controller logic for filtering out debug animations /
-	- Select which animations should be debug animations
 - [GENERAL] Create installer package
 	- Maybe add bootstrapper script to start setup process
 		- install dotnet to /opt/dotnet
@@ -36,6 +25,10 @@
 	- use interfaces instead
 - [FRONTEND] Add Settings tab
 - [FRONTEND] Implement main settings page
+- [FRONTEND] Add support for Partial Views
+	- https://docs.microsoft.com/en-us/aspnet/core/mvc/views/partial?view=aspnetcore-3.1
+- [FRONTEND] Handle overlapping times
+	- EX: 5:00-6:55
 - [BACKEND] Create a settings controller
 - [BACKEND] Allow updating various settings of the tree
 - [BACKEND] Allow monitoring of services
