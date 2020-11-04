@@ -1,0 +1,20 @@
+Ethernet colors
+5v: blue-white
+GND: green
+DATA: green-white
+
+JST colors
+Red: 5v
+Green: DATA
+White: GND
+
+ALITOVE colors
+Red: 5v
+White: DATA
+Blue: GND
+
+
+Ethernet->JST
+blue-white->Red
+green->white
+green-white->green
