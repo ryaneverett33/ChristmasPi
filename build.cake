@@ -40,8 +40,10 @@ Task("CleanSrc")
 {
     Information("Cleaning Src");
     DotNetCoreClean("src/src.csproj", cleanSettings);
-    if (DirectoryExists("build/bin/Debug/netcoreapp3.0/wwwroot")) {
-        DeleteDirectory("build/bin/Debug/netcoreapp3.0/wwwroot", new DeleteDirectorySettings {
+    if (FileExists($"build/bin/{configuration}/netcoreapp3.0/configuration.json"))
+        DeleteFile($"build/bin/{configuration}/netcoreapp3.0/configuration.json");
+    if (DirectoryExists($"build/bin/{configuration}/netcoreapp3.0/wwwroot")) {
+        DeleteDirectory($"build/bin/{configuration}/netcoreapp3.0/wwwroot", new DeleteDirectorySettings {
             Recursive = true
         });
     }
@@ -78,6 +80,7 @@ Task("Clean")
 
 Task("BuildSrc")
     .IsDependentOn("DotnetSettings")
+    .IsDependentOn("CleanSrc")
     .Does(() =>
 {
     Information("Building source");

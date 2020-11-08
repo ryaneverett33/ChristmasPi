@@ -34,7 +34,7 @@ namespace ChristmasPi.Controllers
             // /api/power/on
             if (OperationManager.Instance.CurrentOperatingMode is IOffMode) {
                 // Switch to Default Operating Mode
-                OperationManager.Instance.SwitchModes(OperationManager.Instance.DefaultOperatingMode);
+                OperationManager.Instance.SwitchModes(ConfigurationManager.Instance.CurrentTreeConfig.tree.defaultmode);
                 return Ok();
             }
             else {

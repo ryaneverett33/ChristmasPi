@@ -32,6 +32,8 @@ namespace ChristmasPi.Hardware {
             rendererTypes = rendererTypes.Where(rt => rt != RendererType.UNKNOWN).ToArray();
             List<RendererType> supportedRendererTypes = new List<RendererType>();
             foreach (RendererType type in rendererTypes) {
+                if (type == RendererType.TEST_RENDER && !ConfigurationManager.Instance.RuntimeConfiguration.AllowTestRenderer)
+                    continue;
                 if (RenderFactory.GetSupportedHardwareForRenderer(type).HasFlag(hardwareType))
                     supportedRendererTypes.Add(type);
             }

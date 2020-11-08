@@ -261,7 +261,7 @@ Defaults
                 return redirect;
             (OperationManager.Instance.CurrentOperatingMode as ISetupMode).Finish();
             // switch to default operating mode
-            OperationManager.Instance.SwitchModes(OperationManager.Instance.DefaultOperatingMode);
+            OperationManager.Instance.SwitchModes(ConfigurationManager.Instance.CurrentTreeConfig.tree.defaultmode);
             return Ok();
         }
         [HttpPost("/setup/aux/complete")]
