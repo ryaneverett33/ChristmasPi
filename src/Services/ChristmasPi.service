@@ -3,8 +3,10 @@ Description=ChristmasPi
 After=network.target
 
 [Service]
-ExecStart=dotnet /opt/ChristmasPi/ChristmasPi.Server.dll --daemon
+WorkingDirectory=/opt/ChristmasPi/
+ExecStart=/opt/dotnet/dotnet /opt/ChristmasPi/ChristmasPi.Server.dll --daemon
 Environment="DOTNET_ROOT=/opt/dotnet"
+Environment="DOTNET_CLI_HOME=/home/pi"
 
 [Install]
 WantedBy=multi-user.target

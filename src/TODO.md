@@ -5,7 +5,9 @@
 	- Maybe add bootstrapper script to start setup process
 		- install dotnet to /opt/dotnet
 		- add to global path /etc/profile.d/dotnet.sh
-	- Add builder for creating build packages (zip up the build directory) /
+	- Add builder for creating build packages (zip up the build directory) ?
+	- Setup process sometimes doesn't leave setup mode
+	- After setup, modes fail to activate
 
 ## General
 - [?] branch animation is the result of a basic animation

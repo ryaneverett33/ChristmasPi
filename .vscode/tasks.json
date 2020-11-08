@@ -10,6 +10,13 @@
 		},
 		{
 			"type": "shell",
+			"command": "dotnet cake --Target=BuildServer --configuration=Release",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "build (Release)"
+		},
+		{
+			"type": "shell",
 			"command": "dotnet cake --Target=Clean",
 			"problemMatcher": [],
 			"label": "clean"

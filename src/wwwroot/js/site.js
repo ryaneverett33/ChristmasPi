@@ -31,9 +31,9 @@ function setActivePage(active) {
 function getRuleNameParts(rulename) {
     if (rulename == null || rulename == undefined)
         return null;
-    if (rulename.match(/d[0-9]{1,2}h[1-9]{1,2}e[1-9]{1,2}/) == null)
+    if (rulename.match(/d[0-9]{1,2}h[0-9]{1,2}e[0-9]{1,2}/) == null)
         return null;
-    var day = rulename.match(/d[1-9]{1,2}/)[0].substring(1);
+    var day = rulename.match(/d[0-9]{1,2}/)[0].substring(1);
     var hour = rulename.match(/h[0-9]{1,2}/)[0].substring(1);
     var end = rulename.match(/e[0-9]{1,2}/)[0].substring(1);
     return {
