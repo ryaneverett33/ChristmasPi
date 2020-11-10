@@ -6,9 +6,7 @@
     <StartupObject>ChristmasPi.Scheduler.Program</StartupObject>
     <RootNamespace>ChristmasPi.Scheduler</RootNamespace>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
-    <BaseOutputPath>src/bin/$(Configuration)/$(TargetFrameworkVersion)/</BaseOutputPath>
-    <BaseIntermediateOutputPath>src/obj-Scheduler/$(Configuration)/$(TargetFrameworkVersion)/</BaseIntermediateOutputPath>
-    <IntermediateOutputPath>src/obj-Scheduler/$(Configuration)/$(TargetFrameworkVersion)/</IntermediateOutputPath>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
   </PropertyGroup>
 
   <ItemGroup>

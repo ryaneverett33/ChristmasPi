@@ -39,14 +39,18 @@ namespace ChristmasPi.Hardware.Renderers {
         }
         public void Start() {
             lock (locker) {
+                Log.ForContext<RenderThread>().Debug("Starting render thread");
                 Rendering = true;
-                if (thread.ThreadState == ThreadState.Stopped)
+                if (thread.ThreadState == ThreadState.Stopped) {
+                    Log.ForContext<RenderThread>().Debug("Creating new worker thread");
                     thread = new Thread(work);
+                }
                 thread.Start();
             }
         }
         public void Stop() {
             lock (locker) {
+                Log.ForContext<RenderThread>().Debug("Stopping render thread");
                 Rendering = false;
                 ThreadHelpers.WakeUpThread(currentToken);
             }
@@ -76,7 +80,7 @@ namespace ChristmasPi.Hardware.Renderers {
                     TimeSpan renderTime = DateTime.Now - beforeRender;
                     int newWaitTime = waitTime;
                     if (renderTime.TotalMilliseconds > waitTime) {
-                        Log.ForContext<RenderThread>().Error("Took long to render frame than fps waittime");
+                        Log.ForContext<RenderThread>().Error("Took longer to render frame than fps waittime");
                         Log.ForContext<RenderThread>().Error("WaitTime: {waitTime}, renderTime: {renderTime}", waitTime, renderTime);
                     }
                     else {
@@ -84,6 +88,7 @@ namespace ChristmasPi.Hardware.Renderers {
                     }
                     bool slept = ThreadHelpers.SafeSleep(currentToken, newWaitTime).Result;
                     if (!slept) {
+                        Log.ForContext<RenderThread>().Debug("Sleep was cancelled, exiting thread");
                         // sleep was cancelled, exit thread
                         return;
                     }

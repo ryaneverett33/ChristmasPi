@@ -6,10 +6,7 @@
     <StartupObject>ChristmasPi.BranchConfigurator.Program</StartupObject>
     <RootNamespace>ChristmasPi.BranchConfigurator</RootNamespace>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
-    <BaseOutputPath>src/bin/$(Configuration)/$(TargetFrameworkVersion)/</BaseOutputPath>
-    <BaseIntermediateOutputPath>src/obj-BranchConfigurator/$(Configuration)/$(TargetFrameworkVersion)/</BaseIntermediateOutputPath>
-    <IntermediateOutputPath>src/obj-BranchConfigurator/$(Configuration)/$(TargetFrameworkVersion)/</IntermediateOutputPath>
-    
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
   </PropertyGroup>
 
   <ItemGroup>
