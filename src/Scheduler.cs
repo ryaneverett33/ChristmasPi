@@ -20,6 +20,7 @@ namespace ChristmasPi.Scheduler {
     public class Scheduler {
         public bool Running;
         public bool Scheduling;
+        public bool DebugLog = false;
         public string ScheduleFileLoc { get; private set; }
 
         private FileSystemWatcher watcher;
@@ -52,6 +53,9 @@ namespace ChristmasPi.Scheduler {
                     Console.WriteLine("Invalid config argument");
                     printHelp();
                 }
+                else if (args[i].Equals("--debug", StringComparison.CurrentCultureIgnoreCase) ||
+                    args[i].Equals("-debug", StringComparison.CurrentCultureIgnoreCase))
+                    DebugLog = true;
                 else if (args[i].Equals("--h", StringComparison.CurrentCultureIgnoreCase) ||
                     args[i].Equals("-h", StringComparison.CurrentCultureIgnoreCase) ||
                     args[i].Equals("help", StringComparison.CurrentCultureIgnoreCase))
@@ -68,8 +72,25 @@ namespace ChristmasPi.Scheduler {
             watcher.Created += FileChanged;
             watcher.Deleted += FileChanged;
             watcher.EnableRaisingEvents = true;
-            AssemblyLoadContext.Default.Unloading += SigTermEventHandler; //register sigterm event handler. Don't forget to import System.Runtime.Loader!
-            Console.CancelKeyPress += CancelHandler; //register sigint event 
+            AssemblyLoadContext.Default.Unloading += new Action<AssemblyLoadContext>(obj => {
+                // Per https://logankpaschke.com/linux/systemd/dotnet/systemd-dotnet-1/#
+                if (!unloading) {
+                    if (DebugLog) Console.WriteLine("Recieved SIGTERM, will unload");
+                    unload();
+                }
+            });
+            Console.CancelKeyPress += new ConsoleCancelEventHandler((object sender, ConsoleCancelEventArgs args) => {
+                if (!unloading) {
+                    if (DebugLog) Console.WriteLine("Recieved SIGINT, will unload");
+                    unload();
+                }
+            });
+            AppDomain.CurrentDomain.ProcessExit += new EventHandler((object sender, EventArgs args) => {
+                if (!unloading) {
+                    if (DebugLog) Console.WriteLine("Recieved ProcessExit, will unload");
+                    unload();
+                }
+            });
             Running = true;
             Scheduling = false;
             httpClient = new HttpClient();
@@ -79,19 +100,19 @@ namespace ChristmasPi.Scheduler {
             while (Running) {
                 // get schedule info
                 if (loadSchedule()) {
+                    Console.WriteLine("Successfully loaded schedule");
                     Scheduling = true;
                     while(Scheduling) {
                         TimeSlot[] currentRules = getCurrentSchedule().GetRules();
                         if (currentRules.Length == 0) {
                             if (lastRule != null) {
-                                Console.WriteLine("Just exited a rule");
+                                if (DebugLog) Console.WriteLine("Just exited a rule");
                                 TurnOff();
                             }
-                            Console.WriteLine("No rules for the day, sleeping");
+                            if (DebugLog) Console.WriteLine("No rules for the day, sleeping");
                             // long sleep
                             currentSleepToken = ThreadHelpers.RegisterWakeUp();
                             ThreadHelpers.SafeSleep(currentSleepToken, Constants.SCHEDULER_LONG_SLEEP).Wait();            // ignore the result but wakeup if need be
-                            //ThreadHelpers.UnSafeSleep(Constants.SCHEDULER_LONG_SLEEP);
                             currentSleepToken = null;
                         }
                         else {
@@ -99,14 +120,13 @@ namespace ChristmasPi.Scheduler {
                             int closestRuleIndex = getClosestRule(currentRules);
                             if (closestRuleIndex == -1) {
                                 if (lastRule != null) {
-                                    Console.WriteLine("Just exited a rule");
+                                    if (DebugLog) Console.WriteLine("Just exited a rule");
                                     TurnOff();
                                 }
-                                Console.WriteLine("No more rules, sleeping for {0}", Constants.SCHEDULER_LONG_SLEEP.ToString());
+                                if (DebugLog) Console.WriteLine("No more rules, sleeping for {0}", Constants.SCHEDULER_LONG_SLEEP.ToString());
                                 // no more rules for the current day, go to sleep
                                 currentSleepToken = ThreadHelpers.RegisterWakeUp();
                                 ThreadHelpers.SafeSleep(currentSleepToken, Constants.SCHEDULER_LONG_SLEEP).Wait();            // ignore the result but wakeup if need be
-                                //ThreadHelpers.UnSafeSleep(Constants.SCHEDULER_LONG_SLEEP);
                                 currentSleepToken = null;
                             }
                             else {
@@ -116,16 +136,15 @@ namespace ChristmasPi.Scheduler {
                                     // check if we just left a rule
                                     if (lastRule != null) {
                                         // turn off
-                                        Console.WriteLine("Just exited a rule");
+                                        if (DebugLog) Console.WriteLine("Just exited a rule");
                                         TurnOff();
                                     }
                                     else {
                                         // wait for rule to start
                                         TimeSpan sleepTime = currentRules[closestRuleIndex].StartTime - current;
-                                        Console.WriteLine("Waiting for next rule to start, sleeping for {0}", sleepTime.ToString());
+                                        if (DebugLog) Console.WriteLine("Waiting for next rule to start, sleeping for {0}", sleepTime.ToString());
                                         currentSleepToken = ThreadHelpers.RegisterWakeUp();
                                         ThreadHelpers.SafeSleep(currentSleepToken, sleepTime).Wait();
-                                        //ThreadHelpers.UnSafeSleep(sleepTime);
                                         currentSleepToken = null;
                                     }
                                 }
@@ -134,14 +153,13 @@ namespace ChristmasPi.Scheduler {
                                     if (lastRule != null && lastRule.Value == currentRules[closestRuleIndex]) {
                                         // wait for the end of the rule
                                         TimeSpan sleepTime = currentRules[closestRuleIndex].EndTime - current;
-                                        Console.WriteLine("Waiting for current rule to end, sleeping for {0}", sleepTime.ToString());
+                                        if (DebugLog) Console.WriteLine("Waiting for current rule to end, sleeping for {0}", sleepTime.ToString());
                                         currentSleepToken = ThreadHelpers.RegisterWakeUp();
                                         ThreadHelpers.SafeSleep(currentSleepToken, sleepTime).Wait();
-                                        //ThreadHelpers.UnSafeSleep(sleepTime);
                                         currentSleepToken = null;
                                     }
                                     else {
-                                        Console.WriteLine("Just entered a rule");
+                                        if (DebugLog) Console.WriteLine("Just entered a rule");
                                         // turn on
                                         lastRule = currentRules[closestRuleIndex];
                                         TurnOn();
@@ -152,10 +170,10 @@ namespace ChristmasPi.Scheduler {
                     }
                 }
                 else {
+                    Console.WriteLine("Failed to load schedule, sleeping for a bit");
                     // sleep for a while and then try again
                     currentSleepToken = ThreadHelpers.RegisterWakeUp();
                     ThreadHelpers.SafeSleep(currentSleepToken, Constants.SCHEDULER_ERR_SLEEP).Wait();            // ignore the result but wakeup if need be
-                    //ThreadHelpers.UnSafeSleep(Constants.SCHEDULER_ERR_SLEEP);
                     currentSleepToken = null;
                 }
             }
@@ -169,86 +187,47 @@ namespace ChristmasPi.Scheduler {
                 ThreadHelpers.WakeUpThread(currentSleepToken);
         }
 
-        private void SigTermEventHandler(AssemblyLoadContext obj) {
-            // Per https://logankpaschke.com/linux/systemd/dotnet/systemd-dotnet-1/#
-            // close application
-            if (!unloading) {
-                Console.WriteLine("Recieved SIGTERM, will unload");
-                unload();
-            }
-        }
-
-        private void CancelHandler(object sender, ConsoleCancelEventArgs e) {
-            if (!unloading) {
-                Console.WriteLine("Recieved SIGINT, will unload");
-                unload();
-            }
-        }
-
-        private void TurnOff() {
-            lastRule = null;
-            for (int i = 0; i < Constants.SCHEDULER_MAX_ATTEMPTS; i++) {
-                bool success = TurnOffAsync().Result;
-                if (success) {
-                    Console.WriteLine($"[{DateTime.Now.ToShortDateString()}-{DateTime.Now.ToShortTimeString()}]Successfully turned off");
-                    break;
-                }
-                else {
-                    Console.WriteLine($"Failed to turnoff, {i + 1}/{Constants.SCHEDULER_MAX_ATTEMPTS}");
-                }
-            }
-        }
-        private void TurnOn() {
+        private async void TurnOff() {
             for (int i = 0; i < Constants.SCHEDULER_MAX_ATTEMPTS; i++) {
                 try {
-                    bool success = TurnOnAsync().Result;
-                    if (success) {
+                    HttpResponseMessage response = await httpClient.PostAsync($"{apiURL}/power/off", null);
+                    if (response.StatusCode == System.Net.HttpStatusCode.OK) {
+                        Console.WriteLine($"[{DateTime.Now.ToShortDateString()}-{DateTime.Now.ToShortTimeString()}]Successfully turned off");
+                        break;
+                    }
+                    else
+                        Console.WriteLine($"Failed to turnoff, {i + 1}/{Constants.SCHEDULER_MAX_ATTEMPTS}");
+                }
+                catch (HttpRequestException e) {
+                    if (DebugLog) Console.WriteLine($"Failed to execute turnoff command, exception: {e.Message}");
+                }
+                catch (Exception e) {
+                    if (DebugLog) Console.WriteLine($"Exception occurred turning off, {e}");
+                }
+                Console.WriteLine($"Failed to turnoff, {i + 1}/{Constants.SCHEDULER_MAX_ATTEMPTS}");
+            }
+        }
+        private async void TurnOn() {
+            for (int i = 0; i < Constants.SCHEDULER_MAX_ATTEMPTS; i++) {
+                try {
+                    HttpResponseMessage response = await httpClient.PostAsync($"{apiURL}/power/on", null);
+                    if (response.StatusCode == System.Net.HttpStatusCode.OK) {
                         Console.WriteLine($"[{DateTime.Now.ToShortDateString()}-{DateTime.Now.ToShortTimeString()}]Successfully turned on");
                         break;
                     }
-                    else {
+                    else
                         Console.WriteLine($"Failed to turnon, {i + 1}/{Constants.SCHEDULER_MAX_ATTEMPTS}");
-                    }
+                }
+                catch (HttpRequestException e) {
+                    if (DebugLog) Console.WriteLine($"Failed to execute turnon command, exception: {e.Message}");
                 }
                 catch (Exception e) {
-                    Console.WriteLine(e);
+                    if (DebugLog) Console.WriteLine($"Exception occurred turning on, {e}");
                 }
+                Console.WriteLine($"Failed to turnon, {i + 1}/{Constants.SCHEDULER_MAX_ATTEMPTS}");
             }
         }
 
-        // Turns on the christmas tree
-        private async Task<bool> TurnOnAsync() {
-            try {
-                HttpResponseMessage response = await httpClient.PostAsync($"{apiURL}/power/on", null);
-                // if ((int)response.StatusCode != 200)
-                //    Console.WriteLine($"Failed to turn on, status code: {(int)response.StatusCode}");
-                return response.StatusCode == System.Net.HttpStatusCode.OK;
-            }
-            catch (HttpRequestException e) {
-                Console.WriteLine($"Failed to execute turnon command, exception: {e.Message}");
-            }
-            catch (Exception e) {
-                Console.WriteLine($"Exception occured turning on, {e}");
-                return false;
-            }
-            return false;
-        }
-        
-        // Turns off the christmas tree
-        private async Task<bool> TurnOffAsync() {
-            try {
-                HttpResponseMessage response = await httpClient.PostAsync($"{apiURL}/power/off", null);
-                return response.StatusCode == System.Net.HttpStatusCode.OK;
-            }
-            catch (HttpRequestException e) {
-                Console.WriteLine($"Failed to execute turnon command, exception: {e.Message}");
-            }
-            catch (Exception e) {
-                Console.WriteLine($"Exception occured turning off, {e}");
-                return false;
-            }
-            return false;
-        }
 
         // loads the schedule if the schedule file exists
         private bool loadSchedule() {
@@ -256,15 +235,18 @@ namespace ChristmasPi.Scheduler {
                 try {
                     string json = File.ReadAllText(ScheduleFileLoc);
                     schedule = JsonConvert.DeserializeObject<WeekSchedule>(json);
-                    //Console.WriteLine("Loaded schedule");
+                    Console.WriteLine("Loaded schedule");
                     return true;
                 }
-                catch (Exception) {
+                catch (Exception e) {
+                    if (DebugLog) Console.WriteLine($"Encountered an exception loading the schedule {e}");
                     return false;
                 }
             }
-            else
+            else {
+                if (DebugLog) Console.WriteLine($"Failed to load schedule {ScheduleFileLoc} doesn't exist");
                 return false;
+            }
         }
 
         // gets the current day schedule
@@ -303,7 +285,9 @@ namespace ChristmasPi.Scheduler {
 
         // Clean up and exit
         private void unload() {
+            if (DebugLog) Console.WriteLine("unloading");
             if (!unloading) {
+                Console.WriteLine("Exiting");
                 unloading = true;
                 watcher.EnableRaisingEvents = false;
                 watcher.Dispose();

@@ -9,8 +9,6 @@
 	- After setup, modes fail to activate
 		- unreproducible be just running a setup process
 		- possibly related to bootstrap installer
-	- Scheduler::unload hangs
-	- Scheduler has issues running under systemd
 	- Add debug prints to SetupController
 
 ## General
