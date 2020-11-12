@@ -7,6 +7,11 @@
 		- add to global path /etc/profile.d/dotnet.sh
 	- Setup process sometimes doesn't leave setup mode
 	- After setup, modes fail to activate
+		- unreproducible be just running a setup process
+		- possibly related to bootstrap installer
+	- Scheduler::unload hangs
+	- Scheduler has issues running under systemd
+	- Add debug prints to SetupController
 
 ## General
 - [?] branch animation is the result of a basic animation
@@ -15,6 +20,8 @@
 	- http://theinstructionlimit.com/flash-style-tweeneasing-functions-in-c c# implementation
 	- https://easings.net/en reference of easing functions
 - [FRONTEND] Add animation parameters
+- [BACKEND] All threads should be be created/release by a manager object
+	- should register a RegisterOnShutdownAction to clean up all threads
 - [BOTH] Allow reconfiguring animations
 - [BACKEND] Add support for smart outlets
 - [BACKEND] Implement ServiceInstaller::Dispose()

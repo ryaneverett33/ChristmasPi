@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using ChristmasPi.Operations;
 using ChristmasPi.Data;
 using ChristmasPi.Operations.Interfaces;
+using Serilog;
 
 namespace ChristmasPi.Controllers
 {
@@ -20,10 +21,12 @@ namespace ChristmasPi.Controllers
             // /api/power/off
             if (OperationManager.Instance.CurrentOperatingMode is IOffMode) {
                 (OperationManager.Instance.CurrentOperatingMode as IOffMode).TurnOff();
+                Log.ForContext<PowerController>().Debug("Off(), turned off");
             }
             else {
                 OperationManager.Instance.SwitchModes("OffMode");
                 (OperationManager.Instance.CurrentOperatingMode as IOffMode).TurnOff();
+                Log.ForContext<PowerController>().Debug("Off(), switched to OffMode and Turned off");
             }
             return Ok();
         }
@@ -35,10 +38,12 @@ namespace ChristmasPi.Controllers
             if (OperationManager.Instance.CurrentOperatingMode is IOffMode) {
                 // Switch to Default Operating Mode
                 OperationManager.Instance.SwitchModes(ConfigurationManager.Instance.CurrentTreeConfig.tree.defaultmode);
+                Log.ForContext<PowerController>().Debug("On(), switched to {mode}", ConfigurationManager.Instance.CurrentTreeConfig.tree.defaultmode);
                 return Ok();
             }
             else {
                 // Handle silently for the scheduler
+                Log.ForContext<PowerController>().Debug("On() was called but already turned on");
                 return Ok();
             }
         }

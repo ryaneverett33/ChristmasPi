@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.Loader;
 using System.Collections.Generic;
 using System.IO;
 using Microsoft.Extensions.Configuration;
@@ -10,6 +11,8 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Filters;
 using Serilog.Filters.Expressions;
+using Serilog.Sinks.Async;
+using Serilog.Sinks.File;
 using Serilog.Exceptions;
 
 namespace ChristmasPi.Data {
@@ -163,28 +166,35 @@ namespace ChristmasPi.Data {
             if (!RuntimeConfiguration.NoASPLogging) {
                 configuration.WriteTo.Logger(lg => lg
                     .Filter.ByIncludingOnly(aspExp)
-                    .WriteTo.File(Constants.ASP_LOG_FILE,
-                        rollingInterval: RollingInterval.Day,
-                        rollOnFileSizeLimit: true,
-                        outputTemplate: Constants.LOG_FORMAT)
+                    .WriteTo.Async(configure => configure
+                        .File(Constants.ASP_LOG_FILE,
+                            rollingInterval: RollingInterval.Day,
+                            rollOnFileSizeLimit: true,
+                            outputTemplate: Constants.LOG_FORMAT,
+                            flushToDiskInterval: Constants.LOG_FLUSH_TIME)
+                    )
                 );
             }
             if (!RuntimeConfiguration.NoRedirectLogging) {
                 configuration.WriteTo.Logger(lg => lg
                     .Filter.ByIncludingOnly(redirectExp)
-                    .WriteTo.File(Constants.REDIRECT_LOG_FILE,
-                        rollingInterval: RollingInterval.Day,
-                        rollOnFileSizeLimit: true,
-                        outputTemplate: Constants.LOG_FORMAT)
-                    //.WriteTo.Console(outputTemplate: Constants.LOG_FORMAT)
+                    .WriteTo.Async(configure => configure
+                        .File(Constants.REDIRECT_LOG_FILE,
+                            rollingInterval: RollingInterval.Day,
+                            outputTemplate: Constants.LOG_FORMAT,
+                            flushToDiskInterval: Constants.LOG_FLUSH_TIME)
+                    )
                 );
             }
             configuration.Filter.ByExcluding(aspExp)
             .Filter.ByExcluding(redirectExp)
-            .WriteTo.File(Constants.LOG_FILE,
-                rollingInterval: RollingInterval.Day,
-                rollOnFileSizeLimit: true,
-                outputTemplate: Constants.LOG_FORMAT);
+            .WriteTo.Async(configure => configure
+                .File(Constants.LOG_FILE,
+                    rollingInterval: RollingInterval.Day,
+                    rollOnFileSizeLimit: true,
+                    outputTemplate: Constants.LOG_FORMAT,
+                    flushToDiskInterval: Constants.LOG_FLUSH_TIME)
+            );
             if (!RuntimeConfiguration.DaemonMode || RuntimeConfiguration.DaemonLogToConsole)
                 configuration.WriteTo.Console(outputTemplate: Constants.LOG_FORMAT);
             Log.Logger = configuration.CreateLogger();
@@ -199,21 +209,32 @@ namespace ChristmasPi.Data {
         public void InitializeShutdown() {
             shutdownActions = new Dictionary<string, Action>();
             AppDomain.CurrentDomain.ProcessExit += new EventHandler((object sender, EventArgs args) => {
-                Log.Debug("Starting shutdown procedure, actions count: {count}", shutdownActions.Count);
-                if (shutdownActions.Count > 0) {
-                    List<string> keys = new List<string>(shutdownActions.Keys);
-                    foreach (string key in keys) {
-                        Action action = shutdownActions[key];
-                        Log.Debug("Performing shutdown action for {key}", key);
-                        try {
-                            action();
-                        }
-                        catch (Exception e) {
-                            Log.Debug(e, "Shutdown action failed for {key}", key);
-                        }
+                handleShutdown();
+            });
+            AssemblyLoadContext.Default.Unloading += (obj => {
+                handleShutdown();
+            });
+            Console.CancelKeyPress += new ConsoleCancelEventHandler((object sender, ConsoleCancelEventArgs args) => {
+                handleShutdown();
+            });
+        }
+
+        // handler function for performing shutdown actions
+        private void handleShutdown() {
+            Log.Debug("Starting shutdown procedure, actions count: {count}", shutdownActions.Count);
+            if (shutdownActions.Count > 0) {
+                List<string> keys = new List<string>(shutdownActions.Keys);
+                foreach (string key in keys) {
+                    Action action = shutdownActions[key];
+                    Log.Debug("Performing shutdown action for {key}", key);
+                    try {
+                        action();
+                    }
+                    catch (Exception e) {
+                        Log.Debug(e, "Shutdown action failed for {key}", key);
                     }
                 }
-            });
+            }
         }
 
         /// <summary>

@@ -153,8 +153,8 @@
     }
     function AddRule() {
         // /api/schedule/add
-        var start = $('#addrule-starttime').data("DateTimePicker").viewDate().format("HH:mm");
-        var end = $('#addrule-endtime').data("DateTimePicker").viewDate().format("HH:mm");
+        var start = $('#addrule-starttime').data("DateTimePicker").viewDate().format("hh:mm");
+        var end = $('#addrule-endtime').data("DateTimePicker").viewDate().format("hh:mm");
         var repeat = getRepeatUsage();
         closeAddRuleModal();
         clearBtnValues();

@@ -52,7 +52,8 @@ namespace ChristmasPi.Hardware.Renderers {
             lock (locker) {
                 Log.ForContext<RenderThread>().Debug("Stopping render thread");
                 Rendering = false;
-                ThreadHelpers.WakeUpThread(currentToken);
+                if (currentToken != null)       // Current Token is null if Start() is never called like in RenderFactory::TestRender()
+                    ThreadHelpers.WakeUpThread(currentToken);
             }
         }
         private void work() {
@@ -105,9 +106,11 @@ namespace ChristmasPi.Hardware.Renderers {
         public void Dispose() {
             if (!disposed) {
                 Stop();
-                if (!thread.Join(500))
-                    thread.Abort();
-                renderer.Dispose();
+                if (thread.IsAlive) {
+                    if (!thread.Join(500))
+                        thread.Abort();
+                }
+                renderer = null;
                 disposed = true;
             }
         }

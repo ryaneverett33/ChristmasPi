@@ -81,11 +81,11 @@ namespace ChristmasPi.Hardware.Renderers {
         }
 
         public override void Dispose() {
-            if (disposed) {
-                renderThread.Stop();
+            if (!disposed) {
+                base.Dispose();
+                //renderThread.Stop();
                 renderThread.Dispose();
                 rpi.Dispose();
-                base.Dispose();
                 disposed = true;
             }
         }

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using ChristmasPi.Util;
 using ChristmasPi.Operations;
 using ChristmasPi.Data;
+using Serilog;
 
 namespace ChristmasPi.Controllers {
     [Route("api/[controller]")]
@@ -17,6 +18,7 @@ namespace ChristmasPi.Controllers {
             if (RedirectHandler.ShouldRedirect(this.RouteData, "get") is IActionResult redirect)
                 return redirect;
             // /api/tree/mode
+            Log.ForContext<TreeController>().Debug("GetTreeMode(), returning {info}", OperationManager.Instance.CurrentOperatingInfo);
             return new JsonResult(OperationManager.Instance.CurrentOperatingInfo);
         }
         [HttpGet()]
@@ -29,6 +31,7 @@ namespace ChristmasPi.Controllers {
                 mode = OperationManager.Instance.CurrentOperatingModeName,
                 name = ConfigurationManager.Instance.CurrentTreeConfig.tree.name
             };
+            Log.ForContext<TreeController>().Debug("GetTreeInfo(), returning {configuration}", configuration);
             return new JsonResult(configuration);
         }
     }

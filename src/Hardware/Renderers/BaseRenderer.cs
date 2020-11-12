@@ -55,6 +55,7 @@ namespace ChristmasPi.Hardware.Renderers {
 
         public virtual void Dispose() {
             // nothing to do
+            ledColors = null;
         }
 
         private static RendererHardwareInfo _hardwareInfo = new RendererHardwareInfo();

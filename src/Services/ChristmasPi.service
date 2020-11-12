@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 WorkingDirectory=/opt/ChristmasPi/
-ExecStart=/opt/dotnet/dotnet /opt/ChristmasPi/ChristmasPi.Server.dll --daemon
+ExecStart=/opt/dotnet/dotnet /opt/ChristmasPi/ChristmasPi.Server.dll --daemon --debug
 Environment="DOTNET_ROOT=/opt/dotnet"
 Environment="DOTNET_CLI_HOME=/home/pi"
 

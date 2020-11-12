@@ -10,6 +10,7 @@ using Newtonsoft.Json.Linq;
 using ChristmasPi.Data;
 using ChristmasPi.Data.Extensions;
 using ChristmasPi.Data.Exceptions;
+using Serilog;
 
 namespace ChristmasPi.Controllers
 {
@@ -32,6 +33,7 @@ namespace ChristmasPi.Controllers
                 }
                 jarr.Add(dayarray);
             }
+            Log.ForContext<ScheduleController>().Debug("Get() returned {schedule}", jarr);
             return Content(jarr.ToString(), "application/json");
         }
         [HttpPost("add")]
@@ -39,22 +41,35 @@ namespace ChristmasPi.Controllers
             if (RedirectHandler.ShouldRedirect(this.RouteData, "post") is IActionResult redirect)
                 return redirect;
             try {
-                if (argument == null)
+                if (argument == null) {
+                    Log.ForContext<ScheduleController>().Debug("AddRule(), no arguments");
                     return new BadRequestObjectResult("No arguments supplied");
-                if (argument.start == null || argument.end == null)
+                }   
+                if (argument.start == null || argument.end == null) {
+                    Log.ForContext<ScheduleController>().Debug("AddRule(), no time arguments");
                     return new BadRequestObjectResult("Invalid time arguments");
-                if (argument.repeat == 0)
+                }
+                if (argument.repeat == 0) {
+                    Log.ForContext<ScheduleController>().Debug("AddRule(), repeat argument is 0");
                     return new BadRequestObjectResult("Invalid repeat argument");
+                }
                 DateTime startTime = new DateTime().FromTimestamp(argument.start);
                 DateTime endTime = new DateTime().FromTimestamp(argument.end);
-                if (endTime < startTime || endTime == startTime)
+                if (endTime < startTime || endTime == startTime) {
+                    Log.ForContext<ScheduleController>().Debug("AddRule(), startTime {} or endTime {} constitutes an illegal rule", startTime, endTime);
                     return new StatusCodeResult(StatusCodes.Status400BadRequest);
-                if (ConfigurationManager.Instance.CurrentSchedule.AddRule(startTime, endTime, argument.repeat))
+                }
+                if (ConfigurationManager.Instance.CurrentSchedule.AddRule(startTime, endTime, argument.repeat)) {
+                    Log.ForContext<ScheduleController>().Debug("AddRule(), successfully added rule from {start} to {end}", startTime, endTime);
                     return new OkResult();
-                else
+                }
+                else {
+                    Log.ForContext<ScheduleController>().Debug("AddRule(), failed to add rule from {start} to {end}", startTime, endTime);
                     return new StatusCodeResult(StatusCodes.Status405MethodNotAllowed);
+                }
             }
-            catch (InvalidTimestampException) {
+            catch (InvalidTimestampException e) {
+                Log.ForContext<ScheduleController>().Error(e, "AddRule() encountered an exception");
                 return new BadRequestObjectResult("Invalid argument: time can't be parsed");
             }
         }
@@ -63,26 +78,38 @@ namespace ChristmasPi.Controllers
             if (RedirectHandler.ShouldRedirect(this.RouteData, "post") is IActionResult redirect)
                 return redirect;
             try {
-                if (argument == null)
+                if (argument == null) {
+                    Log.ForContext<ScheduleController>().Debug("RemoveRule(), no arguments");
                     return new BadRequestObjectResult("No arguments supplied");
-                if (argument.start == null || argument.end == null)
+                }
+                if (argument.start == null || argument.end == null) {
+                    Log.ForContext<ScheduleController>().Debug("RemoveRule(), no time arguments");
                     return new BadRequestObjectResult("Invalid time arguments");
-                if (argument.day == null)
+                }
+                if (argument.day == null) {
+                    Log.ForContext<ScheduleController>().Debug("RemoveRule(), no day argument");
                     return new BadRequestObjectResult("Invalid day argument");
+                }
                 DateTime startTime = new DateTime().FromTimestamp(argument.start);
                 DateTime endTime = new DateTime().FromTimestamp(argument.end);
-                if (!ConfigurationManager.Instance.CurrentSchedule.RuleExists(startTime, endTime, argument.GetRepeatFromDay()))
+                if (!ConfigurationManager.Instance.CurrentSchedule.RuleExists(startTime, endTime, argument.GetRepeatFromDay())) {
+                    Log.ForContext<ScheduleController>().Debug("RemoveRule(), rule at {start} to {end} on {day} doesn't exist", startTime, endTime, argument.day);
                     return new BadRequestObjectResult("Rule doesn't exist");
+                }
                 else {
                     if (ConfigurationManager.Instance.CurrentSchedule.RemoveRule(startTime, endTime, argument.GetRepeatFromDay(), ignoreErrors: true)) {
                         new Task(() => ConfigurationManager.Instance.SaveSchedule()).Start();
+                        Log.ForContext<ScheduleController>().Debug("RemoveRule(), successfully removed rule at {start} to {end} on {day}", startTime, endTime, argument.day);
                         return new OkResult();
                     }
-                    else
+                    else {
+                        Log.ForContext<ScheduleController>().Debug("RemoveRule(), failed to remove rule at {start} to {end} on {day}", startTime, endTime, argument.day);
                         return new StatusCodeResult(StatusCodes.Status405MethodNotAllowed);
+                    }
                 }
             }
-            catch (InvalidTimestampException) {
+            catch (InvalidTimestampException e) {
+                Log.ForContext<ScheduleController>().Error(e, "RemoveRule() encountered an exception");
                 return new BadRequestObjectResult("Invalid argument: time can't be parsed");
             }
         }

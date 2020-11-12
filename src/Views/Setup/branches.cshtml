@@ -37,6 +37,9 @@
             // update light count
             $("#lightcounter").text(`${getCurrentLightCount()}/${maxLightCount}`);
         }
+        function updateBranchName() {
+            $("#currentbranch").text(`Branch ${currentBranchIndex + 1}`);
+        }
         function minusLight() {
             if (working)
                 return;
@@ -76,9 +79,35 @@
                     branches[currentBranchIndex - 1].deactivate();
                     branches[currentBranchIndex].activate();
                     validateLights();
+                    updateBranchName();
                 }
             });
             oReq.open("POST", "/setup/branches/branch/new");
+            working = true;
+            oReq.send();
+        }
+        function deleteBranch() {
+            if (working)
+                return;
+            if (branches.length === 1)
+                return;
+            var oReq = new XMLHttpRequest();
+            oReq.addEventListener("load", function () {
+                if (this.status !== 200) {
+                    showErrorModal("Failed to delete branch");
+                    working = false;
+                }
+                else {
+                    branches[currentBranchIndex].delete();
+                    branches.pop();
+                    currentBranchIndex = currentBranchIndex - 1;
+                    branches[currentBranchIndex].activate();
+                    working = false;
+                    validateLights();
+                    updateBranchName();
+                }
+            });
+            oReq.open("POST", "/setup/branches/branch/remove");
             working = true;
             oReq.send();
         }

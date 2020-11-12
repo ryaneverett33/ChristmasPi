@@ -89,10 +89,17 @@ Defaults
         public IActionResult SetupBranches() {
             if (RedirectHandler.ShouldRedirect(this.RouteData, "get") is IActionResult redirect)
                 return redirect;
-            ISetupMode setupMode = (ISetupMode)OperationManager.Instance.CurrentOperatingMode;
-            setupMode.StartSettingUpBranches();
-            var model = new SetupBranchesModel();
-            return View("branches", model);
+            try {
+                ISetupMode setupMode = (ISetupMode)OperationManager.Instance.CurrentOperatingMode;
+                Log.ForContext<SetupController>().Debug("SetupBranches(), setting up branches with {lightcount} lights", (OperationManager.Instance.CurrentOperatingMode as ISetupMode).Configuration.hardware.lightcount);
+                setupMode.StartSettingUpBranches();
+                var model = new SetupBranchesModel();
+                return View("branches", model);
+            }
+            catch (Exception e) {
+                Log.ForContext<SetupController>().Error(e, "SetupBranches(), an exception occurred");
+                return new BadRequestObjectResult("An unknown error occurred");
+            }
         }
         [HttpGet("/setup/defaults")]
         public IActionResult SetupDefaults() {
@@ -202,48 +209,71 @@ Defaults
         public IActionResult BranchesNewBranch() {
             if (RedirectHandler.ShouldRedirect(this.RouteData, "post") is IActionResult redirect)
                 return redirect;
-            if (!(OperationManager.Instance.CurrentOperatingMode as ISetupMode).IsSettingUpBranches)
+            if (!(OperationManager.Instance.CurrentOperatingMode as ISetupMode).IsSettingUpBranches) {
+                Log.ForContext<SetupController>().Debug("BranchesNewBranch(), not in setup mode");
                 return new BadRequestObjectResult("Not in branch setup mode");
+            }   
             Color? color = (OperationManager.Instance.CurrentOperatingMode as ISetupMode).NewBranch();
-            if (color == null)
+            if (color == null) {
+                Log.ForContext<SetupController>().Debug("BranchesNewBranch(), setupmode failed to create new branch");
                 return new BadRequestObjectResult("Reached lightcount");
+            }
             var result = new {
                 color = Util.ColorConverter.ToHex(color.Value)
             };
+            Log.ForContext<SetupController>().Debug("BranchesNewBranch(), successfully created new branch with color {color}", result.color);
             return new JsonResult(result);
         }
         [HttpPost("/setup/branches/branch/remove")]
         public IActionResult BranchesRemoveBranch() {
             if (RedirectHandler.ShouldRedirect(this.RouteData, "post") is IActionResult redirect)
                 return redirect;
-            if (!(OperationManager.Instance.CurrentOperatingMode as ISetupMode).IsSettingUpBranches)
+            if (!(OperationManager.Instance.CurrentOperatingMode as ISetupMode).IsSettingUpBranches) {
+                Log.ForContext<SetupController>().Debug("BranchesRemoveBranch(), not in setup mode");
                 return new BadRequestObjectResult("Not in branch setup mode");
-            if (!(OperationManager.Instance.CurrentOperatingMode as ISetupMode).RemoveBranch())
+            }
+            if (!(OperationManager.Instance.CurrentOperatingMode as ISetupMode).RemoveBranch()) {
+                Log.ForContext<SetupController>().Debug("BranchesRemoveBranch(), failed to remove branch");
                 return new BadRequestObjectResult("Can't remove last branch");
-            else
+            }
+            else {
+                Log.ForContext<SetupController>().Debug("BranchesRemoveBranch(), successfully removed branch");
                 return new OkResult();
+            }
         }
         [HttpPost("/setup/branches/light/new")]
         public IActionResult BranchesAddLight() {
             if (RedirectHandler.ShouldRedirect(this.RouteData, "post") is IActionResult redirect)
                 return redirect;
-            if (!(OperationManager.Instance.CurrentOperatingMode as ISetupMode).IsSettingUpBranches)
+            if (!(OperationManager.Instance.CurrentOperatingMode as ISetupMode).IsSettingUpBranches) {
+                Log.ForContext<SetupController>().Debug("BranchesAddLight(), not in setup mode");
                 return new BadRequestObjectResult("Not in branch setup mode");
-            if (!(OperationManager.Instance.CurrentOperatingMode as ISetupMode).NewLight())
+            }
+            if (!(OperationManager.Instance.CurrentOperatingMode as ISetupMode).NewLight()) {
+                Log.ForContext<SetupController>().Debug("BranchesAddLight(), failed to add light");
                 return new BadRequestObjectResult("Reached lightcount");
-            else
+            }
+            else {
+                //Log.ForContext<SetupController>().Debug("BranchesAddLight(), successfully added light");
                 return new OkResult();
+            }
         }
         [HttpPost("/setup/branches/light/remove")]
         public IActionResult BranchesRemoveLight() {
             if (RedirectHandler.ShouldRedirect(this.RouteData, "post") is IActionResult redirect)
                 return redirect;
-            if (!(OperationManager.Instance.CurrentOperatingMode as ISetupMode).IsSettingUpBranches)
+            if (!(OperationManager.Instance.CurrentOperatingMode as ISetupMode).IsSettingUpBranches) {
+                Log.ForContext<SetupController>().Debug("BranchesRemoveLight(), not in setup mode");
                 return new BadRequestObjectResult("Not in branch setup mode");
-            if (!(OperationManager.Instance.CurrentOperatingMode as ISetupMode).RemoveLight())
+            }
+            if (!(OperationManager.Instance.CurrentOperatingMode as ISetupMode).RemoveLight()) {
+                Log.ForContext<SetupController>().Debug("BranchesRemoveLight(), failed to remove light");
                 return new BadRequestObjectResult("Can't remove last light");
-            else
+            }
+            else {
+                Log.ForContext<SetupController>().Debug("BranchesRemoveLight(), successfully removed light");
                 return new OkResult();
+            }
         }
 
         [HttpPost("/setup/services/install")]

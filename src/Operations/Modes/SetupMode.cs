@@ -218,14 +218,17 @@ namespace ChristmasPi.Operations.Modes {
 
         public void StartSettingUpBranches() {
             if (IsSettingUpBranches) {
-                if (renderer != null)
-                    renderer.Stop();
+                // start over but don't recreate the renderer
+                usedColors.Clear();
+                branches.Clear();
             }
-            renderer = RenderFactory.GetRenderer(Configuration.hardware.type, Configuration);
-            usedColors = new List<Color>();
-            branches = new List<Tuple<Branch, Color>>();
+            else {
+                renderer = RenderFactory.GetRenderer(Configuration.hardware.type, Configuration);
+                usedColors = new List<Color>();
+                branches = new List<Tuple<Branch, Color>>();
+                renderer.Start();
+            }
             lightCount = 0;
-            renderer.Start();
             IsSettingUpBranches = true;
             renderer.SetAllLEDColors(Constants.COLOR_OFF);
             if (!renderer.AutoRender)

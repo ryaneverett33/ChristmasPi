@@ -59,6 +59,9 @@ namespace ChristmasPi.Util {
         /// </summary>
         /// <param name="token">Cancellation token</param>
         public static void WakeUpThread(CancellationTokenSource token) {
+            if (token == null) {
+                Log.ForContext("ClassName", "ThreadHelpers").Debug("Tried to wake up a thread with a null token");
+            }
             Log.ForContext("ClassName", "ThreadHelpers").Debug("Waking up sleeping thread");
             token.Cancel();
         }

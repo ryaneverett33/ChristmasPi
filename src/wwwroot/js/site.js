@@ -53,31 +53,6 @@ function showErrorModal(errorMessage) {
     location.href=`/setup/next?current=${current}`;
 }*/
 
-function deleteBranch() {
-    if (working)
-        return;
-    if (branches.length === 1)
-        return;
-    var oReq = new XMLHttpRequest();
-    oReq.addEventListener("load", function () {
-        if (this.status !== 200) {
-            showErrorModal("Failed to delete branch");
-            working = false;
-        }
-        else {
-            branches[currentBranchIndex].delete();
-            branches.pop();
-            currentBranchIndex = currentBranchIndex - 1;
-            branches[currentBranchIndex].activate();
-            working = false;
-            validateLights();
-        }
-    });
-    oReq.open("POST", "/setup/branches/branch/remove");
-    working = true;
-    oReq.send();
-}
-
 var activeHoverId = "";
 var lastHoverId = "";
 var activeHoverClass = "";

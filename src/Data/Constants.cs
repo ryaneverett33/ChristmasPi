@@ -46,6 +46,7 @@ namespace ChristmasPi.Data {
         public static readonly string REDIRECT_LOG_FILE = "RedirectHandler.log";
         public static readonly string SETUP_PROGRESS_FILE = "Setup.Progress.json";
         public static readonly string PID_FILE = "ChristmasPi.pid";
+        public static readonly TimeSpan LOG_FLUSH_TIME = TimeSpan.FromSeconds(1);
 
         // Exit Codes
         public static readonly int EXIT_REBOOT = 10;
