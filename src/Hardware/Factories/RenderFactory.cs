@@ -33,6 +33,16 @@ namespace ChristmasPi.Hardware.Factories {
                     case RendererType.RPI_WS281x: {
                             if (WS281xRenderer == null)
                                 WS281xRenderer = new WS281xRenderer(hardware.lightcount, hardware.datapin, ConfigurationManager.Instance.CurrentTreeConfig.hardware.fps);
+                            if (WS281xRenderer.IsAlive) {
+                                Log.ForContext<RenderFactory>().Debug("Renderer RPI_WS281x is dirty, attempting to cleanup");
+                                try {
+                                    WS281xRenderer.Stop();
+                                }
+                                catch (Exception e) {
+                                    Log.ForContext<RenderFactory>().Error(e, "GetRenderer, failed to clean dirty renderer RPI_WS281x");
+                                    throw;
+                                }
+                            }
                             return WS281xRenderer;
                         }
                     case RendererType.TEST_RENDER: {

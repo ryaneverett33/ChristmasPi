@@ -22,6 +22,7 @@ namespace ChristmasPi.Hardware.Renderers {
         private RenderThread renderThread;              // thread used for rendering
         private object locker;
         private bool disposed = false;
+        public bool IsAlive => !stopped;
 
         public override event BeforeRenderHandler BeforeRenderEvent;
         public override event AfterRenderHandler AfterRenderEvent;

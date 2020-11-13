@@ -102,6 +102,8 @@ namespace ChristmasPi.Operations {
                     Log.ForContext<OperationManager>().Error("Operating Mode deactivation timed out");
                     Log.ForContext<OperationManager>().Error("Current mode: {_currentOperatingMode}", _currentOperatingMode);
                 }
+                else
+                    Log.ForContext<OperationManager>().Debug("Successfully deactivated {currentMode}", currentMode);
             }
             var newMode = operatingModes[newModeName];
             Log.ForContext<OperationManager>().Debug("Attempting to activate {newModeName}, default? {default}", newMode, defaultmode);
@@ -110,6 +112,8 @@ namespace ChristmasPi.Operations {
                 Log.ForContext<OperationManager>().Error("Operating Mode activation timed out");
                 Log.ForContext<OperationManager>().Error("New mode: {newModeName}", newModeName);
             }
+            else
+                Log.ForContext<OperationManager>().Debug("Successfully activated {newMode}", newModeName);
             _currentOperatingMode = newModeName;
         }
 

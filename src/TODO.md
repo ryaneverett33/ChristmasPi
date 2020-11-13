@@ -9,7 +9,9 @@
 	- After setup, modes fail to activate
 		- unreproducible be just running a setup process
 		- possibly related to bootstrap installer
-	- Add debug prints to SetupController
+	- [BACKEND] Add debug prints to SetupController
+	- [BOTH] Schedule addrule should include the meridian
+		- Format should be h1-12:m0-59 a/pm 
 
 ## General
 - [?] branch animation is the result of a basic animation
@@ -22,6 +24,8 @@
 	- should register a RegisterOnShutdownAction to clean up all threads
 - [BOTH] Allow reconfiguring animations
 - [BACKEND] Add support for smart outlets
+- [BACKEND] Refactor method calls that return HTTP Status codes
+	- This is insanely dumb and I am dumber having written them in the first place
 - [BACKEND] Implement ServiceInstaller::Dispose()
 - [BACKEND] RedirectHandler should try and catch 404 errors
 - [BACKEND] Refactor AnimationParameters to use Attributes

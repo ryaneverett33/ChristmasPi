@@ -6,9 +6,17 @@
 }
 @section Scripts {
 <script type="text/javascript">
+    var doPostBack = false;             // If true, ignore the value of switchChange
     $(function () {
         $("#power-checkbox").bootstrapSwitch();
         $('#power-checkbox').on('switchChange.bootstrapSwitch', function (e, data) {
+            // In order to maintain proper state when a request fails, we should "debounce" a switch back to before a toggle was performed
+            // Example: If the view is off and an on() request fails, then the request handler will recursively call this function
+            // to go back to off. In this situation, we should not make another request
+            if (doPostBack) {
+                doPostBack = false;
+                return;
+            }
             if (data)
                 TurnOn();
             else
@@ -20,6 +28,8 @@
         var oReq = new XMLHttpRequest();
         oReq.addEventListener("load", function () {
             if (this.status !== 200) {
+                doPostBack = true;
+                $("#power-checkbox").bootstrapSwitch('state', false);
                 showErrorModal("Failed to turn on");
             }
             else {
@@ -34,6 +44,8 @@
         var oReq = new XMLHttpRequest();
         oReq.addEventListener("load", function () {
             if (this.status !== 200) {
+                doPostBack = true;
+                $("#power-checkbox").bootstrapSwitch('state', true);
                 showErrorModal("Failed to turn on");
             }
             else {
