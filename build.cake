@@ -42,6 +42,8 @@ Task("CleanSrc")
     DotNetCoreClean("src/src.csproj", cleanSettings);
     if (FileExists($"build/bin/{configuration}/netcoreapp3.0/configuration.json"))
         DeleteFile($"build/bin/{configuration}/netcoreapp3.0/configuration.json");
+    if (FileExists($"build/bin/{configuration}/netcoreapp3.0/schedule.json"))
+        DeleteFile($"build/bin/{configuration}/netcoreapp3.0/schedule.json");
     if (DirectoryExists($"build/bin/{configuration}/netcoreapp3.0/wwwroot")) {
         DeleteDirectory($"build/bin/{configuration}/netcoreapp3.0/wwwroot", new DeleteDirectorySettings {
             Recursive = true
@@ -147,7 +149,8 @@ Task("Release")
         RunTarget("BuildServer");
         RunTarget("BuildScheduler");
         var buildDirectory = $"build/bin/{configuration}/netcoreapp3.0/";
-        var outputZip = $"build/ChristmasPi.{releaseNumber}.zip";
+        var outputZip = $"build/ChristmasPi.zip";
+        writeReleaseFile(buildDirectory, releaseNumber);
         Zip(buildDirectory, outputZip);
         Information($"Created release {releaseNumber} at {outputZip}");
 });

@@ -10,8 +10,6 @@
 		- unreproducible be just running a setup process
 		- possibly related to bootstrap installer
 	- [BACKEND] Add debug prints to SetupController
-	- [BOTH] Schedule addrule should include the meridian
-		- Format should be h1-12:m0-59 a/pm 
 
 ## General
 - [?] branch animation is the result of a basic animation

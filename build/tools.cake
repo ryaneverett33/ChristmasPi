@@ -1,3 +1,6 @@
+using System.IO;
+using System.Text.RegularExpressions;
+
 var help = Argument("h", "null");
 
 void init() {
@@ -7,5 +10,13 @@ void init() {
     }
 }
 bool IsValidReleaseNumber(string releaseNumber) {
-    return System.Text.RegularExpressions.Regex.IsMatch(releaseNumber, @"[0-9]+\.[0-9]+");
+    return Regex.IsMatch(releaseNumber, @"[0-9]+\.[0-9]+");
+}
+
+void writeReleaseFile(string releaseDirectory, string releaseNumber) {
+    if (System.IO.File.Exists($"{releaseDirectory}/version")) {
+        Debug($"version file already exists at {releaseDirectory}/version, deleting");
+        System.IO.File.Delete($"{releaseDirectory}/version");
+    }
+    System.IO.File.WriteAllText($"{releaseDirectory}/version", $"version={releaseNumber}" + Environment.NewLine);
 }

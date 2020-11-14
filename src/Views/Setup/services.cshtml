@@ -16,7 +16,6 @@
         var doInstallScheduler = false;
         var servicePoller = null;
         var servicesPollTime = 100;
-        var buttonActive = $("#toggle-icon").hasClass("nc-minimal-down");
         var rebootDelay = 10;           // time to wait before rebooting
         var timerCount = 0;
         var timerInterval = null;
@@ -27,6 +26,9 @@
             if (savedText != null)
                 newText = savedText + '\n' + text;
             $("#programoutput").text(newText);
+        }
+        function isButtonActive() {
+            return $("#toggle-icon").hasClass("nc-minimal-down");
         }
         // save text from previous installation
         function saveText(text) {
@@ -51,17 +53,15 @@
         });
         // handler function to show console output
         function toggleOutput() {
-            if (buttonActive) {
+            if (!isButtonActive()) {
                 $("#toggle-icon").removeClass("nc-minimal-up");
                 $("#toggle-icon").addClass("nc-minimal-down");
                 $("#console-output").collapse('hide');
-                buttonActive = false;
             }
             else {
                 $("#toggle-icon").removeClass("nc-minimal-down");
                 $("#toggle-icon").addClass("nc-minimal-up");
                 $("#console-output").collapse('show');
-                buttonActive = true;
             }
         }
         // handler function for the continue button

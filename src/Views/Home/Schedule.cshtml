@@ -155,6 +155,11 @@
         // /api/schedule/add
         var start = $('#addrule-starttime').data("DateTimePicker").viewDate().format("hh:mm");
         var end = $('#addrule-endtime').data("DateTimePicker").viewDate().format("hh:mm");
+        var startHour = parseInt($('#addrule-starttime').data("DateTimePicker").viewDate().format("HH"));
+        var endHour = parseInt($('#addrule-endtime').data("DateTimePicker").viewDate().format("HH"));
+        // 00 == 12AM, 12 == 12PM
+        start = `${start} ${startHour > 11 ? "PM" : "AM"}`;
+        end = `${end} ${endHour > 11 ? "PM" : "AM"}`;
         var repeat = getRepeatUsage();
         closeAddRuleModal();
         clearBtnValues();
