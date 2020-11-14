@@ -15,9 +15,10 @@ namespace ChristmasPi.Hardware.Interfaces {
         bool AutoRender { get; }
 
         /// <summary>
-        /// Whether or not the renderer supports 2d (i.e. matrix and cube renderers)
+        /// Whether or not the renderer has been disposed and is no longer usable
         /// </summary>
-        bool is2D { get; }
+        /// <value></value>
+        bool IsDisposed { get; }
 
         /// <summary>
         /// Renders a new frame

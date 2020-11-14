@@ -116,6 +116,7 @@ namespace ChristmasPi.Operations.Modes {
         /// Starts the setup process
         /// </summary>
         public void Start() {
+            Log.ForContext<SetupMode>().Debug("Starting Setup Process");
             currentProgress.StartSetup();
         }
 
@@ -134,6 +135,7 @@ namespace ChristmasPi.Operations.Modes {
             ConfigurationManager.Instance.SaveConfiguration();
             if (currentServiceInstaller != null)
                 currentServiceInstaller.Dispose();
+            Log.ForContext<SetupMode>().Debug("Finished Setup");
         }
 
         /// <summary>
@@ -143,6 +145,7 @@ namespace ChristmasPi.Operations.Modes {
         /// <param name="datapin">The datapin to use</param>
         /// <returns>True if the hardware settings are valid or false if not valid</returns>
         public bool SetHardware(RendererType rendererType, int datapin) {
+            Log.ForContext<SetupMode>().Debug("Setting hardware with renderer {type} on pin {datapin}", rendererType, datapin);
             // test if renderer settings are correct
             if (RenderFactory.TestRender(rendererType, datapin)) {
                 Configuration.hardware.datapin = datapin;
@@ -164,12 +167,19 @@ namespace ChristmasPi.Operations.Modes {
         /// <returns>True if the info is valid, false if parameters are incorrect</returns>
         public bool SetLights(int lightcount, int fps, int brightness) {
             // limit fps to 1-Constants.FPS_MAX and brightness to 0-255, 1 - lightcount to Constants.LIGHTS_MAX
-            if (lightcount < 1)
+            if (lightcount < 1) {
+                Log.ForContext<SetupMode>().Debug("SetLights(), lightcount {count} cannot be less than one", lightCount);
                 return false;
-            if (fps < 1 || fps > Constants.FPS_MAX)
+            }
+            if (fps < 1 || fps > Constants.FPS_MAX) {
+                Log.ForContext<SetupMode>().Debug("SetLights(), invalid FPS value {fps}", fps);
                 return false;
-            if (brightness < 0 || brightness > 255)
+            }
+            if (brightness < 0 || brightness > 255) {
+                Log.ForContext<SetupMode>().Debug("SetLights(), invaid brightness value {brightness}", brightness);
                 return false;
+            }
+            Log.ForContext<SetupMode>().Debug("Setting Lights to count {lightcount} at {fps} fps at {brightness} brightness", lightCount, fps, brightness);
             Configuration.hardware.brightness = brightness;
             Configuration.hardware.lightcount = lightcount;
             Configuration.hardware.fps = fps;
@@ -177,30 +187,39 @@ namespace ChristmasPi.Operations.Modes {
         }
 
         public bool SetBranches(Branch[] branches) {
-            if (branches == null)
+            if (branches == null) {
+                Log.ForContext<SetupMode>().Debug("SetBranches(), branches is null");
                 return false;
-            if (branches.Any(b => {
-                if (b.LightCount == 0 || b.start <= 0 || b.end <= 0)
-                    return true;
+            }
+            if (branches.Any(b => b.LightCount == 0 || b.start <= 0 || b.end <= 0)) {
+                Log.ForContext<SetupMode>().Debug("SetBranches(), branches contain an invalid branch");
                 return false;
-            }))
-                return false;
+            }
             int lightCount = branches.Sum(b => b.LightCount);
-            if (lightCount != Configuration.hardware.lightcount)
+            if (lightCount != Configuration.hardware.lightcount) {
+                Log.ForContext<SetupMode>().Debug("SetBranches(), lightcount {lightcount} does not equal tree light count {treecount}", lightCount, Configuration.hardware.lightcount);
                 return false;
+            }
+            Log.ForContext<SetupMode>().Debug("Setting branches to {count} count", branches.Length);
             Configuration.tree.branches = new List<Branch>(branches);
             finishSettingUpBranches();
             return true;
         }
 
         public bool SetDefaults(string animation, string mode, string color) {
-            if (animation == null || mode == null)
+            if (animation == null || mode == null || color == null) {
+                Log.ForContext<SetupMode>().Debug("SetDefaults(), one of the arguments is null");
                 return false;
-            if (!Animation.AnimationManager.Instance.Animations.ContainsKey(animation))
+            }
+            if (!Animation.AnimationManager.Instance.Animations.ContainsKey(animation)) {
+                Log.ForContext<SetupMode>().Debug("SetDefaults(), animation {animation} is not valid", animation);
                 return false;
+            }
             string[] modes = OperationManager.Instance.GetDefaultableModes();
-            if (!modes.Contains(mode))
+            if (!modes.Contains(mode)) {
+                Log.ForContext<SetupMode>().Debug("SetDefaults(), mode {mode} is invalid", mode);
                 return false;
+            }
             Color defaultColor;
             try {
                 defaultColor = Util.ColorConverter.Convert(color);
@@ -233,6 +252,7 @@ namespace ChristmasPi.Operations.Modes {
             renderer.SetAllLEDColors(Constants.COLOR_OFF);
             if (!renderer.AutoRender)
                 renderer.Render(renderer);
+            Log.ForContext<SetupMode>().Debug("Started setting up branches");
         }
 
         private void finishSettingUpBranches() {
@@ -245,11 +265,14 @@ namespace ChristmasPi.Operations.Modes {
             renderer.Stop();
             IsSettingUpBranches = false;
             renderer.Dispose();
+            Log.ForContext<SetupMode>().Debug("Finished setting up branches");
         }
 
         public Color? NewBranch() {
-            if (lightCount >= Configuration.hardware.lightcount)
+            if (lightCount >= Configuration.hardware.lightcount) {
+                Log.ForContext<SetupMode>().Debug("NewBranch(), can't create a new branch because there are no more lights to use");
                 return null;
+            }
             Color newColor = RandomColor.RandomColorNotInTable(ref usedColors);
             Branch branch;
             if (branches == null || branches.Count == 0)
@@ -260,24 +283,30 @@ namespace ChristmasPi.Operations.Modes {
             }
             branches.Add(new Tuple<Branch, Color>(branch, newColor));
             renderLight(newColor, true);
+            Log.ForContext<SetupMode>().Debug("Successfully created new branch with color {color}", newColor);
             return newColor;
         }
 
         public bool RemoveBranch() {
-            if (branches.Count <= 1)
+            if (branches.Count <= 1) {
+                Log.ForContext<SetupMode>().Debug("RemoveBranch(), there are no branches to remove");
                 return false;
+            }
             branches.RemoveAt(branches.Count - 1);
             lightCount = 0;
             foreach (Tuple<Branch, Color> branch in branches) {
                 lightCount += branch.Item1.LightCount;
             }
             renderBranches();
+            Log.ForContext<SetupMode>().Debug("Successfully removed branch");
             return true;
         }
 
         public bool NewLight() {
-            if (lightCount >= Configuration.hardware.lightcount)
+            if (lightCount >= Configuration.hardware.lightcount) {
+                Log.ForContext<SetupMode>().Debug("NewLight(), can't add new light: out of lights");
                 return false;
+            }
             Color color = branches[branches.Count - 1].Item2;
             branches[branches.Count - 1].Item1.end++;
             renderLight(color, true);
@@ -286,8 +315,10 @@ namespace ChristmasPi.Operations.Modes {
 
         public bool RemoveLight() {
             Tuple<Branch, Color> branch = branches[branches.Count - 1];
-            if (branch.Item1.end <= branch.Item1.start)
+            if (branch.Item1.end <= branch.Item1.start) {
+                Log.ForContext<SetupMode>().Debug("RemoveLight(), at the beginning of the branch; can't remove light");
                 return false;
+            }
             branches[branches.Count - 1].Item1.end--;
             renderLight(branch.Item2, false);
             return true;
@@ -302,11 +333,14 @@ namespace ChristmasPi.Operations.Modes {
                 if (installSchedulerService)
                     model.Output += "\nScheduler.service already installed";
                 queueServiceUpdate(model);
+                Log.ForContext<SetupMode>().Debug("StartServicesInstall(), already installed");
                 return true;
             }
             // If two different browsers attempt to install at the same time
-            if (currentServiceInstaller != null)
+            if (currentServiceInstaller != null) {
+                Log.ForContext<SetupMode>().Debug("StartServicesInstall(), already started services install");
                 return false;
+            }
             this.installSchedulerService = installSchedulerService;
             Log.ForContext<SetupMode>().Debug("Install Scheduler Service? {installSchedulerService}", installSchedulerService);
             currentServiceInstaller = new ServiceInstaller("ChristmasPi.service");
@@ -314,6 +348,7 @@ namespace ChristmasPi.Operations.Modes {
             currentServiceInstaller.OnInstallProgress = serviceInstallHandler;
             currentServiceInstaller.OnInstallSuccess = serviceInstallHandler;
             currentServiceInstaller.StartInstall();
+            Log.ForContext<SetupMode>().Debug("Started the services installer");
             return true;
         }
         
@@ -397,9 +432,6 @@ namespace ChristmasPi.Operations.Modes {
             }
         }
         private void servicesReboot() {
-            //lastStatusUpdate = lastStatusUpdate.Reboot();
-            //serviceHasUpdate = true;
-            //servicesInstalled = true;
             // Start reboot process
             /*
                 Allow the frontend to process the reboot request but don't actually reboot on the backend.
@@ -439,24 +471,7 @@ namespace ChristmasPi.Operations.Modes {
             else
                 return ServiceStatusModel.Stale();
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        public bool IsRebootRequired() {
-            // if service installer requires a reboot
-            throw new NotImplementedException();
-        }
         
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        public bool Reboot() {
-            // mark reboot step as complete and exit
-            throw new NotImplementedException();
-        }
 
         private void queueServiceUpdate(ServiceStatusModel update) {
             if (serviceUpdates == null) {

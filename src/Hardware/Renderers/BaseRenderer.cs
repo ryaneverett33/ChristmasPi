@@ -16,8 +16,9 @@ namespace ChristmasPi.Hardware.Renderers {
 
         public int LightCount { get; protected set; }
         public virtual bool AutoRender => false;
-        public virtual bool is2D => false;
+        public virtual bool IsDisposed => disposed;
         protected bool stopped = true;
+        private bool disposed = false;
         public abstract event BeforeRenderHandler BeforeRenderEvent;
         public abstract event AfterRenderHandler AfterRenderEvent;
         public abstract void Render(IRenderer obj);
@@ -54,8 +55,11 @@ namespace ChristmasPi.Hardware.Renderers {
         public abstract void Stop();
 
         public virtual void Dispose() {
-            // nothing to do
-            ledColors = null;
+            if (!disposed) {
+                // nothing to do
+                ledColors = null;
+                disposed = true;
+            }
         }
 
         private static RendererHardwareInfo _hardwareInfo = new RendererHardwareInfo();

@@ -10,20 +10,20 @@
 @section Scripts {
     <script type="text/javascript">
         $(window).on("load", function () {
-            // set validation string, placeholder, and image
-            var placeholder = $("#placeholder-0").val();
-            var image = $("#image-0").val();
-            $("#datapininput").attr("placeholder", placeholder);
-            $("#hardware-img").attr("src", image);
+            setRendererDetails();
         });
         $("#renderer").on("change", function() {
+            setRendererDetails();
+            ValidateHardware()
+        });
+        // set validation string, placeholder, and image
+        function setRendererDetails() {
             var index = $("#renderer").prop("selectedIndex");
             var placeholder = $(`#placeholder-${index}`).val();
             var image = $(`#image-${index}`).val();
             $(`#datapininput`).attr("placeholder", placeholder);
             $(`#hardware-img`).attr("src", image);
-            ValidateHardware()
-        });
+        }
         function ValidateHardware() {
             var index = $("#renderer").prop("selectedIndex");
             var validationRaw = $(`#validationstring-${index}`).val();

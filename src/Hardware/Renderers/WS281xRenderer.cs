@@ -18,11 +18,11 @@ namespace ChristmasPi.Hardware.Renderers {
     /// </summary>
     public class WS281xRenderer : BaseRenderer, IRenderer {
         public override bool AutoRender => true;
+        public bool IsAlive => !stopped;                // Whether any helper threads are active
         private WS281x rpi;                             // WS281x object used for hardware access
         private RenderThread renderThread;              // thread used for rendering
         private object locker;
         private bool disposed = false;
-        public bool IsAlive => !stopped;
 
         public override event BeforeRenderHandler BeforeRenderEvent;
         public override event AfterRenderHandler AfterRenderEvent;

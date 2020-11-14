@@ -34,6 +34,11 @@
                 $("#newBtn").prop('disabled', false);
                 $("#submitBtn").prop('disabled', true);
             }
+            // TODO uncomment when resetButton is re-enabled
+            /*if (getCurrentLightCount() <= 1)
+                $("#resetBtn").prop('disabled', true);
+            else
+                $("#resetBtn").prop('disabled', false);*/
             // update light count
             $("#lightcounter").text(`${getCurrentLightCount()}/${maxLightCount}`);
         }
@@ -211,8 +216,9 @@
         <i class="nc-icon nc-simple-delete"></i></button>
     <button id="newBtn" class="btn btn-info btn-just-icon" onclick="newBranch()">
         <i class="nc-icon nc-scissors"></i></button>
-    <button id="resetBtn" class="btn btn-info btn-just-icon" onclick="branchSetupLoad()">
-        <i class="nc-icon nc-refresh-69"></i></button>
+    <!--TODO: Fix and re-enable-->
+    <!--<button id="resetBtn" class="btn btn-info btn-just-icon" onclick="branchSetupLoad()">
+        <i class="nc-icon nc-refresh-69"></i></button>-->
     <button id="addBtn" class="btn btn-info btn-just-icon" onclick="addLight()">
         <i class="nc-icon nc-simple-add"></i>
     </button>

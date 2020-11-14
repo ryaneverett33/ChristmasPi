@@ -47,8 +47,8 @@ namespace ChristmasPi.Hardware.Renderers {
         }
 
         public override void Dispose() {
-            writer.Dispose();
             base.Dispose();
+            writer.Dispose();
         }
     }
 }

@@ -152,25 +152,37 @@ Defaults
             return new RedirectResult("/setup/next?current=services");
         }
         [HttpPost("/setup/hardware/submit")]
-        public IActionResult SubmitHardware([FromForm]int datapin, [FromForm]string renderer) {
+        public IActionResult SubmitHardware([FromForm]string datapin, [FromForm]string renderer) {
             if (RedirectHandler.ShouldRedirect(this.RouteData, "post") is IActionResult redirect)
                 return redirect;
             // save data
             RendererType rendererType;
+            int datapinSafe;
+            if (!int.TryParse(datapin, out datapinSafe))
+                return View("hardware", new SetupHardwareModel("Invalid datapin, must be an integer"));
             if (!Enum.TryParse<RendererType>(renderer, out rendererType))
                 return View("hardware", new SetupHardwareModel("Invalid renderer type"));
-            if (!(OperationManager.Instance.CurrentOperatingMode as ISetupMode).SetHardware(rendererType, datapin))
+            if (!(OperationManager.Instance.CurrentOperatingMode as ISetupMode).SetHardware(rendererType, datapinSafe))
                 return View("hardware", new SetupHardwareModel("Invalid settings"));
             else {
                 (OperationManager.Instance.CurrentOperatingMode as ISetupMode).CurrentProgress.CompleteStep();
                 return new RedirectResult("/setup/next?current=hardware");
             }
         }
-        [HttpPost("/setup/light/submit")]
-        public IActionResult SubmitLights([FromForm]int lightcount, [FromForm]int fps, [FromForm]int brightness) {
+        [HttpPost("/setup/lights/submit")]
+        public IActionResult SubmitLights([FromForm]string lightcount, [FromForm]string fps, [FromForm]string brightness) {
             if (RedirectHandler.ShouldRedirect(this.RouteData, "post") is IActionResult redirect)
                 return redirect;
-            if (!(OperationManager.Instance.CurrentOperatingMode as ISetupMode).SetLights(lightcount, fps, brightness))
+            int lightcountSafe;
+            int fpsSafe;
+            int brightnessSafe;
+            if (!int.TryParse(lightcount, out lightcountSafe))
+                return View("lights", new SetupLightsModel("Invalid lightcount, must be an integer"));
+            if (!int.TryParse(fps, out fpsSafe))
+                return View("lights", new SetupLightsModel("Invalid fps, must be an integer"));
+            if (!int.TryParse(brightness, out brightnessSafe))
+                return View("lights", new SetupLightsModel("Invalid brightness, must be an integer"));
+            if (!(OperationManager.Instance.CurrentOperatingMode as ISetupMode).SetLights(lightcountSafe, fpsSafe, brightnessSafe))
                 return View("lights", new SetupLightsModel("Invalid settings"));
             else {
                 (OperationManager.Instance.CurrentOperatingMode as ISetupMode).CurrentProgress.CompleteStep();
