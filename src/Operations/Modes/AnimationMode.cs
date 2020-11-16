@@ -96,11 +96,11 @@ namespace ChristmasPi.Operations.Modes {
                 return StatusCodes.Status200OK;
             }
             catch (InvalidAnimationActionException e) {
-                Log.ForContext<AnimationMode>().Error(e, "StartAnimation() encountered an invalid animation action exception while stopping animation");
+                Log.ForContext<AnimationMode>().Error(e, "PauseAnimation() encountered an invalid animation action exception while stopping animation");
                 return StatusCodes.Status400BadRequest;
             }
             catch (Exception e) {
-                Log.ForContext<AnimationMode>().Error(e, "StartAnimation() encountered an exception while stopping animation");
+                Log.ForContext<AnimationMode>().Error(e, "PauseAnimation() encountered an exception while stopping animation");
                 return StatusCodes.Status500InternalServerError;
             }
         }
@@ -114,11 +114,11 @@ namespace ChristmasPi.Operations.Modes {
                 return StatusCodes.Status200OK;
             }
             catch (InvalidAnimationActionException e) {
-                Log.ForContext<AnimationMode>().Error(e, "StartAnimation() encountered an invalid animation action exception while stopping animation");
+                Log.ForContext<AnimationMode>().Error(e, "StopAnimation() encountered an invalid animation action exception while stopping animation");
                 return StatusCodes.Status400BadRequest;
             }
             catch (Exception e) {
-                Log.ForContext<AnimationMode>().Error(e, "StartAnimation() encountered an exception while stopping animation");
+                Log.ForContext<AnimationMode>().Error(e, "StopAnimation() encountered an exception while stopping animation");
                 return StatusCodes.Status500InternalServerError;
             }
         }
@@ -131,11 +131,11 @@ namespace ChristmasPi.Operations.Modes {
                 return StatusCodes.Status200OK;
             }
             catch (InvalidAnimationActionException e) {
-                Log.ForContext<AnimationMode>().Error(e, "StartAnimation() encountered an invalid animation action exception while stopping animation");
+                Log.ForContext<AnimationMode>().Error(e, "ResumeAnimation() encountered an invalid animation action exception while stopping animation");
                 return StatusCodes.Status400BadRequest;
             }
             catch (Exception e) {
-                Log.ForContext<AnimationMode>().Error(e, "StartAnimation() encountered an exception while stopping animation");
+                Log.ForContext<AnimationMode>().Error(e, "ResumeAnimation() encountered an exception while stopping animation");
                 return StatusCodes.Status500InternalServerError;
             }
         }

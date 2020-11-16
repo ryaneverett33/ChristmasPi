@@ -104,6 +104,7 @@ namespace ChristmasPi
                 // check for the existence of a pid file
                 if (PIDFile.Load() is int pid) {
                     PIDFile.Consume();
+                    Log.ForContext<Startup>().Debug("Waiting up to 30 seconds for PID {pid} to exit", pid);
                     // start waiting for pid to exit
                     bool pidexists = false;
                     for (int i = 0; i < Constants.REBOOT_MAX_ATTEMPTS; i++) {

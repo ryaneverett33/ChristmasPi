@@ -17,6 +17,13 @@
 		},
 		{
 			"type": "shell",
+			"command": "dotnet cake --Target=BuildScheduler",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "build Scheduler"
+		},
+		{
+			"type": "shell",
 			"command": "dotnet cake --Target=Clean",
 			"problemMatcher": [],
 			"label": "clean"

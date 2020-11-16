@@ -18,6 +18,8 @@
   <ItemGroup>
     <Compile Remove="Server.cs" />
     <Compile Remove="Startup.cs" />
+    <Compile Remove="Scheduler.cs" />
+    <Compile Remove="BranchConfigurator.cs" />
   </ItemGroup>
 
 

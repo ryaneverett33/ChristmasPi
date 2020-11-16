@@ -439,6 +439,7 @@ namespace ChristmasPi.Operations.Modes {
                 so if the application never dies then the frontend will continue to work normally.
             */
             if (!ConfigurationManager.Instance.RuntimeConfiguration.IgnoreRestarts) {
+                PIDFile.Save();
                 Task.Run(async () => {
                     await Task.Delay(Constants.REBOOT_DELAY_SLEEP);
                     Log.ForContext<SetupMode>().Information("Rebooting");

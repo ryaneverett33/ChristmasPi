@@ -108,7 +108,6 @@ namespace ChristmasPi.Util {
         private bool installerStub() {
             writeline("Starting installation process");
             writeline("Info\t\tname: {0}, path: {1}", this.serviceName, this.servicePath);
-            PIDFile.Save();
             writeline("Wrote PID file");
             Thread.Sleep(1500);
             for (int i = 0; i < 10; i++) {

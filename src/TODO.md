@@ -12,6 +12,7 @@
 
 ## General
 - [?] branch animation is the result of a basic animation
+- [ROUTING] Can navigate to an auxiliary page without having started setup
 - Tweening frames
 	- Tween from one color to another over a period of time
 	- http://theinstructionlimit.com/flash-style-tweeneasing-functions-in-c c# implementation
@@ -19,6 +20,7 @@
 - [FRONTEND] Add animation parameters
 - [FRONTEND] Make urls friendly if a setup post action fails
 	- /setup/lights/submit -> /setup/lights
+- [BUILD] Create release should automatically pull release number from Constants.VERSION
 - [FRONTEND] Renable reset button?
 - [FRONTEND] hardware should use builtin validation
 	- https://developer.mozilla.org/en-US/docs/Learn/Forms/Form_validation
@@ -41,6 +43,9 @@
 - [FRONTEND] Handle overlapping times
 	- EX: 5:00-6:55
 - [BACKEND] Create a settings controller
+- [BACKEND] Split Rendering into it's own service
+	- Server should no longer run as root, but the renderservice should
+	- Interact via WCF https://github.com/dotnet/wcf
 - [BACKEND] Allow updating various settings of the tree
 - [BACKEND] Allow monitoring of services
 	- Check if they're alive

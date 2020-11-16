@@ -99,6 +99,8 @@ Task("BuildSrc")
         else
             CopyFile("src/lib/libpidexists.so", $"build/bin/{configuration}/netcoreapp3.0/libpidexists.so");
     }
+    else
+        CopyFile("src/lib/libpidexists.so", $"build/bin/{configuration}/netcoreapp3.0/libpidexists.so");
     CopyFile("src/lib/ws2811.so", $"build/bin/{configuration}/netcoreapp3.0/ws2811.so");
     var files = GetFiles("src/Services/*");
     foreach(var file in files)
@@ -139,6 +141,7 @@ Task("BuildAll")
 });
 
 Task("Release")
+    .IsDependentOn("Clean")
     .Does(() => {
         if (releaseNumber == "")
             throw new Exception("Cannot create release, no release number was given");

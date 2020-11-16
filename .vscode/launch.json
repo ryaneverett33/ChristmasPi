@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": ".NET Core Launch (web)",
+            "name": "Launch ChristmasPi",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
@@ -43,6 +43,18 @@
                 "build/bin/Debug/netcoreapp3.0/wwwroot/"
             ],
             "cwd": "${workspaceFolder}",
+        },
+        {
+            "name": "Launch Scheduler",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build Scheduler",
+            "program": "${workspaceFolder}/build/bin/Debug/netcoreapp3.0/Scheduler.dll",
+            "args": [
+                "--debug"
+            ],
+            "cwd": "${workspaceFolder}/build/bin/Debug/netcoreapp3.0/",
+            "stopAtEntry": false
         }
     ]
 }

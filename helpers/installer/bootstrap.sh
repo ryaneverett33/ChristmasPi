@@ -4,7 +4,7 @@
 dotnet_installer="https://dot.net/v1/dotnet-install.sh"
 dotnet_version="3.1"
 dotnet_install_location="/opt/dotnet/"
-christmaspi_install_location="/usr/local/ChristmasPi"
+christmaspi_install_location="/opt/ChristmasPi"
 christmaspi_release_url="https://github.com/Changer098/ChristmasPi/releases/latest/download/ChristmasPi.zip"
 
 # Arguments
@@ -44,8 +44,6 @@ function install_dotnet {
     root_out=$(echo export DOTNET_ROOT="$dotnet_install_location")
     echo $path_out >> /home/pi/.bashrc
     echo $root_out >> /home/pi/.bashrc
-    echo $path_out >> /etc/bash.bashrc
-    echo $root_out >> /etc/bash.bashrc
     source /home/$USER/.bashrc
 }
 

@@ -54,6 +54,8 @@ namespace ChristmasPi.Hardware.Renderers {
                 Rendering = false;
                 if (currentToken != null)       // Current Token is null if Start() is never called like in RenderFactory::TestRender()
                     ThreadHelpers.WakeUpThread(currentToken);
+                if (!thread.Join(250))
+                    thread.Abort();
             }
         }
         private void work() {
@@ -95,7 +97,12 @@ namespace ChristmasPi.Hardware.Renderers {
                     }
                 }
                 if (syncTime != 0) {
-                    ThreadHelpers.SafeSleep(currentToken, syncTime).Wait();
+                    bool safeSlept = ThreadHelpers.SafeSleep(currentToken, syncTime).Result;
+                    if (!safeSlept) {
+                        Log.ForContext<RenderThread>().Debug("Sync Sleep was cancelled, exiting thread");
+                        // sleep was cancelled, exit thread
+                        return;
+                    }
                 }
                 lock (locker) {
                     doRender = Rendering;
@@ -105,7 +112,8 @@ namespace ChristmasPi.Hardware.Renderers {
 
         public void Dispose() {
             if (!disposed) {
-                Stop();
+                if (Rendering)
+                    Stop();
                 if (thread.IsAlive) {
                     if (!thread.Join(500))
                         thread.Abort();

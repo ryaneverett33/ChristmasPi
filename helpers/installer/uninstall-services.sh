@@ -9,13 +9,15 @@ function isServiceInstalled {
 }
 if isServiceInstalled "ChristmasPi.service"; then
     echo "Uninstalling ChristmasPi.service"
-    rm /etc/systemd/system/ChristmasPi.service
+    systemctl stop ChristmasPi.service
+    find /etc/systemd/system/ -name ChristmasPi.service -exec rm -rf {} \;
     systemctl disable ChristmasPi.service
     systemctl daemon-reload
 fi
 if isServiceInstalled "Scheduler.service"; then
     echo "Uninstalling Scheduler.service"
-    rm /etc/systemd/system/Scheduler.service
+    systemctl stop Scheduler.service
+    find /etc/systemd/system/ -name Scheduler.service -exec rm -rf {} \;
     systemctl disable Scheduler.service
     systemctl daemon-reload
 fi

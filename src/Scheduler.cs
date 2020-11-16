@@ -30,6 +30,7 @@ namespace ChristmasPi.Scheduler {
         private HttpClient httpClient;
         private TimeSlot? lastRule;
         private bool unloading = false;
+        private bool loadedSchedule = false;
 
         public Scheduler(string[] args) {
             for (int i = 0; i < args.Length; i++) {
@@ -97,9 +98,10 @@ namespace ChristmasPi.Scheduler {
         }
 
         public void Run() {
+            loadedSchedule = loadSchedule();
             while (Running) {
                 // get schedule info
-                if (loadSchedule()) {
+                if (loadedSchedule) {
                     Console.WriteLine("Successfully loaded schedule");
                     Scheduling = true;
                     while(Scheduling) {
@@ -183,6 +185,7 @@ namespace ChristmasPi.Scheduler {
         private void FileChanged(object sender, FileSystemEventArgs e) {
             // For each event (Created, Changed, Deleted), the action is the same: restart the scheduler and wakeup anything sleeping
             Scheduling = false;
+            loadedSchedule = loadSchedule();
             if (currentSleepToken != null)
                 ThreadHelpers.WakeUpThread(currentSleepToken);
         }
@@ -231,11 +234,11 @@ namespace ChristmasPi.Scheduler {
 
         // loads the schedule if the schedule file exists
         private bool loadSchedule() {
+            lastRule = null;
             if (File.Exists(ScheduleFileLoc)) {
                 try {
                     string json = File.ReadAllText(ScheduleFileLoc);
                     schedule = JsonConvert.DeserializeObject<WeekSchedule>(json);
-                    Console.WriteLine("Loaded schedule");
                     return true;
                 }
                 catch (Exception e) {

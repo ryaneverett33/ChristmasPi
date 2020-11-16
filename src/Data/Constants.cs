@@ -58,5 +58,6 @@ namespace ChristmasPi.Data {
         // Misc
         public static readonly string USAGE_STRING = "Usage: dotnet ChristmasPi.dll [OPTION]";
         public static readonly string LOG_FORMAT = "{Timestamp:HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception} {Properties:j}";
+        public static readonly string VERSION = "0.45";
     }
 }
