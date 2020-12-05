@@ -139,6 +139,7 @@ namespace ChristmasPi.Scheduler {
                                     if (lastRule != null) {
                                         // turn off
                                         if (DebugLog) Console.WriteLine("Just exited a rule");
+                                        lastRule = null;
                                         TurnOff();
                                     }
                                     else {
