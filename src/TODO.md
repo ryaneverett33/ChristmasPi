@@ -1,15 +1,5 @@
 ﻿# TODO
 
-## Release 0.5
-- [GENERAL] Create installer package
-	- Maybe add bootstrapper script to start setup process
-		- install dotnet to /opt/dotnet
-		- add to global path /etc/profile.d/dotnet.sh
-	- Setup process sometimes doesn't leave setup mode
-	- After setup, modes fail to activate
-		- unreproducible be just running a setup process
-		- possibly related to bootstrap installer
-
 ## General
 - [?] branch animation is the result of a basic animation
 - [ROUTING] Can navigate to an auxiliary page without having started setup

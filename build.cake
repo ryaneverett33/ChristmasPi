@@ -79,7 +79,12 @@ Task("Clean")
     RunTarget("CleanScheduler");
     RunTarget("CleanBranchConfigurator");
 });
-
+Task("BuildInstaller")
+    .Does(() =>
+{
+    CopyFile("helpers/installer/bootstrap.sh", $"build/bin/{configuration}/netcoreapp3.0/bootstrap.sh");
+    CopyFile("helpers/installer/uninstall.sh", $"build/bin/{configuration}/netcoreapp3.0/uninstall.sh");
+});
 Task("BuildSrc")
     .IsDependentOn("DotnetSettings")
     .IsDependentOn("CleanSrc")
@@ -95,18 +100,19 @@ Task("BuildSrc")
     CopyDirectory("src/wwwroot/", $"build/bin/{configuration}/netcoreapp3.0/wwwroot/");
     if (configuration == "Debug") {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-            CopyFile("src/lib/libpidexists.dylib", $"build/bin/{configuration}/netcoreapp3.0/libpidexists.dylib");
+            CopyFile("src/lib/x64/libpidexists.dylib", $"build/bin/{configuration}/netcoreapp3.0/libpidexists.dylib");
         else
-            CopyFile("src/lib/libpidexists.so", $"build/bin/{configuration}/netcoreapp3.0/libpidexists.so");
+            CopyFile("src/lib/armv7/libpidexists.so", $"build/bin/{configuration}/netcoreapp3.0/libpidexists.so");
     }
     else
-        CopyFile("src/lib/libpidexists.so", $"build/bin/{configuration}/netcoreapp3.0/libpidexists.so");
-    CopyFile("src/lib/ws2811.so", $"build/bin/{configuration}/netcoreapp3.0/ws2811.so");
+        CopyFile("src/lib/armv7/libpidexists.so", $"build/bin/{configuration}/netcoreapp3.0/libpidexists.so");
+    CopyFile("src/lib/armv7/ws2811.so", $"build/bin/{configuration}/netcoreapp3.0/ws2811.so");
     var files = GetFiles("src/Services/*");
     foreach(var file in files)
     {
         CopyFile(file, $"build/bin/{configuration}/netcoreapp3.0/{file.GetFilename()}");
     }
+    RunTarget("BuildInstaller");
 });
 Task("BuildServer")
     .IsDependentOn("BuildSrc")

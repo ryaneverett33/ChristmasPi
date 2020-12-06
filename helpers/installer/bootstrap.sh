@@ -21,7 +21,7 @@ function prompt_yes_no {
 }
 
 function is_dotnet_installed {
-    command -v dotnet &> /dev/null
+    command -v $dotnet_install_location/dotnet &> /dev/null
     return $?
 }
 
