@@ -1,12 +1,22 @@
 ﻿# TODO
 
-## General
-- [?] branch animation is the result of a basic animation
-- [ROUTING] Can navigate to an auxiliary page without having started setup
+## 0.5 Release
 - Tweening frames
 	- Tween from one color to another over a period of time
 	- http://theinstructionlimit.com/flash-style-tweeneasing-functions-in-c c# implementation
 	- https://easings.net/en reference of easing functions
+- [BOTH] Allow reconfiguring animations
+- [BACKEND] Implement ServiceInstaller::Dispose()
+- Update documentation
+- [BACKEND] Refactor method calls that return HTTP Status codes
+	- This is insanely dumb and I am dumber having written them in the first place
+- [BACKEND] Remove OperationMode::GetProperty()
+	- use interfaces instead
+- [BACKEND] Add support for custom animations
+
+## General
+- [?] branch animation is the result of a basic animation
+- [ROUTING] Can navigate to an auxiliary page without having started setup
 - [FRONTEND] Add animation parameters
 - [FRONTEND] Make urls friendly if a setup post action fails
 	- /setup/lights/submit -> /setup/lights
@@ -16,16 +26,10 @@
 	- https://developer.mozilla.org/en-US/docs/Learn/Forms/Form_validation
 - [BACKEND] All threads should be be created/release by a manager object
 	- should register a RegisterOnShutdownAction to clean up all threads
-- [BOTH] Allow reconfiguring animations
 - [BACKEND] Add support for smart outlets
-- [BACKEND] Refactor method calls that return HTTP Status codes
-	- This is insanely dumb and I am dumber having written them in the first place
-- [BACKEND] Implement ServiceInstaller::Dispose()
 - [BACKEND] RedirectHandler should try and catch 404 errors
 - [BACKEND] Refactor AnimationParameters to use Attributes
 - [BACKEND] HelpFormatter should dynamically set `argumentColumnWidth` instead of being a constant
-- [BACKEND] Remove OperationMode::GetProperty()
-	- use interfaces instead
 - [FRONTEND] Add Settings tab
 - [FRONTEND] Implement main settings page
 - [FRONTEND] Add support for Partial Views
