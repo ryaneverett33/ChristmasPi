@@ -20,6 +20,7 @@ namespace ChristmasPi.Scheduler {
     public class Scheduler {
         public bool Running;
         public bool Scheduling;
+        public bool? TurnedOn;
         public bool DebugLog = false;
         public string ScheduleFileLoc { get; private set; }
 
@@ -28,9 +29,7 @@ namespace ChristmasPi.Scheduler {
         private CancellationTokenSource currentSleepToken;
         private string apiURL;
         private HttpClient httpClient;
-        private TimeSlot? lastRule;
         private bool unloading = false;
-        private bool loadedSchedule = false;
 
         public Scheduler(string[] args) {
             for (int i = 0; i < args.Length; i++) {
@@ -98,77 +97,44 @@ namespace ChristmasPi.Scheduler {
         }
 
         public void Run() {
-            loadedSchedule = loadSchedule();
+            loadSchedule();
             while (Running) {
                 // get schedule info
-                if (loadedSchedule) {
+                if (schedule != null) {
                     Console.WriteLine("Successfully loaded schedule");
                     Scheduling = true;
                     while(Scheduling) {
-                        TimeSlot[] currentRules = getCurrentSchedule().GetRules();
-                        if (currentRules.Length == 0) {
-                            if (lastRule != null) {
-                                if (DebugLog) Console.WriteLine("Just exited a rule");
-                                TurnOff();
-                            }
-                            if (DebugLog) Console.WriteLine("No rules for the day, sleeping");
-                            // long sleep
-                            currentSleepToken = ThreadHelpers.RegisterWakeUp();
-                            ThreadHelpers.SafeSleep(currentSleepToken, Constants.SCHEDULER_LONG_SLEEP).Wait();            // ignore the result but wakeup if need be
-                            currentSleepToken = null;
-                        }
-                        else {
-                            // get current rule
-                            int closestRuleIndex = getClosestRule(currentRules);
-                            if (closestRuleIndex == -1) {
-                                if (lastRule != null) {
-                                    if (DebugLog) Console.WriteLine("Just exited a rule");
-                                    TurnOff();
-                                }
-                                if (DebugLog) Console.WriteLine("No more rules, sleeping for {0}", Constants.SCHEDULER_LONG_SLEEP.ToString());
-                                // no more rules for the current day, go to sleep
+                        TimeSlot[] currentRules = null;
+                        try {
+                            if (schedule == null) {
+                                /*
+                                    When ChristmasPi updates the schedule, the file is first deleted and then written to.
+                                    Because of this, two FileChanged events are fired: one for the deletion, and another for the write.
+                                    During the first deletion event, schedule will be null as the schedule file is empty.
+                                    We should try and handle this event by waiting for the next event to finish.
+                                */
+                                if (DebugLog) Console.WriteLine("Schedule is null, waiting 10 seconds before proceeding");
                                 currentSleepToken = ThreadHelpers.RegisterWakeUp();
-                                ThreadHelpers.SafeSleep(currentSleepToken, Constants.SCHEDULER_LONG_SLEEP).Wait();            // ignore the result but wakeup if need be
-                                currentSleepToken = null;
+                                ThreadHelpers.SafeSleep(currentSleepToken, TimeSpan.FromSeconds(10)).Wait();            // ignore the result but wakeup if need be
                             }
-                            else {
-                                // check if we're in the rule or need to wait for the rule
-                                DateTime current = DateTime.Now.ZeroOut();
-                                if (current < currentRules[closestRuleIndex].StartTime) {
-                                    // check if we just left a rule
-                                    if (lastRule != null) {
-                                        // turn off
-                                        if (DebugLog) Console.WriteLine("Just exited a rule");
-                                        lastRule = null;
-                                        TurnOff();
-                                    }
-                                    else {
-                                        // wait for rule to start
-                                        TimeSpan sleepTime = currentRules[closestRuleIndex].StartTime - current;
-                                        if (DebugLog) Console.WriteLine("Waiting for next rule to start, sleeping for {0}", sleepTime.ToString());
-                                        currentSleepToken = ThreadHelpers.RegisterWakeUp();
-                                        ThreadHelpers.SafeSleep(currentSleepToken, sleepTime).Wait();
-                                        currentSleepToken = null;
-                                    }
-                                }
-                                else {
-                                    // check if we've already turned on 
-                                    if (lastRule != null && lastRule.Value == currentRules[closestRuleIndex]) {
-                                        // wait for the end of the rule
-                                        TimeSpan sleepTime = currentRules[closestRuleIndex].EndTime - current;
-                                        if (DebugLog) Console.WriteLine("Waiting for current rule to end, sleeping for {0}", sleepTime.ToString());
-                                        currentSleepToken = ThreadHelpers.RegisterWakeUp();
-                                        ThreadHelpers.SafeSleep(currentSleepToken, sleepTime).Wait();
-                                        currentSleepToken = null;
-                                    }
-                                    else {
-                                        if (DebugLog) Console.WriteLine("Just entered a rule");
-                                        // turn on
-                                        lastRule = currentRules[closestRuleIndex];
-                                        TurnOn();
-                                    }
-                                }
-                            }
+                            currentRules = getCurrentSchedule().GetRules();
+                        }
+                        catch (Exception e) {
+                            Console.WriteLine("An exception occurred while handing Schedule data");
+                            Console.WriteLine(e);
+                            // sleep, try again
+                            currentSleepToken = ThreadHelpers.RegisterWakeUp();
+                            ThreadHelpers.SafeSleep(currentSleepToken, TimeSpan.FromSeconds(10)).Wait();
+                        }
+                        try {
+                            scheduler(currentRules);
+                        }
+                        catch (Exception e) {
+                            Console.WriteLine("An exception occurred while performing the schedule");
+                            Console.WriteLine(e);
+                            // sleep, try again
+                            currentSleepToken = ThreadHelpers.RegisterWakeUp();
+                            ThreadHelpers.SafeSleep(currentSleepToken, TimeSpan.FromSeconds(10)).Wait();
                         }
                     }
                 }
@@ -182,11 +148,77 @@ namespace ChristmasPi.Scheduler {
             }
         }
 
+        private void scheduler(TimeSlot[] currentRules) {
+            if (currentRules == null)
+                throw new ArgumentNullException("currentRules");
+            if (currentRules.Length == 0) {
+                if (TurnedOn.HasValue && (bool)TurnedOn) {
+                    if (DebugLog) Console.WriteLine("Just exited a rule");
+                    TurnOff();
+                }
+                if (DebugLog) Console.WriteLine("No rules for the day, sleeping");
+                // long sleep
+                currentSleepToken = ThreadHelpers.RegisterWakeUp();
+                ThreadHelpers.SafeSleep(currentSleepToken, Constants.SCHEDULER_LONG_SLEEP).Wait();            // ignore the result but wakeup if need be
+                currentSleepToken = null;
+            }
+            else {
+                // get current rule
+                int closestRuleIndex = getClosestRule(currentRules);
+                if (closestRuleIndex == -1) {
+                    if (TurnedOn.HasValue && (bool)TurnedOn) {
+                        if (DebugLog) Console.WriteLine("Just exited a rule");
+                        TurnOff();
+                    }
+                    if (DebugLog) Console.WriteLine("No more rules, sleeping for {0}", Constants.SCHEDULER_LONG_SLEEP.ToString());
+                    // no more rules for the current day, go to sleep
+                    currentSleepToken = ThreadHelpers.RegisterWakeUp();
+                    ThreadHelpers.SafeSleep(currentSleepToken, Constants.SCHEDULER_LONG_SLEEP).Wait();            // ignore the result but wakeup if need be
+                    currentSleepToken = null;
+                }
+                else {
+                    // check if we're in the rule or need to wait for the rule
+                    DateTime current = DateTime.Now.ZeroOut();
+                    if (current < currentRules[closestRuleIndex].StartTime) {
+                        // check if we just left a rule
+                        if (TurnedOn.HasValue && (bool)TurnedOn) {
+                            if (DebugLog) Console.WriteLine("Just exited a rule");
+                            TurnOff();
+                        }
+                        else {
+                            // wait for rule to start
+                            TimeSpan sleepTime = currentRules[closestRuleIndex].StartTime - current;
+                            if (DebugLog) Console.WriteLine("Waiting for next rule to start, sleeping for {0}", sleepTime.ToString());
+                            currentSleepToken = ThreadHelpers.RegisterWakeUp();
+                            ThreadHelpers.SafeSleep(currentSleepToken, sleepTime).Wait();
+                            currentSleepToken = null;
+                        }
+                    }
+                    else {
+                        // check if we've already turned on 
+                        if (TurnedOn.HasValue && (bool)TurnedOn) {
+                            // wait for the end of the rule
+                            TimeSpan sleepTime = currentRules[closestRuleIndex].EndTime - current;
+                            if (DebugLog) Console.WriteLine("Waiting for current rule to end, sleeping for {0}", sleepTime.ToString());
+                            currentSleepToken = ThreadHelpers.RegisterWakeUp();
+                            ThreadHelpers.SafeSleep(currentSleepToken, sleepTime).Wait();
+                            currentSleepToken = null;
+                        }
+                        else {
+                            if (DebugLog) Console.WriteLine("Just entered a rule");
+                            // turn on
+                            TurnOn();
+                        }
+                    }
+                }
+            }
+        }
+
         // File Changed handler
         private void FileChanged(object sender, FileSystemEventArgs e) {
             // For each event (Created, Changed, Deleted), the action is the same: restart the scheduler and wakeup anything sleeping
             Scheduling = false;
-            loadedSchedule = loadSchedule();
+            loadSchedule();
             if (currentSleepToken != null)
                 ThreadHelpers.WakeUpThread(currentSleepToken);
         }
@@ -197,6 +229,7 @@ namespace ChristmasPi.Scheduler {
                     HttpResponseMessage response = await httpClient.PostAsync($"{apiURL}/power/off", null);
                     if (response.StatusCode == System.Net.HttpStatusCode.OK) {
                         Console.WriteLine($"[{DateTime.Now.ToShortDateString()}-{DateTime.Now.ToShortTimeString()}]Successfully turned off");
+                        TurnedOn = false;
                         break;
                     }
                     else
@@ -217,6 +250,7 @@ namespace ChristmasPi.Scheduler {
                     HttpResponseMessage response = await httpClient.PostAsync($"{apiURL}/power/on", null);
                     if (response.StatusCode == System.Net.HttpStatusCode.OK) {
                         Console.WriteLine($"[{DateTime.Now.ToShortDateString()}-{DateTime.Now.ToShortTimeString()}]Successfully turned on");
+                        TurnedOn = true;
                         break;
                     }
                     else
@@ -234,22 +268,21 @@ namespace ChristmasPi.Scheduler {
 
 
         // loads the schedule if the schedule file exists
-        private bool loadSchedule() {
-            lastRule = null;
+        private void loadSchedule() {
+            TurnedOn = null;
             if (File.Exists(ScheduleFileLoc)) {
                 try {
                     string json = File.ReadAllText(ScheduleFileLoc);
                     schedule = JsonConvert.DeserializeObject<WeekSchedule>(json);
-                    return true;
                 }
                 catch (Exception e) {
                     if (DebugLog) Console.WriteLine($"Encountered an exception loading the schedule {e}");
-                    return false;
+                    schedule = null;
                 }
             }
             else {
                 if (DebugLog) Console.WriteLine($"Failed to load schedule {ScheduleFileLoc} doesn't exist");
-                return false;
+                schedule = null;
             }
         }
 
