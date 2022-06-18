@@ -27,12 +27,17 @@ namespace ChristmasPi.Util {
         /// <summary>
         /// Calculates the number of frames shown in a given time
         /// </summary>
-        /// <param name="time">Total time of the clip</param>
+        /// <param name="time">Total time of the clip in seconds</param>
         /// <param name="fps">Frame rate of the animation</param>
         /// <returns>Number of frames to be shown</returns>
         public static int FrameCount(float time, int fps) {
             float num = time * fps;
             return (int)num;
+        }
+
+        // the time in ms that a frame is visible
+        public static float FrameTime(int fps) {
+            return (float)(1 / (float)fps);
         }
     }
 }
